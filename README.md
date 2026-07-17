@@ -1,7 +1,7 @@
 # ai-engineering
 
-![Version](https://img.shields.io/badge/version-0.2.0-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-3-22c55e?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.3.0-6366f1?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-4-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -24,6 +24,7 @@ CLAUDE.md    Instructions Claude reads when working in this repo
 | [bump-version](skills/bump-version/SKILL.md) | Cut a release: bump the version, sync it into `README.md`, and write a `CHANGELOG.md` entry derived from the git diff. |
 | [imp-sonnet](skills/imp-sonnet/SKILL.md) | Main agent plans the discussed changes, a Sonnet subagent implements them, then the main agent reviews, fixes, and summarizes. |
 | [basic-review](skills/basic-review/SKILL.md) | Quick sanity check of the current diff for bugs, security issues, and over-engineering, reported as a severity (0–3) table. |
+| [fix-input-overflow](skills/fix-input-overflow/SKILL.md) | Assess whether the app's native date/month/time inputs overflow on iOS Safari, and apply the global CSS reset fix if so. |
 
 ## Conventions
 
