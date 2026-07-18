@@ -9,7 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.0] - 2026-07-17
+## [0.4.0] - 2026-07-18
+
+### Added
+- `review-dax-insights` skill — reviews a product, feature, or launch plan against Dax Raad's three product principles (shareable "cool" marketing, one singular Aha moment reached in <60 s, primitives-first retention); reports a ✅/⚠️/❌/❓ table with the highest-leverage action per gap. Assess-only, no changes applied. Source doc kept verbatim as `dax-insights.md` alongside the skill.
+- `review-website-design` skill — reviews a website or design against the premium-website psychology framework (Halo Effect first impression, cognitive fluency, Peak-End micro-interactions, 2026 trends layer, client delivery & ownership); same status-table report format, assess-only. Full framework with the trends table kept as `premium-website-framework.md`.
+- `fix-react-doctor` skill — runs `npx react-doctor@latest` and iteratively fixes reported React anti-patterns until the score reaches 100, with guardrails: behavior-preserving edits only, build/typecheck verification each iteration, no rule suppression to chase the score, and early-stop when the score plateaus. Leaves changes uncommitted for review.
+
+### Changed
+- README: skills badge 4 → 7 and Skills table rows for the three new skills.
 
 ### Added
 - `fix-input-overflow` skill — assesses whether the current app's native `date`/`month`/`time`/`datetime-local` inputs suffer the iOS Safari intrinsic-width overflow (greps for usage, checks for an existing reset), applies the global CSS `appearance: none` + `min-width: 0` + `::-webkit-date-and-time-value` fix to the root stylesheet if so, then verifies with the project build.

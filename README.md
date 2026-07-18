@@ -1,7 +1,7 @@
 # ai-engineering
 
-![Version](https://img.shields.io/badge/version-0.3.0-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-4-22c55e?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.4.0-6366f1?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-7-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -25,6 +25,9 @@ CLAUDE.md    Instructions Claude reads when working in this repo
 | [imp-sonnet](skills/imp-sonnet/SKILL.md) | Main agent plans the discussed changes, a Sonnet subagent implements them, then the main agent reviews, fixes, and summarizes. |
 | [basic-review](skills/basic-review/SKILL.md) | Quick sanity check of the current diff for bugs, security issues, and over-engineering, reported as a severity (0–3) table. |
 | [fix-input-overflow](skills/fix-input-overflow/SKILL.md) | Assess whether the app's native date/month/time inputs overflow on iOS Safari, and apply the global CSS reset fix if so. |
+| [review-dax-insights](skills/review-dax-insights/SKILL.md) | Review a product, feature, or launch plan against Dax Raad's three principles: shareable marketing, one Aha moment, primitives-first retention. |
+| [review-website-design](skills/review-website-design/SKILL.md) | Review a website against the premium-psychology framework: Halo Effect hero, cognitive fluency, Peak-End micro-interactions, 2026 trends, ownership. |
+| [fix-react-doctor](skills/fix-react-doctor/SKILL.md) | Run `npx react-doctor@latest` and iteratively fix the reported React anti-patterns until the score reaches 100, verifying the build along the way. |
 
 ## Conventions
 
