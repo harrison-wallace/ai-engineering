@@ -1,7 +1,7 @@
 # ai-engineering
 
 ![Version](https://img.shields.io/badge/version-0.4.0-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-7-22c55e?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-9-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -24,6 +24,8 @@ CLAUDE.md    Instructions Claude reads when working in this repo
 | [bump-version](skills/bump-version/SKILL.md) | Cut a release: bump the version, sync it into `README.md`, and write a `CHANGELOG.md` entry derived from the git diff. |
 | [imp-sonnet](skills/imp-sonnet/SKILL.md) | Main agent plans the discussed changes, a Sonnet subagent implements them, then the main agent reviews, fixes, and summarizes. |
 | [basic-review](skills/basic-review/SKILL.md) | Quick sanity check of the current diff for bugs, security issues, and over-engineering, reported as a severity (0–3) table. |
+| [check-diff-public-ready](skills/check-diff-public-ready/SKILL.md) | Pass over the working diff for secrets, PII, internal URLs, and other material unsafe to push to a public repo; report-only severity table. |
+| [check-repo-public-ready](skills/check-repo-public-ready/SKILL.md) | Whole-repo audit for the same public-exposure risks (plus `.gitignore`/hygiene); report-only before open-sourcing or keeping a repo public. |
 | [fix-input-overflow](skills/fix-input-overflow/SKILL.md) | Assess whether the app's native date/month/time inputs overflow on iOS Safari, and apply the global CSS reset fix if so. |
 | [review-dax-insights](skills/review-dax-insights/SKILL.md) | Review a product, feature, or launch plan against Dax Raad's three principles: shareable marketing, one Aha moment, primitives-first retention. |
 | [review-website-design](skills/review-website-design/SKILL.md) | Review a website against the premium-psychology framework: Halo Effect hero, cognitive fluency, Peak-End micro-interactions, 2026 trends, ownership. |

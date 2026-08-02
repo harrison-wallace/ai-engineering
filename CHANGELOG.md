@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `check-diff-public-ready` skill — report-only pass on the working diff (or last commit if clean) for material unsafe on a public repo: secrets/credentials, PII, internal infra, accidental dumps, dangerous committed config; severity table; no fixes applied.
+- `check-repo-public-ready` skill — same public-exposure checklist for the whole tree, plus high-risk path inventory, `.gitignore`/LICENSE hygiene, and an optional bounded history pass; report-only.
+
+### Changed
+- README: skills badge 7 → 9 and Skills table rows for the two new public-ready skills.
+
 ## [0.4.0] - 2026-07-18
 
 ### Added
