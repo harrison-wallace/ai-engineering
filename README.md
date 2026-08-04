@@ -1,7 +1,7 @@
 # ai-engineering
 
-![Version](https://img.shields.io/badge/version-0.4.0-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-9-22c55e?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.5.0-6366f1?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-10-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -30,6 +30,7 @@ CLAUDE.md    Instructions Claude reads when working in this repo
 | [review-dax-insights](skills/review-dax-insights/SKILL.md) | Review a product, feature, or launch plan against Dax Raad's three principles: shareable marketing, one Aha moment, primitives-first retention. |
 | [review-website-design](skills/review-website-design/SKILL.md) | Review a website against the premium-psychology framework: Halo Effect hero, cognitive fluency, Peak-End micro-interactions, 2026 trends, ownership. |
 | [fix-react-doctor](skills/fix-react-doctor/SKILL.md) | Run `npx react-doctor@latest` and iteratively fix the reported React anti-patterns until the score reaches 100, verifying the build along the way. |
+| [check-npm-supply-chain](skills/check-npm-supply-chain/SKILL.md) | Audit a repo for npm supply-chain compromise indicators (Shai-Hulud-style worms): malicious install hooks, stealer payloads, IOCs, lockfile and hardening gaps; report-only. |
 
 ## Conventions
 

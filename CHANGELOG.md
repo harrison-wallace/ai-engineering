@@ -9,12 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-04
+
 ### Added
+- `check-npm-supply-chain` skill — report-only audit for npm supply-chain compromise indicators of the Shai-Hulud-worm class: enumerates `preinstall`/`postinstall`/`prepare` hooks in the project and across `node_modules`, sweeps known IOCs (dropper filenames, exfil workflows, worm-created branches/repos), greps dependencies for credential-stealer patterns (npm/GitHub/AWS/Kubernetes/Vault secret stores), checks lockfile integrity, and reports hardening gaps (`ignore-scripts`, frozen lockfiles, token hygiene) in the standard 0–3 severity table.
 - `check-diff-public-ready` skill — report-only pass on the working diff (or last commit if clean) for material unsafe on a public repo: secrets/credentials, PII, internal infra, accidental dumps, dangerous committed config; severity table; no fixes applied.
 - `check-repo-public-ready` skill — same public-exposure checklist for the whole tree, plus high-risk path inventory, `.gitignore`/LICENSE hygiene, and an optional bounded history pass; report-only.
 
 ### Changed
-- README: skills badge 7 → 9 and Skills table rows for the two new public-ready skills.
+- README: skills badge 7 → 10 and Skills table rows for the three new skills.
 
 ## [0.4.0] - 2026-07-18
 
