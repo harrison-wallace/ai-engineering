@@ -1,7 +1,7 @@
 # ai-engineering
 
-![Version](https://img.shields.io/badge/version-0.5.0-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-10-22c55e?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.6.0-6366f1?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-13-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -19,18 +19,46 @@ CLAUDE.md    Instructions Claude reads when working in this repo
 
 ## Skills
 
+### Review & audit
+
+| Skill | Description |
+|---|---|
+| [basic-review](skills/basic-review/SKILL.md) | Quick sanity check of the current diff for bugs, security issues, and over-engineering, reported as a severity (0–3) table. |
+| [check-diff-public-ready](skills/check-diff-public-ready/SKILL.md) | Pass over the working diff for secrets, PII, internal URLs, and other material unsafe to push to a public repo; report-only severity table. |
+| [check-repo-public-ready](skills/check-repo-public-ready/SKILL.md) | Whole-repo audit for the same public-exposure risks (plus `.gitignore`/hygiene); report-only before open-sourcing or keeping a repo public. |
+| [check-npm-supply-chain](skills/check-npm-supply-chain/SKILL.md) | Audit a repo for npm supply-chain compromise indicators (Shai-Hulud-style worms): malicious install hooks, stealer payloads, IOCs, lockfile and hardening gaps; report-only. |
+
+### AWS
+
+Read-only, single-account, `aws` CLI. Every dollar figure they emit is labelled
+as an estimate; none of them mutate infrastructure.
+
+| Skill | Description |
+|---|---|
+| [aws-cost-mtd](skills/aws-cost-mtd/SKILL.md) | Month-to-date spend by service and region from Cost Explorer, with run-rate, month-end forecast, and deltas vs last month. |
+| [aws-cost-optimize](skills/aws-cost-optimize/SKILL.md) | Savings sweep: Cost Optimization Hub and Compute Optimizer plus direct hunts for idle/orphaned resources and Savings Plans coverage gaps, ranked by estimated monthly saving. |
+| [aws-s3-audit](skills/aws-s3-audit/SKILL.md) | Per-bucket audit of security posture (public access, encryption, TLS, versioning) and cost (lifecycle gaps, version bloat, abandoned multipart uploads, storage-class fit). |
+
+### Fix & apply
+
+| Skill | Description |
+|---|---|
+| [fix-input-overflow](skills/fix-input-overflow/SKILL.md) | Assess whether the app's native date/month/time inputs overflow on iOS Safari, and apply the global CSS reset fix if so. |
+| [fix-react-doctor](skills/fix-react-doctor/SKILL.md) | Run `npx react-doctor@latest` and iteratively fix the reported React anti-patterns until the score reaches 100, verifying the build along the way. |
+
+### Product & design
+
+| Skill | Description |
+|---|---|
+| [review-dax-insights](skills/review-dax-insights/SKILL.md) | Review a product, feature, or launch plan against Dax Raad's three principles: shareable marketing, one Aha moment, primitives-first retention. |
+| [review-website-design](skills/review-website-design/SKILL.md) | Review a website against the premium-psychology framework: Halo Effect hero, cognitive fluency, Peak-End micro-interactions, 2026 trends, ownership. |
+
+### Repo workflow
+
 | Skill | Description |
 |---|---|
 | [bump-version](skills/bump-version/SKILL.md) | Cut a release: bump the version, sync it into `README.md`, and write a `CHANGELOG.md` entry derived from the git diff. |
 | [imp-sonnet](skills/imp-sonnet/SKILL.md) | Main agent plans the discussed changes, a Sonnet subagent implements them, then the main agent reviews, fixes, and summarizes. |
-| [basic-review](skills/basic-review/SKILL.md) | Quick sanity check of the current diff for bugs, security issues, and over-engineering, reported as a severity (0–3) table. |
-| [check-diff-public-ready](skills/check-diff-public-ready/SKILL.md) | Pass over the working diff for secrets, PII, internal URLs, and other material unsafe to push to a public repo; report-only severity table. |
-| [check-repo-public-ready](skills/check-repo-public-ready/SKILL.md) | Whole-repo audit for the same public-exposure risks (plus `.gitignore`/hygiene); report-only before open-sourcing or keeping a repo public. |
-| [fix-input-overflow](skills/fix-input-overflow/SKILL.md) | Assess whether the app's native date/month/time inputs overflow on iOS Safari, and apply the global CSS reset fix if so. |
-| [review-dax-insights](skills/review-dax-insights/SKILL.md) | Review a product, feature, or launch plan against Dax Raad's three principles: shareable marketing, one Aha moment, primitives-first retention. |
-| [review-website-design](skills/review-website-design/SKILL.md) | Review a website against the premium-psychology framework: Halo Effect hero, cognitive fluency, Peak-End micro-interactions, 2026 trends, ownership. |
-| [fix-react-doctor](skills/fix-react-doctor/SKILL.md) | Run `npx react-doctor@latest` and iteratively fix the reported React anti-patterns until the score reaches 100, verifying the build along the way. |
-| [check-npm-supply-chain](skills/check-npm-supply-chain/SKILL.md) | Audit a repo for npm supply-chain compromise indicators (Shai-Hulud-style worms): malicious install hooks, stealer payloads, IOCs, lockfile and hardening gaps; report-only. |
 
 ## Conventions
 

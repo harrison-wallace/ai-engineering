@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-04
+
+### Added
+- `aws-cost-mtd` skill — read-only month-to-date spend report for a single AWS account via Cost Explorer: breakdown by service (and region on demand), delta against the same days of the previous month, daily trend to catch step changes, and a month-end forecast. Picks `UnblendedCost` vs `AmortizedCost` deliberately by first checking whether Savings Plans or RIs exist, and filters credits/refunds out of service attribution. Opens with a **blocking cost gate**: the free identity calls run first so the account can be named, then it states the request count and dollar total ($0.01 per Cost Explorer request) and waits for approval before any billable call.
+- `aws-cost-optimize` skill — read-only savings sweep for a single account, ranked by estimated monthly saving with effort and risk columns. Combines AWS's own recommenders (Cost Optimization Hub, Compute Optimizer, Cost Explorer rightsizing, Trusted Advisor) with direct sweeps that need no enrolment: unattached EBS volumes, gp2→gp3 candidates, unassociated Elastic IPs, long-stopped instances, idle NAT gateways and load balancers (verified against 14 days of CloudWatch), stale snapshots, idle RDS, and log groups with no retention. Also reports Savings Plans/RI coverage and utilisation as opposite failure modes. Gates only the Cost Explorer portion (~$0.06) and degrades gracefully if declined or if the account is not enrolled in the optional recommenders.
+- `aws-s3-audit` skill — per-bucket audit of one account producing two tables: security by 0–3 severity (public access block, policy/ACL exposure, encryption, TLS-only enforcement, object ownership, versioning, logging, KMS bucket keys) and cost by estimated monthly saving (missing multipart-abort rules, noncurrent-version bloat, absent lifecycle transitions, storage-class fit). Measures bucket size from free CloudWatch storage metrics rather than recursive `s3 ls`, which is billed per request and can run for hours on a large bucket.
+
+### Changed
+- README: skills badge 10 → 13, and the single flat Skills table split into five category tables (Review & audit, AWS, Fix & apply, Product & design, Repo workflow) so related skills group together as the list grows.
+
 ## [0.5.0] - 2026-08-04
 
 ### Added
@@ -28,6 +38,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - README: skills badge 4 → 7 and Skills table rows for the three new skills.
+
+## [0.3.0] - 2026-07-17
 
 ### Added
 - `fix-input-overflow` skill — assesses whether the current app's native `date`/`month`/`time`/`datetime-local` inputs suffer the iOS Safari intrinsic-width overflow (greps for usage, checks for an existing reset), applies the global CSS `appearance: none` + `min-width: 0` + `::-webkit-date-and-time-value` fix to the root stylesheet if so, then verifies with the project build.
