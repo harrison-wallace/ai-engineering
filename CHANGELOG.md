@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-08-06
+
+### Added
+- `imp-grok-4-5` skill — same plan/delegate/review/summarize split as `imp-sonnet`, but the implementation phase runs Grok 4.5 instead of a Claude subagent. Because the `Agent` tool can only spawn Claude models, delegation shells out to the `grok` CLI in headless mode (`grok --prompt-file … --model grok-4.5 --permission-mode acceptEdits --cwd <repo>`) via `Bash`. The plan goes through `--prompt-file` rather than an inline argument so long prompts survive shell quoting, and the prompt must be self-contained since Grok starts with no access to the conversation. Adds a `command -v grok` preflight that aborts rather than silently falling back to a Claude implementation, pins the Bash timeout to 600 s for the agent loop, and instructs Grok not to run git write commands — with the review phase checking `git log` in case it does anyway. Verified end to end against `grok 0.2.118`: file edits, shell commands, and test runs all work headless under `acceptEdits`, which is used deliberately because `bypassPermissions` is blocked by Claude Code's auto-mode classifier and stricter modes stall with no way to prompt.
+
+### Changed
+- README: skills badge 13 → 14, and `imp-grok-4-5` added to the Repo workflow table.
+
 ## [0.6.0] - 2026-08-04
 
 ### Added
