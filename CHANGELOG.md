@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-08-06
+
+### Changed
+- `imp-grok-4-5`: the delegation command now runs Grok under `--always-approve` with explicit `--deny` rules (`git commit/push/add/tag/reset/checkout/stash`, `rm -rf`) instead of `--permission-mode acceptEdits`. In headless mode a permission prompt has nobody to answer it — it resolves as `cancelled`, ends the turn, and the process still exits 0, so `acceptEdits` silently killed runs on the first `search_replace`. Deny rules beat always-approve and are checked against every segment of a chained command, so "don't commit" becomes enforced rather than a request in the prompt file.
+- `imp-grok-4-5`: the run is now capped with `--max-turns 300` and redirected to `<scratchpad>/grok-run.log` (read back with `tail`) rather than piped, so evidence survives a bad run.
+- `imp-grok-4-5`: added a mandatory post-run check that `git status --short` / `git diff --stat` is non-empty before reading Grok's report — exit 0 and confident stdout narration are not evidence that anything was written.
+
+### Added
+- `imp-grok-4-5`: a "Troubleshooting a run that did nothing" section — how to locate and parse the session trace at `~/.grok/sessions/<url-encoded-cwd>/<session-id>/events.jsonl`, a table mapping trace outcomes (permission `cancelled`, max-turns exhausted, no edit-tool call, no tool call at all) to causes and fixes, and two footguns: a leading `~/` in a Grok permission rule is literal glob text (so `Edit(~/git/**)` matches nothing, which is why a `/tmp` smoke test can pass while a run under `~/git` fails), and a `Blocked by classifier` denial comes from Claude Code's own permission layer — report it and offer the `! grok …` escape hatch rather than working around it. Caps escalation at two attempts before reporting.
+
 ## [0.7.0] - 2026-08-06
 
 ### Added
