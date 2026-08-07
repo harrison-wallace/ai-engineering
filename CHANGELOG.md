@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-08-07
+
+### Changed
+- `imp-grok-4-5`: phase 2 standing instructions now tell Grok to look for an existing helper before writing a new one — name likely directories, grep them first, and report which helpers were reused. A cold agent otherwise reimplements a hardened sibling (e.g. a full-file read next to a bounded tail-read) that already exists a module away.
+- `imp-grok-4-5`: the headless invocation must be run exactly as written — appending `; echo "exit: $?"` or any other chain turns the call into a multi-segment command that Claude Code's classifier can block before it reaches a shell. The worktree check is the real evidence of success.
+- `imp-grok-4-5`: the "Blocked by classifier" footgun now opens with "did you change the command?" as the first check, notes that a skill working all day is evidence *for* a local deviation not against it, and points at a Bash permission rule for `grok` in `.claude/settings.json` as the durable fix.
+
 ## [0.8.0] - 2026-08-07
 
 ### Added

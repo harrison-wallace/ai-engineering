@@ -43,6 +43,14 @@ Include these standing instructions in the prompt file:
   directory, lockfile, `Makefile`, CI config, `package.json` scripts — to use what it finds, and
   to report the command it settled on so you can re-run it in phase 3. This applies to every
   delegation.
+- **Tell it to look for an existing helper before writing a new one.** A cold agent cannot know
+  what the repo already has, so it writes its own version of things that already exist a module
+  away — and the duplicate is usually the worse one, because the original was hardened by a bug
+  the newcomer has not hit yet. A provider that reads the whole of a growing append-only file
+  will pass every test and fall over after an hour of real use, next to a sibling module with a
+  bounded tail-read helper it never looked for. Name the directories most likely to hold prior
+  art, tell Grok to grep them before adding any helper, and to list in its report which existing
+  helpers it reused. This applies to every delegation.
 - **An async call started before unmount keeps running.** Unmounting a component does not cancel
   work already in flight. Whenever the plan involves aborting, retrying, or resuming on remount,
   the prompt file must state explicitly whether the original in-flight call is cancelled or
@@ -89,6 +97,10 @@ request in the prompt file into an enforced block.
 - Redirect to a log file rather than piping into `tail`. When a run misbehaves the evidence has to
   survive.
 - Do not `cd` into the repo *and* pass `--cwd`; `--cwd` alone is enough.
+- **Run the invocation exactly as written and append nothing to it.** Adding even
+  `; echo "exit: $?"` turns it into a chained command, and chained commands are classified
+  segment by segment — which can get the entire call blocked before it reaches a shell. The exit
+  code is not worth it; the worktree check below is the real evidence anyway.
 - If the run fails, times out, or produces no diff, report exactly that to the user before doing
   anything else — do not quietly implement it yourself instead.
 
@@ -144,9 +156,16 @@ Two footguns worth knowing before they cost an hour:
   smoke test can pass while the same run fails inside a repo under `~/git`. Path rules must be
   written with absolute paths or `**/` patterns.
 - **Claude Code's own permission classifier may block the `grok` call.** That is a denial on *this*
-  side, not a Grok failure, and it reads `Blocked by classifier`. Do not try to work around it.
+  side, not a Grok failure, and it reads `Blocked by classifier`. **First check whether you changed
+  the command.** Appending anything — `; echo "exit: $?"`, an `&&` chain, a pipe — makes it a
+  chained command and is the most common trigger, so retry the invocation verbatim before
+  concluding anything else. Note that a user reporting the skill has worked all day is evidence
+  *for* this cause, not against it: the template is fine and the deviation is yours. If the
+  verbatim call is still blocked, do not try to work around it — renaming the binary, wrapping it
+  in a script, or routing it through another tool all circumvent the check rather than satisfy it.
   Tell the user, and offer that they run the exact command themselves by typing `! grok …` in the
-  prompt so its output lands in the conversation — then pick up at phase 3.
+  prompt so its output lands in the conversation — then pick up at phase 3. A Bash permission rule
+  for `grok` in the project's `.claude/settings.json` is the durable fix.
 
 Escalate at most twice, then stop and report. Never substitute your own implementation for Grok's
 without the user saying so.
