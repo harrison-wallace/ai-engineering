@@ -34,6 +34,25 @@ Write the plan to a prompt file in the scratchpad directory — never inline a l
 
 The prompt file must be self-contained. Grok starts cold with **no access to this conversation**: include the goal, absolute file paths, relevant snippets and conventions it cannot infer, and the acceptance criteria. Instruct it to implement exactly the plan — no scope additions — to report which files it changed, and **not to run `git commit`, `git push`, or any other git write command** (the `--deny` rules below enforce this, but saying it in the prompt stops Grok wasting a turn on a blocked call).
 
+Include these standing instructions in the prompt file:
+
+- **Discover the toolchain; do not assume it.** Any interpreter, test runner, or build command
+  written into the acceptance criteria is a guess until verified. A plan can say `python -m pytest`
+  while the repo in fact only has a virtualenv interpreter such as `venv/bin/python` and no
+  `python` on `PATH`. Tell Grok to find the project's actual interpreter and test runner — venv
+  directory, lockfile, `Makefile`, CI config, `package.json` scripts — to use what it finds, and
+  to report the command it settled on so you can re-run it in phase 3. This applies to every
+  delegation.
+- **An async call started before unmount keeps running.** Unmounting a component does not cancel
+  work already in flight. Whenever the plan involves aborting, retrying, or resuming on remount,
+  the prompt file must state explicitly whether the original in-flight call is cancelled or
+  allowed to complete. Left unstated, Grok guesses, and the guess is where the defects land.
+  Include this only when component lifecycle or in-flight async work is in scope.
+- **Give every style constraint a command that checks it.** A constraint stated as an adjective —
+  "wrap at roughly 100 columns", "match the surrounding indentation" — is not something a cold
+  agent can confirm, and it drifts. Write the check next to the constraint
+  (`awk '{print length}' <file> | sort -n | tail -1`) and tell Grok to run it before reporting.
+
 Then run it from the repo root:
 
 ```bash
@@ -95,7 +114,7 @@ writes a machine-readable trace of every tool call and permission decision:
 ```
 
 The directory name is the working directory with `/` percent-encoded as `%2F` (so
-`/home/h/git/AgentLens` → `%2Fhome%2Fh%2Fgit%2FAgentLens`); take the newest session directory
+`/home/you/git/my-project` → `%2Fhome%2Fyou%2Fgit%2Fmy-project`); take the newest session directory
 inside it. Filter for the decisions:
 
 ```bash

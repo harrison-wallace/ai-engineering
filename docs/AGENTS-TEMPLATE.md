@@ -10,6 +10,8 @@ Rules for authors:
   standardized verbatim across all repos — do not edit them per-project.
 - Replace every <placeholder>. Delete any subsection that doesn't apply
   (e.g. "Database" for a DB-less app — or retitle it "No Database" and say so).
+- Machine-specific values — absolute paths, hostnames, usernames — belong in
+  the copy, not here. Keep them as <placeholders> in this template.
 - Keep it short: most repos are 60–130 lines. Project-specific sections
   (architecture, domain rules) go between Code Conventions and Additional Notes.
 - Delete these comments from the copy.
@@ -62,7 +64,7 @@ This file outlines guidelines for AI coding agents interacting with this project
 
 ### Access & Networking
 
-- <how the app is reached: e.g. "LAN: `https://<name>.lan` via Caddy reverse proxy (`/home/h/git/proxy-local/Caddyfile`), mkcert TLS certs" or "Cloudflare Zero Trust tunnel; no open inbound ports.">
+- <how the app is reached: e.g. "LAN: `https://<name>.lan` via Caddy reverse proxy (`<path to Caddyfile>`), mkcert TLS certs" or "Cloudflare Zero Trust tunnel; no open inbound ports.">
 - <container/network requirements: e.g. "Container `<name>` must be on `--network proxy` with port `<port>` mapped.">
 
 ### Database
@@ -115,7 +117,7 @@ Or, if there is no local script, use the global `/bump-version` skill.
 - Always prioritise security best practices in code, documentation, and infrastructure suggestions.
 - These guidelines may be updated; always refer to the latest version in the repo.
 
-## Local Test-Serving Port (standardized across ~/git)
+## Local Test-Serving Port (standardized across all repos)
 
 - **Reserved port: `38080`.** When serving the app locally to test a change (dev server, preview, etc.), bind it to **38080** — e.g. `next dev -p 38080`, `vite --port 38080`, `PORT=38080 npm start`. Never serve on the app's default/production port (3000, 5173, 8080, …) so you don't collide with a real running instance.
 - **Always shut the test server down when finished** — never leave it running.

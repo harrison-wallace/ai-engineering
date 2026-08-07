@@ -1,7 +1,7 @@
 # ai-engineering
 
-![Version](https://img.shields.io/badge/version-0.7.2-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-14-22c55e?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.8.0-6366f1?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-15-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -58,6 +58,7 @@ as an estimate; none of them mutate infrastructure.
 | Skill | Description |
 |---|---|
 | [bump-version](skills/bump-version/SKILL.md) | Cut a release: bump the version, sync it into `README.md`, and write a `CHANGELOG.md` entry derived from the git diff. |
+| [bump-version-sonnet](skills/bump-version-sonnet/SKILL.md) | The same release split in two: the main agent derives it from the diff and writes the changelog prose, a Sonnet subagent applies the file edits verbatim, the main agent verifies. |
 | [imp-grok-4-5](skills/imp-grok-4-5/SKILL.md) | Main agent plans the discussed changes, the headless `grok` CLI (Grok 4.5) implements them, then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
 | [imp-sonnet](skills/imp-sonnet/SKILL.md) | Main agent plans the discussed changes, a Sonnet subagent implements them, then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
 
@@ -85,10 +86,10 @@ standardized verbatim across repos — edit those here, not per-project.
 ## Installing (symlinks)
 
 This repo is the source of truth; `~/.claude` just points at it. Install a skill by
-symlinking its directory:
+symlinking its directory — run these from the repo root, so `$PWD` resolves to it:
 
 ```bash
-ln -sfn ~/git/ai-engineering/skills/<name> ~/.claude/skills/<name>
+ln -sfn "$PWD/skills/<name>" ~/.claude/skills/<name>
 ```
 
 Edits made here are live in Claude Code immediately — no copying or re-syncing —
@@ -103,11 +104,11 @@ If you run Claude Code with multiple profiles (separate config directories selec
 via `CLAUDE_CONFIG_DIR` — see [docs/CLAUDE-PROFILES.md](docs/CLAUDE-PROFILES.md) for
 how to set them up), each profile has its own `skills/` directory and none of them
 inherit from `~/.claude`. Symlink into every profile **directly** — never chain one
-profile's link through another's:
+profile's link through another's, again from the repo root:
 
 ```bash
 for d in ~/.claude ~/.claude-*; do
-  ln -sfn ~/git/ai-engineering/skills/<name> "$d/skills/<name>"
+  ln -sfn "$PWD/skills/<name>" "$d/skills/<name>"
 done
 ```
 

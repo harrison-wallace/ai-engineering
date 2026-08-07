@@ -29,6 +29,26 @@ Launch a subagent with the Agent tool:
 
 Do not commit, and instruct the subagent not to commit either.
 
+Include these standing instructions in the subagent prompt:
+
+- **Discover the toolchain; do not assume it.** Any interpreter, test runner, or build command
+  written into the acceptance criteria is a guess until verified. A plan can say `python -m pytest`
+  while the repo in fact only has a virtualenv interpreter such as `venv/bin/python` and no
+  `python` on `PATH`. Instruct the subagent to find the project's actual interpreter and test
+  runner — venv directory, lockfile, `Makefile`, CI config, `package.json` scripts — to use what
+  it finds, and to report the command it settled on so you can re-run it in phase 3. This applies
+  to every delegation.
+- **An async call started before unmount keeps running.** Unmounting a component does not cancel
+  work already in flight. Whenever the plan involves aborting, retrying, or resuming on remount,
+  the prompt must state explicitly whether the original in-flight call is cancelled or allowed to
+  complete. Left unstated, the subagent guesses, and the guess is where the defects land. Include
+  this only when component lifecycle or in-flight async work is in scope.
+- **Give every style constraint a command that checks it.** A constraint stated as an adjective —
+  "wrap at roughly 100 columns", "match the surrounding indentation" — is not something a cold
+  agent can confirm, and it drifts. Write the check next to the constraint
+  (`awk '{print length}' <file> | sort -n | tail -1`) and tell the subagent to run it before
+  reporting.
+
 ## 3. Review (main agent)
 
 Never trust the subagent's report alone. **Capture the handover before you touch anything** — the

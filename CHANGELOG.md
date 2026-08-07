@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-08-07
+
+### Added
+- `bump-version-sonnet` skill — the same release as `bump-version` split in two: the main agent decides the bump type, derives the release from the diff, and writes the finished `CHANGELOG.md` prose, a Sonnet subagent transcribes it into `package.json` / `README.md` / `CHANGELOG.md` and any stale docs, then the main agent verifies. The judgement cannot be delegated because deriving the release depends on the conversation, and a cold subagent seeing only `git diff` writes worse release notes than the agent that did the work. Three rules carry the split: **the subagent writes no prose** — every word is the main agent's, verbatim, which is what keeps release notes accurate despite delegating and turns verification into a string match rather than a re-read; pre-flight and the idempotency check stay with the main agent, and a failing pre-flight aborts **before** delegation so a subagent is never the thing that decides a failing typecheck is acceptable; and the skill is a thin layer over `bump-version` rather than a fork, so the SemVer table and derivation steps keep one home. Deliberately carries no `imp-*` scorecard — that rubric measures open-ended implementation, and this work is transcription.
+- `imp-grok-4-5`, `imp-sonnet`: a standing-instructions block in phase 2 listing what every delegation prompt must carry. **Discover the toolchain; do not assume it** — an interpreter or test runner written into the acceptance criteria is a guess until verified (a plan can say `python -m pytest` where the repo only has `venv/bin/python`), so the cold agent finds the real one and reports the command it settled on. **An async call started before unmount keeps running** — unmounting does not cancel work already in flight, so any plan involving aborting, retrying, or resuming on remount must state explicitly whether the original in-flight call is cancelled or allowed to complete; left unstated the cold agent guesses, and the guess is where the defects land. **Give every style constraint a command that checks it** — a constraint stated as an adjective ("wrap at roughly 100 columns") is not something a cold agent can confirm, and it drifts, so the check ships next to the constraint.
+- `docs/AGENTS-TEMPLATE.md`: an authoring rule that machine-specific values — absolute paths, hostnames, usernames — stay as `<placeholders>` in the template and are filled in only in the copy.
+
+### Changed
+- `docs/AGENTS-TEMPLATE.md`: the Caddy example path is now `<path to Caddyfile>` instead of a real absolute path, and the port section heading reads "standardized across all repos" rather than naming a personal `~/git` directory. That heading is copied verbatim into every generated `AGENTS.md`, so it propagated one machine's filesystem layout into every repo built from the template.
+- `imp-grok-4-5`: the percent-encoding worked example is now `/home/you/git/my-project` → `%2Fhome%2Fyou%2Fgit%2Fmy-project`, which teaches the encoding identically without shipping a real username and private project name from a public repo.
+- README: the install snippets use `"$PWD/skills/<name>"` run from the repo root instead of a hardcoded clone path, so they work wherever the repo is cloned rather than assuming one layout.
+- README: skills badge 14 → 15, and `bump-version-sonnet` added to the Repo workflow table.
+
 ## [0.7.2] - 2026-08-07
 
 ### Added
