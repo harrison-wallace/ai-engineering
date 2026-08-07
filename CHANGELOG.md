@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-08-07
+
+### Added
+- `imp-grok-4-5`, `imp-sonnet`: a scoring phase (3b) that grades the delegated implementation 1–5 across six dimensions — Fidelity, Bloat, Correctness, Security, Maintainability, Verification — each with written 1/3/5 behavioural anchors, because an unanchored "rate out of 5" returns a 4 every run and cannot be compared across runs. Scores grade **the execution of the plan only, never the plan itself**: a clean build of a mediocre plan scores high, which isolates the one variable being measured. Rules that keep the number meaningful: every score below 5 cites a `file:line` or command output (the model's own report is a claim, not evidence), Security is `N/A` when the diff touches no input/secrets/paths/subprocess, 5 means nothing to change, and the headline is the **lowest** dimension rather than the mean so an elegant implementation of the wrong thing cannot average its way to a 4. The rubric is deliberately identical in both skills so runs stay comparable across models.
+- `imp-grok-4-5`, `imp-sonnet`: an optional `<repo-root>/.imp-scorecard.log` — one line per run (date, model, task, six scores, failure note) appended only if the file already exists, never created unprompted. The model field is what makes Grok and Sonnet runs comparable in one file.
+- `imp-grok-4-5`, `imp-sonnet`: a trailing "Note on the skill" in the summary for the one-line "this would have gone better if the skill had X" observation. Capped at two bullets with zero as an explicitly normal outcome, restricted to repeatable skill-level fixes rather than one-off model mistakes, and barred from editing the skill or opening follow-up work — it is a comment for the user to act on separately.
+
+### Changed
+- `imp-grok-4-5`, `imp-sonnet`: phase 3 split into Review (3) → Score (3b) → Fix (3c). Review now dumps the diff and status to `<scratchpad>/{grok,sonnet}-raw.{diff,status}` and ends with "do not fix anything yet", because the previous single phase fixed problems before any grading and would have scored the repaired code rather than the handover. Fixes explicitly do not revise the scorecard.
+- README: the `imp-grok-4-5` and `imp-sonnet` rows now mention scoring the result out of 5.
+- `imp-sonnet`: corrected the stale "four phases" line in the intro.
+
 ## [0.7.1] - 2026-08-06
 
 ### Changed

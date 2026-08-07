@@ -1,6 +1,6 @@
 # ai-engineering
 
-![Version](https://img.shields.io/badge/version-0.7.1-6366f1?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.7.2-6366f1?style=flat-square)
 ![Skills](https://img.shields.io/badge/skills-14-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
@@ -58,8 +58,8 @@ as an estimate; none of them mutate infrastructure.
 | Skill | Description |
 |---|---|
 | [bump-version](skills/bump-version/SKILL.md) | Cut a release: bump the version, sync it into `README.md`, and write a `CHANGELOG.md` entry derived from the git diff. |
-| [imp-grok-4-5](skills/imp-grok-4-5/SKILL.md) | Main agent plans the discussed changes, the headless `grok` CLI (Grok 4.5) implements them, then the main agent reviews, fixes, and summarizes. |
-| [imp-sonnet](skills/imp-sonnet/SKILL.md) | Main agent plans the discussed changes, a Sonnet subagent implements them, then the main agent reviews, fixes, and summarizes. |
+| [imp-grok-4-5](skills/imp-grok-4-5/SKILL.md) | Main agent plans the discussed changes, the headless `grok` CLI (Grok 4.5) implements them, then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
+| [imp-sonnet](skills/imp-sonnet/SKILL.md) | Main agent plans the discussed changes, a Sonnet subagent implements them, then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
 
 ## Conventions
 
