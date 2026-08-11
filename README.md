@@ -79,9 +79,11 @@ symlinked into place:
 ## AGENTS.md template
 
 [docs/AGENTS-TEMPLATE.md](docs/AGENTS-TEMPLATE.md) is the canonical starting point
-for a new repo's `AGENTS.md`: copy it in, fill the placeholders, delete what doesn't
-apply. Its Core Rules, Additional Notes, and Local Test-Serving Port sections are
-standardized verbatim across repos — edit those here, not per-project.
+for a new repo's `AGENTS.md`: copy it in, fill the `REPO:` blocks, delete what doesn't
+apply. Sections 1 (Core Rules), 2 (Language Style), 6 (Definition of Done), and
+7 (Local Test-Serving Port) are standardized verbatim across repos — edit those
+here, not per-project. Sections 3–5 are per-repo: permitted commands, prohibited
+targets, and the version/changelog flow.
 
 ## Installing (symlinks)
 

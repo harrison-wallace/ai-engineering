@@ -1,123 +1,171 @@
+# AGENTS.md
+
 <!--
-AGENTS-TEMPLATE.md — copy to <repo>/AGENTS.md and fill in.
+AGENTS-TEMPLATE.md — AI agent instructions for a repository.
 
-Section order is fixed; keep it consistent across repos:
-  Core Rules → Permitted → Prohibited → Infrastructure Guidelines →
-  Code Conventions → Versioning → Additional Notes → Local Test-Serving Port
+1. Copy this file to the repository root as AGENTS.md.
+2. Fill every "REPO:" block below.
+3. Delete these comments when you are done.
 
-Rules for authors:
-- "Core Rules", "Additional Notes" bullets, and "Local Test-Serving Port" are
-  standardized verbatim across all repos — do not edit them per-project.
-- Replace every <placeholder>. Delete any subsection that doesn't apply
-  (e.g. "Database" for a DB-less app — or retitle it "No Database" and say so).
-- Machine-specific values — absolute paths, hostnames, usernames — belong in
-  the copy, not here. Keep them as <placeholders> in this template.
-- Keep it short: most repos are 60–130 lines. Project-specific sections
-  (architecture, domain rules) go between Code Conventions and Additional Notes.
-- Delete these comments from the copy.
+Sections 1, 2, 6, and 7 are standardized across repos. They work as they are.
+Edit them here, not per-project. Sections 3, 4, and 5 need real values.
+Machine-specific values — absolute paths, hostnames, usernames — belong in the
+copy, not here. Keep them as <placeholders> in this template.
+Project-specific sections (architecture, domain rules) go between 5 and 6.
 -->
 
-## Core Rules
+This file gives the rules for AI coding agents that work on this project. The
+purpose is to keep collaboration focused, to prevent unwanted automated actions,
+and to keep manual control of deployment and version control.
 
-think before coding
-state your assumptions. ask when unsure. never guess.
-
-→ simplicity first
-write the minimum code that solves the problem.
-no abstractions nobody asked for.
-
-→ surgical changes
-don't touch code unrelated to the request.
-every changed line must trace back to what was asked.
-
-→ goal-driven execution
-turn vague instructions into verifiable success criteria
-before writing a single line.
+If a rule is not clear, ask the owner before you continue. These rules can
+change. Always use the version in the repository.
 
 ---
 
-This file outlines guidelines for AI coding agents interacting with this project. The purpose is to ensure collaboration is focused, prevent unintended automated actions, and maintain control over manual processes like serving, hosting, and version control.
+## 1. Core Rules
 
-## Permitted Actions
+- **Think before you code.** State your assumptions. Ask when you are not sure.
+  Never guess.
+- **Goal-driven execution.** Change a vague instruction into a success criterion
+  that you can verify. Do this before you write code.
+- **Simplicity first.** Write the minimum code that solves the problem. Do not
+  add an abstraction that nobody asked for. Choose the simplest implementation
+  that fully meets the current requirement.
+- **Surgical changes.** Do not touch code that the request does not cover. Each
+  changed line must trace back to the request.
+- **Long-term architecture.** Make architectural decisions for the long term. Do
+  not accept a temporary fix that only works now and that someone must replace
+  later.
+- **Prefer established libraries.** Use a well-maintained library instead of a
+  custom implementation, if a suitable library exists.
+- **Security first.** Apply security best practice in code, in documentation,
+  and in infrastructure suggestions. Never write a credential, an account
+  number, or customer data into the repository.
 
-- Focus exclusively on generating or updating code and documentation.
-- Run build commands like `<npm run build>` to verify output (you may also serve it locally to test a change, then shut it down).
-- Update `README.md` with latest changes to keep it accurate and current.
-- View previous commits and branches if needed for troubleshooting or recovery (but do not make changes).
-- Suggest improvements or optimizations when noticed and relevant to the current task.
-- <extra tool access, e.g. "You have access to `gh` / `aws` CLI commands for infrastructure tasks when explicitly requested.">
+<!--
+REPO: backward compatibility. Keep one of the two lines below. Delete the other.
+- **Do not preserve backward compatibility** unless the owner asks for it. This
+  is an internal tool. A clean design is more important than an old interface.
+- **Preserve backward compatibility.** External clients depend on this
+  interface. A breaking change needs owner approval and a MAJOR version bump.
+-->
 
-## Prohibited Actions
+---
 
-- **Serving/hosting**: You MAY serve or host locally to test a change (e.g. `npm run dev`), but you MUST stop the process as soon as the test is finished — never leave a server running. The owner still handles all production/permanent hosting.
-- **Modifying `.md` files**: Do not create or update any `.md` files unless explicitly asked (exception: proactive updates to `README.md` as noted above, and changelog/version bumps via the release flow below).
-- **Version control**: Do not run `git commit`, `git add`, `git push`, or any related operations. The owner handles all commits manually.
-- <project-specific prohibitions, e.g. "Do not modify the proxy Docker network or Caddy container config without explicit instruction.">
+## 2. Language Style
 
-## Infrastructure Guidelines
+Write all replies and all documentation in ASD-STE100 Simplified Technical
+English. Use these rules:
 
-### CI/CD
+- Use the active voice.
+- Keep each sentence to 20 words or fewer.
+- Give one idea in each sentence.
+- Use simple tenses: present, past, and future.
+- Use the same word for the same idea each time.
+- Do not use idioms, slang, or unnecessary jargon.
+- Keep each paragraph to 6 sentences or fewer.
 
-- <pipeline: e.g. "Jenkins multibranch pipeline (`jenkins/Jenkinsfile`) builds and deploys on `main` only" or "GitHub Actions, single workflow `.github/workflows/deploy.yml`, AWS auth via OIDC — no long-lived credentials.">
-- <quality gates: e.g. "CI always runs `npm run lint` + `npm run typecheck` before build.">
-- Do not suggest or add any other CI system unless explicitly instructed.
+Keep output short. Do not waste tokens. Keep clarity and information density.
 
-### Access & Networking
+---
 
-- <how the app is reached: e.g. "LAN: `https://<name>.lan` via Caddy reverse proxy (`<path to Caddyfile>`), mkcert TLS certs" or "Cloudflare Zero Trust tunnel; no open inbound ports.">
-- <container/network requirements: e.g. "Container `<name>` must be on `--network proxy` with port `<port>` mapped.">
+## 3. Permitted Actions
 
-### Database
+<!--
+REPO: replace this whole list with the real commands and paths for this
+repository. Name the source directories, the exact test commands, the linters,
+and the read-only CLI tools. The examples below are a starting point.
+-->
 
-- <engine, location, backup policy — or delete/retitle "No Database" if the app has none.>
+- Generate or update code in `<SOURCE_DIRS>`.
+- Run the tests to verify a change, for example `<TEST_COMMAND>`.
+- Run a linter or a syntax check, for example `<LINT_COMMAND>`.
+- Validate infrastructure templates in `<IAC_DIR>` with `<IAC_LINT_COMMAND>`.
+- Update `README.md` and `<OTHER_DOCS>` when a code change makes them incorrect.
+- Add or update a plan document in `<PLANS_DIR>`.
+- Read previous commits, branches, and pull requests for troubleshooting. Do not
+  change them.
+- Suggest an improvement or an optimisation when you see one, if it is relevant
+  to the current task.
+- Use `<READ_ONLY_CLI_TOOLS>` for **read-only** tasks. Examples: describe a
+  resource, read a log, read a pull request.
+  - Ask the user to log in to the correct profile or account when you need to
+    read a protected resource.
 
-### Port Reference
+---
 
-| Environment | Port |
-|---|---|
-| Dev (`npm run dev`) | <dev port> |
-| Production container | <prod port> |
+## 4. Prohibited Actions
 
-## Code Conventions
+<!--
+REPO: these are cautious defaults. Replace the <PLACEHOLDER> values with the
+real names for this repository. Keep a rule unless it gets in your way. If you
+loosen one, do it on purpose and not because the agent asked you to.
+-->
 
-- <stack and strictness: e.g. "TypeScript strict; use the existing `typecheck` and `lint` scripts.">
-- <theme/design system and where tokens live: e.g. "tokens in `app/globals.css`.">
-- <where state/APIs/shared UI live.>
-- Prefer small surgical changes; keep the existing style and structure consistent.
+- **Version control.** Do not run `git add`, `git commit`, `git push`,
+  `git rebase`, `git reset`, or any similar operation. The owner does all
+  commits manually.
+- **Deployment.** Do not run `<DEPLOY_SCRIPT>`, do not update an infrastructure
+  stack, and do not publish a release artifact. The owner controls all
+  deployments.
+- **Production writes.** Do not run any write action against
+  `<PRODUCTION_TARGET>`. The owner must give explicit permission first. Where a
+  script or a skill keeps a write behind a confirmation flag, do not remove that
+  flag.
+- **Long-running processes.** You can start a local process to test a change.
+  You must stop the process when the test is complete. Never leave a process
+  running. Section 7 gives the rules for a local test server.
+- **Markdown files.** Do not create or update a `.md` file unless the owner asks
+  for it. The exceptions are a correction to `README.md` after a code change, a
+  correction to a component `README.md` after a code change, and the release
+  flow in section 5.
+- **Secrets.** Do not read, print, or copy a value from a secret store, from a
+  parameter store, or from any credential file.
+- **Destructive actions.** Do not delete, terminate, or modify any deployed
+  resource in any environment.
 
-## Versioning
+---
 
-Version lives in `package.json` and is mirrored in `README.md`. Follow **Semantic Versioning** (`MAJOR.MINOR.PATCH`):
+## 5. Version and Changelog Flow
 
-| Increment | When to use | Examples |
-|---|---|---|
-| `PATCH` (x.x.**1**) | Bug fixes, performance wins, UI tweaks, error handling, dead-code removal | Fix wrong calculation, add try/catch, correct date logic |
-| `MINOR` (x.**1**.0) | New features, new pages, new API endpoints, significant UI additions | New dashboard section, new endpoint, new agent |
-| `MAJOR` (**1**.0.0) | Breaking architectural changes, schema migrations requiring data migration | Swap DB engine, change auth model, complete rewrites |
+<!--
+REPO: name the files that hold the version and the release tool for this
+repository. Delete this section only if the repository has no version at all.
+-->
 
-**To perform a version bump:**
+`<VERSION_FILES>` hold the version. `CHANGELOG.md` contains the full rules. Use
+`<RELEASE_TOOL>` when the owner asks for a release. Do not bump a version on
+your own.
 
-<!-- Keep whichever flow the repo uses; delete the other. -->
+| Increment | When to use | Example |
+| --- | --- | --- |
+| **PATCH** (x.y.+1) | Bug fix, security fix, performance improvement, documentation, or pipeline change. | `<PATCH_EXAMPLE>` |
+| **MINOR** (x.+1.0) | New feature or non-breaking enhancement. | `<MINOR_EXAMPLE>` |
+| **MAJOR** (+1.0.0) | Breaking change that affects an existing client. | `<MAJOR_EXAMPLE>` |
 
-```bash
-./scripts/bump-version.sh (patch|minor|major) "One-sentence summary of what changed"
-```
+Each changelog entry starts with a keyword: `ADDED`, `CHANGED`, `FIXED`,
+`SECURITY`, `PERFORMANCE`, `DOCUMENTATION`, or `PIPELINE`. Each entry names the
+Jira ticket, for example `<TICKET_EXAMPLE>`.
 
-Or, if there is no local script, use the global `/bump-version` skill.
+<!-- Project-specific sections (architecture, domain rules, sprint workflow,
+     etc.) go here, before section 6. -->
 
-**Always** update `CHANGELOG.md` in the same session as the version bump. Each entry must include what changed, what was fixed, and why it matters (brief). Use the headers `### Added`, `### Changed`, `### Fixed`, `### Removed` — omit empty sections. Creating/updating `CHANGELOG.md` and the version line in `README.md` is **explicitly permitted** as part of the release process; all other `.md` modification rules remain in force.
+---
 
-<!-- Project-specific sections (architecture, domain rules, sprint workflow, etc.)
-     go here, before Additional Notes. -->
+## 6. Definition of Done
 
-## Additional Notes
+Before you report a task as complete, confirm each point:
 
-- If clarification is needed on any rule, ask the owner before proceeding.
-- Keep output concise — avoid wasting tokens while maintaining clarity and information density.
-- Always prioritise security best practices in code, documentation, and infrastructure suggestions.
-- These guidelines may be updated; always refer to the latest version in the repo.
+1. The change meets the success criterion that you stated at the start.
+2. You did not change unrelated code.
+3. The tests pass, or you report the failure with the output.
+4. The documentation is correct, if the change made it incorrect.
+5. You state what you did not do, and you give the reason.
 
-## Local Test-Serving Port (standardized across all repos)
+---
+
+## 7. Local Test-Serving Port (standardized across all repos)
 
 - **Reserved port: `38080`.** When serving the app locally to test a change (dev server, preview, etc.), bind it to **38080** — e.g. `next dev -p 38080`, `vite --port 38080`, `PORT=38080 npm start`. Never serve on the app's default/production port (3000, 5173, 8080, …) so you don't collide with a real running instance.
 - **Always shut the test server down when finished** — never leave it running.
