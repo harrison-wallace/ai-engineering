@@ -25,7 +25,7 @@ the long-horizon files. Checkboxes stay in the phase doc.
 | `/session-start` | Sit down: propose Now/Next from plans + phases + git. Write only after the user confirms (or named Now in the same message). |
 | `/session-check` | Read-only brief. Flags stale → `/session-snap`. |
 | `/session-snap` | Mid-sitting rewrite so SESSION matches git + this chat. Does not close. |
-| `/session-end` | Formal close: promote Next, prune old Parking, stop. |
+| `/session-end` | Formal close: promote Next, append sittings log, prune old Parking, stop. |
 | `/session-prune` | Propose archive/index tidy of `docs/plans` and `docs/phases`. Confirm each. |
 | `/session-help` | Print this table. |
 
@@ -34,6 +34,9 @@ Do not name a command `/session` or `/status` (Grok built-ins: `/sessions`, `/se
 ## Path
 
 Always `docs/plans/SESSION.md`. Create `docs/plans/` if it does not exist.
+
+Sitting log (end only): `docs/plans/archive/sittings.md`. Create on first
+`/session-end`. Start, check, and snap do not read or write it.
 
 Migrate, then continue (never keep two handshake files):
 
@@ -49,6 +52,7 @@ One file. Never both.
 | This sitting's queue | SESSION Now / Next | — |
 | Half-formed idea | SESSION Parking | A second `THOUGHTS.md` |
 | Work just done | git + Last session | A running changelog |
+| Closed sitting | `docs/plans/archive/sittings.md` | SESSION Last session as a pile; product `CHANGELOG.md` |
 | Locked choice | Decision log (`DECISIONS.md` or ADRs) | Reciting the decision |
 | Phase how / DoD / checkboxes | `docs/phases/` (or `docs/plans/mvp/`) | A second checklist |
 | Multi-month map | Master plan / `IMPLEMENTATION-PLAN.md` / `PROGRESS.md` | Copying the roadmap |
@@ -80,6 +84,7 @@ Do not run that command.
    `Milestone` (from the current in-progress phase or plan if obvious, else
    `none`), and **Now** (`none` unless the next action is obvious).
 4. Leave Next / Blocked / Last session / Parking empty rather than inventing.
+   Do not create `archive/sittings.md`.
 5. Append the two gitignore lines as under Gitignore.
 6. Tell the user to run `/session-start`. Do not start product work.
 
@@ -87,7 +92,7 @@ Do not run that command.
 
 Sit down and scope. Do not implement.
 
-**Read (skip `archive/` and `ROADMAP.md` as Next):**
+**Read (skip `archive/` — including `archive/sittings.md` — and `ROADMAP.md` as Next):**
 
 - `docs/plans/SESSION.md`
 - other files in `docs/plans/` and `docs/phases/`
@@ -96,6 +101,9 @@ Sit down and scope. Do not implement.
 - the current **in-progress** phase doc (🟡 / 🔨 / 🟦 / "in progress"), not
   the next empty one
 - last ~10 commits and the dirty tree
+
+Do not read `docs/plans/archive/sittings.md`. Last session is the previous
+sitting.
 
 **Propose** one Now and 3–7 Next, each with evidence ("from PHASE-6.md",
 "dirty README"). Now is one slice, not a whole phase. Milestone is a pointer
@@ -116,7 +124,8 @@ Read only. Do not edit the file.
 
 1. If `docs/plans/SESSION.md` is missing, say so and tell the user to run
    `/session-init`. Stop. (Init also migrates `STATUS.md`.)
-2. Read SESSION. Then only the docs the Now item needs.
+2. Read SESSION. Then only the docs the Now item needs. Do not read
+   `archive/sittings.md`.
 3. Brief in 4–6 lines: Now, Next (headlines), Blocked, Parking count.
 4. Stale: commits after `Updated`, or dirty files **not** named in Last
    session → **stale → run `/session-snap`**. Dirty files already listed
@@ -135,12 +144,13 @@ Mid-sitting save. Rewrite the file. Do not append. Do not close.
 4. Replace Last session with what landed and what did not since the previous
    `Updated` (git log + working tree + this conversation).
 5. Park new thoughts. Do **not** prune Parking for age (that is end).
-6. Do not treat the sitting as over. Do not keep implementing unless the user
+6. Do not write `archive/sittings.md` (that is end).
+7. Do not treat the sitting as over. Do not keep implementing unless the user
    asked for more work in the same turn.
 
 ### End (`/session-end`)
 
-Formal close. Rewrite the file. Do not append.
+Formal close. Rewrite SESSION. Do not append SESSION.
 
 1. If `docs/plans/SESSION.md` is missing, say so and tell the user to run
    `/session-init`. Stop.
@@ -148,9 +158,14 @@ Formal close. Rewrite the file. Do not append.
 3. Move a finished Now off. Promote the first Next, or write `none`.
 4. Keep Next at 3–7 ordered items (so the next start is cheap).
 5. Replace Last session with what landed and what did not.
-6. Park new thoughts. Delete a Parking item older than two weeks that is
+6. Append one stanza to `docs/plans/archive/sittings.md` (create the file
+   and parent dir if needed). Copy Last session only — do not invent extra
+   fields. Heading: `## YYYY-MM-DD — <Milestone>`. If the file is new,
+   start it with `# Sittings` and nothing else above the first stanza.
+   If Last session is empty, skip the append.
+7. Park new thoughts. Delete a Parking item older than two weeks that is
    still vague.
-7. Stop. Do not keep implementing.
+8. Stop. Do not keep implementing.
 
 ### Prune (`/session-prune`)
 
@@ -162,7 +177,10 @@ the current phase doc is archived.
    "not scheduled" (`ROADMAP.md`).
 3. Propose **archive** to `docs/plans/archive/` or `docs/phases/archive/` plus
    a one-line pointer in the index. Optionally refresh a short
-   `docs/plans/INDEX.md` that start should read first.
+   `docs/plans/INDEX.md` that start should read first. If
+   `docs/plans/archive/sittings.md` is huge, propose rotate to
+   `docs/plans/archive/sittings-YYYY.md` plus a one-line pointer at the top
+   of a fresh `sittings.md`. Do not delete the log.
 4. **Wait.** Apply only what the user confirms, file by file.
 5. Do not delete. Do not merge two phase docs. Do not rewrite a master plan
    or DoD. Do not tick checkboxes. Do not touch files outside those trees.
@@ -175,6 +193,7 @@ Print the Commands table. One line: SESSION is not the plan. Stop. No edits.
 
 - One Now item.
 - Overwrite SESSION, never append.
+- End appends one stanza to `docs/plans/archive/sittings.md`. Snap does not.
 - Do not start Linear, GitHub issues, or a Projects board for this.
 - These skills are user-scoped. They operate on whatever repo is the cwd.
   They do not live in the target repo.

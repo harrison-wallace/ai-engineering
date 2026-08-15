@@ -11,4 +11,5 @@ Read and follow `session-handshake` (sibling skill, or
 
 Propose, then wait. Do not write Now unless the user confirmed or named the
 Now item in this message. Do not implement. Do not treat ROADMAP.md as Next.
-Prefer the current in-progress phase, not the next empty one.
+Prefer the current in-progress phase, not the next empty one. Do not read
+`docs/plans/archive/sittings.md` — Last session is the previous sitting.

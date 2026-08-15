@@ -9,5 +9,6 @@ user-invocable: true
 Read and follow `session-handshake` (sibling skill, or
 `~/.claude/skills/session-handshake/SKILL.md`). Run **Snap** only.
 
-Rewrite SESSION. Do not append. Do not close the sitting. Do not prune
-Parking for age. If the file is missing, tell the user to run `/session-init`.
+Rewrite SESSION. Do not append SESSION. Do not write `archive/sittings.md`.
+Do not close the sitting. Do not prune Parking for age. If SESSION is
+missing, tell the user to run `/session-init`.

@@ -9,6 +9,7 @@ user-invocable: true
 Read and follow `session-handshake` (sibling skill, or
 `~/.claude/skills/session-handshake/SKILL.md`). Run **Check** only.
 
-Read-only. Do not edit SESSION. If the file is missing, tell the user to run
-`/session-init`. If it is stale, tell the user to run `/session-snap`.
-Do not start the Now item unless the user also said to continue.
+Read-only. Do not edit SESSION. Do not read `archive/sittings.md`. If
+SESSION is missing, tell the user to run `/session-init`. If it is stale,
+tell the user to run `/session-snap`. Do not start the Now item unless the
+user also said to continue.

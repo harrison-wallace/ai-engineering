@@ -1,7 +1,7 @@
 # ai-engineering
 
 ![Version](https://img.shields.io/badge/version-0.8.1-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-23-22c55e?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-24-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -59,7 +59,8 @@ as an estimate; none of them mutate infrastructure.
 |---|---|
 | [bump-version](skills/bump-version/SKILL.md) | Cut a release: bump the version, sync it into `README.md`, and write a `CHANGELOG.md` entry derived from the git diff. |
 | [bump-version-sonnet](skills/bump-version-sonnet/SKILL.md) | The same release split in two: the main agent derives it from the diff and writes the changelog prose, a Sonnet subagent applies the file edits verbatim, the main agent verifies. |
-| [imp-grok-4-5](skills/imp-grok-4-5/SKILL.md) | Main agent plans the discussed changes, the headless `grok` CLI (Grok 4.5) implements them, then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
+| [imp-grok-4-5](skills/imp-grok-4-5/SKILL.md) | Main agent plans the discussed changes, Grok 4.5 implements them (native subagent inside Grok; otherwise the headless `grok` CLI), then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
+| [imp-grok-4-6](skills/imp-grok-4-6/SKILL.md) | Same split as `imp-grok-4-5`, with Grok 4.6 as the implementer. Generic "have grok implement this" trigger. |
 | [imp-sonnet](skills/imp-sonnet/SKILL.md) | Main agent plans the discussed changes, a Sonnet subagent implements them, then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
 
 ### Session handshake (`SESSION.md`)
@@ -75,7 +76,7 @@ cwd repo; they are not copied into it. Do not name a command `/session` or
 | [session-start](skills/session-start/SKILL.md) | Sit down: propose Now/Next from plans + phases + git. Write after confirm. |
 | [session-check](skills/session-check/SKILL.md) | Enter-repo brief. Read-only. Flags stale → `/session-snap`. |
 | [session-snap](skills/session-snap/SKILL.md) | Mid-sitting rewrite so SESSION matches git + this chat. Does not close. |
-| [session-end](skills/session-end/SKILL.md) | Formal close: promote Next, prune old Parking, stop. |
+| [session-end](skills/session-end/SKILL.md) | Formal close: promote Next, append sittings log, prune old Parking, stop. |
 | [session-prune](skills/session-prune/SKILL.md) | Propose archive/index tidy of `docs/plans` and `docs/phases`. Confirm each. |
 | [session-help](skills/session-help/SKILL.md) | Print the command table. |
 
@@ -116,6 +117,9 @@ and `git log` stays the single history of every change. The same pattern works f
 agents and commands (symlink the individual `.md` file into `~/.claude/agents/` or
 `~/.claude/commands/`). New skills appear in Claude's skill list at the next session
 start.
+
+Grok and OpenCode both load `~/.claude/skills/`, so that one symlink is enough
+for Claude Code, Grok, and OpenCode.
 
 ### Multiple profiles
 

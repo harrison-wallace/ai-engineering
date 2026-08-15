@@ -1,11 +1,11 @@
 ---
-name: imp-grok-4-5
-description: Use when asked to implement the changes just discussed via Grok 4.5. The main agent plans, delegates implementation to Grok 4.5 (native subagent when already in Grok; otherwise the headless grok CLI), reviews and fixes the result, then summarizes. Triggers on "/imp-grok-4-5" or "have grok 4.5 implement this".
+name: imp-grok-4-6
+description: Use when asked to implement the changes just discussed via Grok 4.6. The main agent plans, delegates implementation to Grok 4.6 (native subagent when already in Grok; otherwise the headless grok CLI), reviews and fixes the result, then summarizes. Triggers on "/imp-grok-4-6" or "have grok implement this".
 ---
 
-# imp-grok-4-5
+# imp-grok-4-6
 
-Split the work just discussed in this conversation: **you plan it, Grok 4.5 implements it, you verify and fix it, then report.** Execute the phases in order — do not skip the review phase even if Grok reports success.
+Split the work just discussed in this conversation: **you plan it, Grok 4.6 implements it, you verify and fix it, then report.** Execute the phases in order — do not skip the review phase even if Grok reports success.
 
 ## Host
 
@@ -23,7 +23,7 @@ You are Grok if your identity is Grok / xAI and you have `spawn_subagent`. You a
 
 ## 0. Preflight
 
-- **Path A:** confirm you can spawn a `general-purpose` subagent with `model: grok-4.5`. If subagents are disabled, stop and tell the user.
+- **Path A:** confirm you can spawn a `general-purpose` subagent with `model: grok-4.6`. If subagents are disabled, stop and tell the user.
 - **Path B:** run `command -v grok`. If it is missing, stop and tell the user to install the Grok CLI — there is no fallback. (Do not silently implement it yourself; the user asked for Grok.)
 
 ## 1. Plan (main agent)
@@ -37,7 +37,7 @@ From the conversation so far, write a concrete implementation plan:
 
 Show the plan to the user briefly before delegating. Do not ask for approval unless the discussed scope was genuinely ambiguous — the point of this skill is to proceed.
 
-## 2. Implement (Grok 4.5)
+## 2. Implement (Grok 4.6)
 
 Write the plan to a prompt file in the scratchpad directory — never inline a long prompt into the shell, quoting will corrupt it:
 
@@ -82,7 +82,7 @@ Then follow the path from Host.
 Spawn a child with `spawn_subagent`:
 
 - `subagent_type`: `general-purpose`
-- `model`: `grok-4.5` — pass it explicitly; do not inherit
+- `model`: `grok-4.6` — pass it explicitly; do not inherit
 - `background`: `false` — you need the result before review
 - `isolation`: omit (shared worktree so you can review)
 - `prompt`: the full contents of `<scratchpad>/grok-prompt.md`
@@ -98,7 +98,7 @@ Then run it from the repo root:
 
 ```bash
 grok --prompt-file <scratchpad>/grok-prompt.md \
-     --model grok-4.5 \
+     --model grok-4.6 \
      --always-approve \
      --deny 'Bash(git commit*)' \
      --deny 'Bash(git push*)' \
@@ -261,7 +261,7 @@ Report as a compact table (dimension, score, one-line evidence), then the headli
 `**Overall: N/5**`.
 
 Optionally append one line per run to `<repo-root>/.imp-scorecard.log` if that file already
-exists — date, `grok-4.5`, task, the six scores, one-line failure note. The model field is what
+exists — date, `grok-4.6`, task, the six scores, one-line failure note. The model field is what
 makes the log comparable across the `imp-*` skills. Do not create the file unprompted.
 
 ## 3c. Fix (main agent)
