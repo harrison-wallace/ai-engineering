@@ -1,6 +1,6 @@
 ---
 name: status-init
-description: Create STATUS.md in the current repo (once). Use when setting up session tracking, "init STATUS", or the user runs /status-init.
+description: Create docs/plans/STATUS.md in the current repo (once; creates the folder if needed). Use when setting up session tracking, "init STATUS", or the user runs /status-init.
 user-invocable: true
 ---
 

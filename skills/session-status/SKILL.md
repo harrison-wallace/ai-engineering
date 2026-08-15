@@ -16,9 +16,10 @@ Template: [STATUS.template.md](STATUS.template.md).
 
 ## Path
 
-- `docs/plans/STATUS.md` if `docs/plans/` already exists.
-- Otherwise `STATUS.md` at the repo root.
-- Do not create `docs/plans/` only to hold this file.
+Always `docs/plans/STATUS.md`. Create `docs/plans/` if it does not exist.
+
+If `STATUS.md` exists at the repo root and `docs/plans/STATUS.md` does not,
+move it there (create the directory), then continue. Do not keep both.
 
 One file. Never both.
 
@@ -36,13 +37,15 @@ One file. Never both.
 
 ### Init (`/status-init`)
 
-1. If the file exists, say so and stop. Tell the user to run `/status-check`.
-   Do not overwrite.
-2. If it does not: write the template. Fill `Updated` (today), `Milestone`
-   (from the repo plan if obvious, else `none`), and **Now** (the next real
-   action, or `none` if you must ask).
-3. Leave Next / Blocked / Last session / Parking empty rather than inventing.
-4. Do not start product work.
+1. If `docs/plans/STATUS.md` exists, say so and stop. Tell the user to run
+   `/status-check`. Do not overwrite.
+2. If a repo-root `STATUS.md` exists instead, move it to `docs/plans/STATUS.md`
+   and stop. Tell the user to run `/status-check`.
+3. Otherwise create `docs/plans/` if needed and write the template. Fill
+   `Updated` (today), `Milestone` (from the repo plan if obvious, else `none`),
+   and **Now** (the next real action, or `none` if you must ask).
+4. Leave Next / Blocked / Last session / Parking empty rather than inventing.
+5. Do not start product work.
 
 ### Check (`/status-check`)
 

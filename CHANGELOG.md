@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `session-status` skill — contract for the `STATUS.md` handshake (path, template, what belongs where). Not a slash command (`user-invocable: false`).
 - `status-init`, `status-check`, `status-snap`, `status-end` — user-scoped slash skills (`/status-init` etc.). Init creates the file once; check is read-only and flags stale; snap is a mid-session rewrite; end is the formal close. Same `~/.claude/skills/<name>` symlink install as every other skill. Do not use `/status` (Grok built-in). `docs/AGENTS-TEMPLATE.md` section 1 tells every copied `AGENTS.md` to read STATUS first if present.
 
+### Changed
+- STATUS path is always `docs/plans/STATUS.md`. Init creates `docs/plans/` when missing. A leftover repo-root `STATUS.md` is moved there. No root fallback.
+
 ## [0.8.1] - 2026-08-07
 
 ### Changed

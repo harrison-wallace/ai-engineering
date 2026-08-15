@@ -71,7 +71,7 @@ slash command).
 
 | Skill | Description |
 |---|---|
-| [status-init](skills/status-init/SKILL.md) | Create `STATUS.md` once (`docs/plans/` if that folder exists, else repo root). Refuses if the file exists. |
+| [status-init](skills/status-init/SKILL.md) | Create `docs/plans/STATUS.md` once (creates `docs/plans/` if needed). Refuses if the file exists. |
 | [status-check](skills/status-check/SKILL.md) | Enter-repo brief. Read-only. Flags stale → `/status-snap`. |
 | [status-snap](skills/status-snap/SKILL.md) | Mid-session rewrite so STATUS matches git + this chat. Does not close the session. |
 | [status-end](skills/status-end/SKILL.md) | Formal close: promote Next, prune old Parking, stop. |
