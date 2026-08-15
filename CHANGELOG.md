@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `session-status` skill — repo-local `STATUS.md` handshake so Now / Next / Blocked / Last session / Parking survive a new chat or a tool switch. Init writes the file, start briefs it, end rewrites it (never appends). Template lives next to the skill. `docs/AGENTS-TEMPLATE.md` section 1 now tells every copied `AGENTS.md` to read STATUS first if present.
+
 ## [0.8.1] - 2026-08-07
 
 ### Changed

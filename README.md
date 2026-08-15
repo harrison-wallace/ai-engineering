@@ -1,7 +1,7 @@
 # ai-engineering
 
 ![Version](https://img.shields.io/badge/version-0.8.1-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-15-22c55e?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-16-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -61,6 +61,7 @@ as an estimate; none of them mutate infrastructure.
 | [bump-version-sonnet](skills/bump-version-sonnet/SKILL.md) | The same release split in two: the main agent derives it from the diff and writes the changelog prose, a Sonnet subagent applies the file edits verbatim, the main agent verifies. |
 | [imp-grok-4-5](skills/imp-grok-4-5/SKILL.md) | Main agent plans the discussed changes, the headless `grok` CLI (Grok 4.5) implements them, then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
 | [imp-sonnet](skills/imp-sonnet/SKILL.md) | Main agent plans the discussed changes, a Sonnet subagent implements them, then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
+| [session-status](skills/session-status/SKILL.md) | Repo-local `STATUS.md` handshake: one Now item, Next, Blocked, Last session, Parking. Survives new chats and tool switches. Init / start / end. |
 
 ## Conventions
 
