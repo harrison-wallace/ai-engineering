@@ -1,4 +1,4 @@
-# Status
+# Session
 
 Updated: YYYY-MM-DD
 Milestone: <id and name, or "none">

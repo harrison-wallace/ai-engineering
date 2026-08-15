@@ -10,11 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- `session-status` skill — contract for the `STATUS.md` handshake (path, template, what belongs where). Not a slash command (`user-invocable: false`).
-- `status-init`, `status-check`, `status-snap`, `status-end` — user-scoped slash skills (`/status-init` etc.). Init creates the file once; check is read-only and flags stale; snap is a mid-session rewrite; end is the formal close. Same `~/.claude/skills/<name>` symlink install as every other skill. Do not use `/status` (Grok built-in). `docs/AGENTS-TEMPLATE.md` section 1 tells every copied `AGENTS.md` to read STATUS first if present.
+- `session-handshake` contract plus `/session-init`, `/session-start`, `/session-check`, `/session-snap`, `/session-end`, `/session-prune`, `/session-help`. File is always `docs/plans/SESSION.md`. Start scopes Now/Next from plans + phases + git after confirm. Prune proposes archive-only tidy. Help prints the command table. Init appends `docs/plans/` and `docs/phases/` to `.gitignore` and migrates `STATUS.md`.
 
 ### Changed
-- STATUS path is always `docs/plans/STATUS.md`. Init creates `docs/plans/` when missing. A leftover repo-root `STATUS.md` is moved there. No root fallback.
+- Replaced `STATUS.md` / `/status-*` / `session-status` with `SESSION.md` / `/session-*` / `session-handshake`. Breaking for invoke names. Same `~/.claude/skills/<name>` symlink install.
+
+### Removed
+- `session-status`, `status-init`, `status-check`, `status-snap`, `status-end`.
 
 ## [0.8.1] - 2026-08-07
 

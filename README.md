@@ -1,7 +1,7 @@
 # ai-engineering
 
 ![Version](https://img.shields.io/badge/version-0.8.1-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-20-22c55e?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-23-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -62,19 +62,22 @@ as an estimate; none of them mutate infrastructure.
 | [imp-grok-4-5](skills/imp-grok-4-5/SKILL.md) | Main agent plans the discussed changes, the headless `grok` CLI (Grok 4.5) implements them, then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
 | [imp-sonnet](skills/imp-sonnet/SKILL.md) | Main agent plans the discussed changes, a Sonnet subagent implements them, then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
 
-### Session handshake (`STATUS.md`)
+### Session handshake (`SESSION.md`)
 
 User-scoped. Same symlink install as every other skill. They operate on the
-cwd repo; they are not copied into it. Do not name a command `/status` (Grok
-built-in). Contract: [session-status](skills/session-status/SKILL.md) (not a
-slash command).
+cwd repo; they are not copied into it. Do not name a command `/session` or
+`/status` (Grok built-ins). Contract:
+[session-handshake](skills/session-handshake/SKILL.md) (not a slash command).
 
 | Skill | Description |
 |---|---|
-| [status-init](skills/status-init/SKILL.md) | Create `docs/plans/STATUS.md` once (creates `docs/plans/` if needed). Refuses if the file exists. |
-| [status-check](skills/status-check/SKILL.md) | Enter-repo brief. Read-only. Flags stale → `/status-snap`. |
-| [status-snap](skills/status-snap/SKILL.md) | Mid-session rewrite so STATUS matches git + this chat. Does not close the session. |
-| [status-end](skills/status-end/SKILL.md) | Formal close: promote Next, prune old Parking, stop. |
+| [session-init](skills/session-init/SKILL.md) | Create `docs/plans/SESSION.md` once; gitignore `docs/plans/` and `docs/phases/`; migrate `STATUS.md`. Then `/session-start`. |
+| [session-start](skills/session-start/SKILL.md) | Sit down: propose Now/Next from plans + phases + git. Write after confirm. |
+| [session-check](skills/session-check/SKILL.md) | Enter-repo brief. Read-only. Flags stale → `/session-snap`. |
+| [session-snap](skills/session-snap/SKILL.md) | Mid-sitting rewrite so SESSION matches git + this chat. Does not close. |
+| [session-end](skills/session-end/SKILL.md) | Formal close: promote Next, prune old Parking, stop. |
+| [session-prune](skills/session-prune/SKILL.md) | Propose archive/index tidy of `docs/plans` and `docs/phases`. Confirm each. |
+| [session-help](skills/session-help/SKILL.md) | Print the command table. |
 
 ## Conventions
 

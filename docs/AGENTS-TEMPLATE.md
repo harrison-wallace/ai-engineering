@@ -42,10 +42,10 @@ change. Always use the version in the repository.
 - **Security first.** Apply security best practice in code, in documentation,
   and in infrastructure suggestions. Never write a credential, an account
   number, or customer data into the repository.
-- **Session handshake.** Read `docs/plans/STATUS.md` first, if the file exists.
-  Rewrite it at the end of a tracking session. Do not append.
+- **Session handshake.** Read `docs/plans/SESSION.md` first, if the file exists.
+  Rewrite it at the end of a tracking sitting. Do not append.
   Keep one Now item. Delete a Parking item that is older than two weeks and
-  still vague. Do not put a locked decision or the roadmap in STATUS.
+  still vague. Do not put a locked decision or the roadmap in SESSION.
 
 <!--
 REPO: backward compatibility. Keep one of the two lines below. Delete the other.
