@@ -51,7 +51,8 @@ One file. Never both.
 
 Read only. Do not edit the file.
 
-1. If the file is missing, say so and tell the user to run `/status-init`. Stop.
+1. If `docs/plans/STATUS.md` is missing, say so and tell the user to run
+   `/status-init`. Stop. (Init also moves a leftover repo-root `STATUS.md`.)
 2. Read STATUS. Then only the docs the Now item needs.
 3. Brief in 4–6 lines: Now, Next (headlines), Blocked, Parking count.
 4. Stale check: if `git log` has a commit after `Updated`, or the working tree
@@ -62,7 +63,8 @@ Read only. Do not edit the file.
 
 Mid-session save. Rewrite the file. Do not append. Do not close the session.
 
-1. If the file is missing, say so and tell the user to run `/status-init`. Stop.
+1. If `docs/plans/STATUS.md` is missing, say so and tell the user to run
+   `/status-init`. Stop.
 2. Set `Updated` to today.
 3. Adjust Now only if that item is actually finished; then promote the first Next
    (or `none`).
@@ -76,7 +78,8 @@ Mid-session save. Rewrite the file. Do not append. Do not close the session.
 
 Formal close. Rewrite the file. Do not append.
 
-1. If the file is missing, say so and tell the user to run `/status-init`. Stop.
+1. If `docs/plans/STATUS.md` is missing, say so and tell the user to run
+   `/status-init`. Stop.
 2. Set `Updated` to today.
 3. Move a finished Now off. Promote the first Next, or write `none`.
 4. Keep Next at 3–7 ordered items.
