@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- `session-status` skill — repo-local `STATUS.md` handshake so Now / Next / Blocked / Last session / Parking survive a new chat or a tool switch. Init writes the file, start briefs it, end rewrites it (never appends). Template lives next to the skill. `docs/AGENTS-TEMPLATE.md` section 1 now tells every copied `AGENTS.md` to read STATUS first if present.
+- `session-status` skill — contract for the `STATUS.md` handshake (path, template, what belongs where). Not a slash command (`user-invocable: false`).
+- `status-init`, `status-check`, `status-snap`, `status-end` — user-scoped slash skills (`/status-init` etc.). Init creates the file once; check is read-only and flags stale; snap is a mid-session rewrite; end is the formal close. Same `~/.claude/skills/<name>` symlink install as every other skill. Do not use `/status` (Grok built-in). `docs/AGENTS-TEMPLATE.md` section 1 tells every copied `AGENTS.md` to read STATUS first if present.
 
 ## [0.8.1] - 2026-08-07
 

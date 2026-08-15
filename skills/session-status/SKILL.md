@@ -1,12 +1,16 @@
 ---
 name: session-status
-description: Create or rewrite the STATUS.md handshake file so work, next steps, and leftover thoughts survive across agent sessions. Use when starting or ending a multi-session effort, when the user says "track this across sessions", "set up STATUS.md", "session handshake", or runs /session-status.
+description: Contract for the STATUS.md handshake (path, template, what belongs where). Not a slash command. Invoked by /status-init, /status-check, /status-snap, and /status-end.
+user-invocable: false
 ---
 
 # session-status
 
 A repo-local `STATUS.md` is the only queue that survives a new chat or a tool
 switch. Chat memory and in-session todos do not.
+
+This file is the contract. The four user skills run one mode each. Do not invent
+a fifth file or a board.
 
 Template: [STATUS.template.md](STATUS.template.md).
 
@@ -28,40 +32,61 @@ One file. Never both.
 | Locked choice | Decision log (`DECISIONS.md` or ADRs) | Reciting the decision |
 | Multi-month map | Existing plan / roadmap | Copying the roadmap |
 
-## Mode
+## Modes
 
-Detect from the request. If unclear, ask once: **init**, **start**, or **end**.
+### Init (`/status-init`)
 
-### Init
-
-1. If the file exists, say so and switch to **start**. Do not overwrite.
-2. If it does not: write the template, fill `Updated` (today), `Milestone` (from
-   the repo plan if obvious, else `none`), and **Now** (the next real action, or
-   `none` if you must ask).
+1. If the file exists, say so and stop. Tell the user to run `/status-check`.
+   Do not overwrite.
+2. If it does not: write the template. Fill `Updated` (today), `Milestone`
+   (from the repo plan if obvious, else `none`), and **Now** (the next real
+   action, or `none` if you must ask).
 3. Leave Next / Blocked / Last session / Parking empty rather than inventing.
+4. Do not start product work.
 
-### Start
+### Check (`/status-check`)
 
-1. Read STATUS. Then only the docs the Now item needs.
-2. Brief the user in 4–6 lines: Now, Next (headlines), Blocked, Parking count.
-3. Do the Now item only if the user asked you to continue. Otherwise stop after
-   the brief.
+Read only. Do not edit the file.
 
-### End
+1. If the file is missing, say so and tell the user to run `/status-init`. Stop.
+2. Read STATUS. Then only the docs the Now item needs.
+3. Brief in 4–6 lines: Now, Next (headlines), Blocked, Parking count.
+4. Stale check: if `git log` has a commit after `Updated`, or the working tree
+   has work that Last session does not mention, say **stale → run `/status-snap`**.
+5. Do not start the Now item unless the user also said to continue.
 
-Rewrite the file. Do not append.
+### Snap (`/status-snap`)
 
-1. Set `Updated` to today.
-2. Move a finished Now off. Promote the first Next, or write `none`.
-3. Keep Next at 3–7 ordered items.
-4. Replace Last session with a short list of what landed and what did not.
-5. Park new thoughts. Delete a Parking item older than two weeks that is still
+Mid-session save. Rewrite the file. Do not append. Do not close the session.
+
+1. If the file is missing, say so and tell the user to run `/status-init`. Stop.
+2. Set `Updated` to today.
+3. Adjust Now only if that item is actually finished; then promote the first Next
+   (or `none`).
+4. Replace Last session with what landed and what did not since the previous
+   `Updated` (git log + working tree + this conversation).
+5. Park new thoughts. Do **not** prune Parking for age (that is end).
+6. Do not clear a claim. Do not treat the session as over. Do not keep
+   implementing unless the user asked for more work in the same turn.
+
+### End (`/status-end`)
+
+Formal close. Rewrite the file. Do not append.
+
+1. If the file is missing, say so and tell the user to run `/status-init`. Stop.
+2. Set `Updated` to today.
+3. Move a finished Now off. Promote the first Next, or write `none`.
+4. Keep Next at 3–7 ordered items.
+5. Replace Last session with what landed and what did not.
+6. Park new thoughts. Delete a Parking item older than two weeks that is still
    vague.
-6. Commit STATUS with the work, or immediately after, if you are committing.
+7. Stop. Do not keep implementing.
 
 ## Rules
 
 - One Now item.
 - Overwrite, never append.
 - Do not start Linear, GitHub issues, or a Projects board for this.
-- Do not implement product work while only asked to init or brief.
+- Do not name a slash command `/status` (Grok built-in).
+- These skills are user-scoped. They operate on whatever repo is the cwd.
+  They do not live in the target repo.
