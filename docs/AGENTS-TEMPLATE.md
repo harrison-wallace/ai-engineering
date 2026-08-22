@@ -42,12 +42,12 @@ change. Always use the version in the repository.
 - **Security first.** Apply security best practice in code, in documentation,
   and in infrastructure suggestions. Never write a credential, an account
   number, or customer data into the repository.
-- **Session handshake.** Read `docs/plans/SESSION.md` first, if the file exists.
-  Rewrite it at the end of a tracking sitting. Do not append SESSION.
-  `/session-end` also appends one stanza to `docs/plans/archive/sittings.md`.
-  Do not read that log on start. Keep one Now item. Delete a Parking item
-  that is older than two weeks and still vague. Do not put a locked decision
-  or the roadmap in SESSION.
+- **Phase board.** If `docs/plans/NOW.md` exists, read it first, then only the
+  phase doc it names. `docs/plans/BOARD.md` owns phase status (at most one in
+  progress). Checkboxes and Definition of Done stay in the phase doc.
+  `/phase sync` rewrites NOW and the active checkboxes. `/phase advance` closes
+  a slice or a phase. Do not invent a sitting file. Do not put a locked
+  decision or Later items in NOW.
 
 <!--
 REPO: backward compatibility. Keep one of the two lines below. Delete the other.

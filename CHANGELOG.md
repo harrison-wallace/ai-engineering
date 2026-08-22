@@ -11,14 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - `imp-grok-4-6` skill — same plan/delegate/review/score/fix split as `imp-grok-4-5`, with Grok 4.6 as the implementer. Takes the generic "have grok implement this" trigger (4.6 is now the default Grok model). Inside Grok it spawns a native `general-purpose` subagent with `model: grok-4.6`; from Claude Code or OpenCode it shells out to the headless `grok` CLI. The implementer prompt forbids re-loading `imp-grok-*` or nesting another `grok` process.
-- `session-handshake` contract plus `/session-init`, `/session-start`, `/session-check`, `/session-snap`, `/session-end`, `/session-prune`, `/session-help`. File is always `docs/plans/SESSION.md`. Start scopes Now/Next from plans + phases + git after confirm. Prune proposes archive-only tidy. Help prints the command table. Init appends `docs/plans/` and `docs/phases/` to `.gitignore` and migrates `STATUS.md`.
+- `phase` skill — one slash command with modes (`status` default, `init`, `sync`, `shape`, `advance`, `prune`, `help`). Working files: `docs/plans/BOARD.md` (phase table + close log) and `docs/plans/NOW.md` (current slice). Checkboxes, appetite (stop conditions, not calendar), and DoD stay in `docs/phases/`. Init gitignores those two trees unless they are already tracked, and migrates leftover `SESSION.md` / `STATUS.md`.
 
 ### Changed
 - `imp-grok-4-5`: implement phase is now host-aware. Inside Grok it uses `spawn_subagent` (`model: grok-4.5`) instead of nesting a `grok` CLI process. Claude Code and OpenCode still use the headless CLI. Generic "have grok implement this" moved to `imp-grok-4-6` so the two skills no longer collide; 4.5 keeps `/imp-grok-4-5` and "have grok 4.5 implement this".
-- Replaced `STATUS.md` / `/status-*` / `session-status` with `SESSION.md` / `/session-*` / `session-handshake`. Breaking for invoke names. Same `~/.claude/skills/<name>` symlink install.
-- `session-handshake`: `/session-end` appends one stanza to `docs/plans/archive/sittings.md` (Last session copy, dated heading). Start, check, and snap skip the log. Init does not create it. Prune may rotate it if huge. SESSION stays a one-slot Last session, never a running history.
+- Replaced the sitting handshake (`SESSION.md` / `/session-*`, and the earlier `/status-*`) with `/phase`. Breaking for invoke names. Same `~/.claude/skills/<name>` symlink install. No sittings log.
+- `docs/AGENTS-TEMPLATE.md`: Core Rules "Session handshake" replaced with "Phase board".
 
 ### Removed
+- `session-handshake`, `session-init`, `session-start`, `session-check`, `session-snap`, `session-end`, `session-prune`, `session-help`.
 - `session-status`, `status-init`, `status-check`, `status-snap`, `status-end`.
 
 ## [0.8.1] - 2026-08-07

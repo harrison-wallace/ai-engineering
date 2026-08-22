@@ -1,7 +1,7 @@
 # ai-engineering
 
 ![Version](https://img.shields.io/badge/version-0.8.1-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-24-22c55e?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-17-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -63,22 +63,15 @@ as an estimate; none of them mutate infrastructure.
 | [imp-grok-4-6](skills/imp-grok-4-6/SKILL.md) | Same split as `imp-grok-4-5`, with Grok 4.6 as the implementer. Generic "have grok implement this" trigger. |
 | [imp-sonnet](skills/imp-sonnet/SKILL.md) | Main agent plans the discussed changes, a Sonnet subagent implements them, then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
 
-### Session handshake (`SESSION.md`)
+### Phase board (`BOARD.md` + `NOW.md`)
 
-User-scoped. Same symlink install as every other skill. They operate on the
-cwd repo; they are not copied into it. Do not name a command `/session` or
-`/status` (Grok built-ins). Contract:
-[session-handshake](skills/session-handshake/SKILL.md) (not a slash command).
+User-scoped. Same symlink install as every other skill. Operates on the cwd
+repo; not copied into it. Do not name a command `/session` or `/status`
+(Grok built-ins).
 
 | Skill | Description |
 |---|---|
-| [session-init](skills/session-init/SKILL.md) | Create `docs/plans/SESSION.md` once; gitignore `docs/plans/` and `docs/phases/`; migrate `STATUS.md`. Then `/session-start`. |
-| [session-start](skills/session-start/SKILL.md) | Sit down: propose Now/Next from plans + phases + git. Write after confirm. |
-| [session-check](skills/session-check/SKILL.md) | Enter-repo brief. Read-only. Flags stale → `/session-snap`. |
-| [session-snap](skills/session-snap/SKILL.md) | Mid-sitting rewrite so SESSION matches git + this chat. Does not close. |
-| [session-end](skills/session-end/SKILL.md) | Formal close: promote Next, append sittings log, prune old Parking, stop. |
-| [session-prune](skills/session-prune/SKILL.md) | Propose archive/index tidy of `docs/plans` and `docs/phases`. Confirm each. |
-| [session-help](skills/session-help/SKILL.md) | Print the command table. |
+| [phase](skills/phase/SKILL.md) | Long-horizon tracker: `BOARD.md` (phases) + `NOW.md` (current slice) + `docs/phases/` (how / DoD). Modes: `status` (default), `init`, `sync`, `shape`, `advance`, `prune`, `help`. Gitignores the two trees unless already tracked. |
 
 ## Conventions
 
