@@ -1,6 +1,6 @@
 # ai-engineering
 
-![Version](https://img.shields.io/badge/version-0.8.1-6366f1?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.9.0-6366f1?style=flat-square)
 ![Skills](https://img.shields.io/badge/skills-17-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
@@ -72,6 +72,56 @@ repo; not copied into it. Do not name a command `/session` or `/status`
 | Skill | Description |
 |---|---|
 | [phase](skills/phase/SKILL.md) | Long-horizon tracker: `BOARD.md` (phases) + `NOW.md` (current slice) + `docs/phases/` (how / DoD). Modes: `status` (default), `init`, `sync`, `shape`, `advance`, `prune`, `help`. Gitignores the two trees unless already tracked. |
+
+#### Cheatsheet
+
+Run these from the repo you're working in — the skill reads and writes that
+repo's `docs/`, never this one.
+
+| Command | What it does |
+|---|---|
+| `/phase` | Read-only brief: phase, slice, blocked, next shaped row, dirty files. Never starts work. |
+| `/phase init` | Once per repo: creates `NOW.md` + `BOARD.md`, migrates a leftover `SESSION.md`/`STATUS.md`, appends the two gitignore lines. |
+| `/phase shape auth` | Writes `docs/phases/auth.md` from the template (goal, appetite, scope, DoD) and adds a `shaped` board row. |
+| `/phase sync` | Rewrites `NOW.md` and ticks the checkboxes that actually landed, from git + this chat. Does not close anything. |
+| `/phase advance` | Closes the current slice — or the whole phase if its DoD is met — and pulls the next `shaped` row into `in progress`. |
+| `/phase prune` | Proposes archiving duplicate/superseded/orphan docs. Waits for confirmation, file by file. |
+| `/phase help` | Prints the modes table. |
+
+A phase from start to finish:
+
+```
+cd ~/git/my-app
+/phase init                  # first time only
+/phase shape onboarding      # → docs/phases/onboarding.md, board row `shaped`
+                             #   edit the doc: slices as checkboxes, DoD at the bottom
+… build the first slice …
+/phase sync                  # ticks what landed, NOW points at the next slice
+/phase advance               # slice DoD met → tick it, move NOW on
+… build the rest …
+/phase advance               # phase DoD met → row `done`, log line, next phase in
+```
+
+Day to day:
+
+```
+/phase                       # new chat, no idea where you were → read the brief
+/phase and continue          # brief, then actually start the slice
+/phase sync                  # end of a working block, before closing the chat
+```
+
+Things worth knowing:
+
+- **`NOW.md` is not the plan.** It holds one phase, one slice, one blocked line.
+  Checkboxes and DoD live in the phase doc; the board holds the ordering.
+- **`BOARD.md` wins.** If the two disagree, the unique `in progress` row is the
+  truth and `sync` rewrites `NOW.md`.
+- **`sync` never closes a phase** — that's `advance`, and only when the DoD is met.
+- **Both trees are gitignored** by `init`, so the board is local scratch, not a
+  commitment you've published. Unshaped ideas go in the board's Later section or
+  a committed root `ROADMAP.md`.
+- Old `/session-*` commands still route here: `session-init` → `init`,
+  `session-check`/`session-start` → `status`, `session-snap`/`session-end` → `sync`.
 
 ## Conventions
 

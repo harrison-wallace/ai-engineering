@@ -9,9 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-08-24
+
 ### Added
 - `imp-grok-4-6` skill — same plan/delegate/review/score/fix split as `imp-grok-4-5`, with Grok 4.6 as the implementer. Takes the generic "have grok implement this" trigger (4.6 is now the default Grok model). Inside Grok it spawns a native `general-purpose` subagent with `model: grok-4.6`; from Claude Code or OpenCode it shells out to the headless `grok` CLI. The implementer prompt forbids re-loading `imp-grok-*` or nesting another `grok` process.
 - `phase` skill — one slash command with modes (`status` default, `init`, `sync`, `shape`, `advance`, `prune`, `help`). Working files: `docs/plans/BOARD.md` (phase table + close log) and `docs/plans/NOW.md` (current slice). Checkboxes, appetite (stop conditions, not calendar), and DoD stay in `docs/phases/`. Init gitignores those two trees unless they are already tracked, and migrates leftover `SESSION.md` / `STATUS.md`.
+- `README.md`: a `/phase` cheatsheet under the Phase board section — a mode-by-mode command table, a worked example of one phase from `init` through `shape` / `sync` / two `advance` calls, the three day-to-day invocations, and the gotchas that are easy to get wrong from the skill doc alone (NOW is not the plan, BOARD wins a conflict, `sync` never closes a phase, both trees are gitignored, old `/session-*` aliases still route). The skill file is written for the agent executing it; the README needed the version a person reads before typing.
 
 ### Changed
 - `imp-grok-4-5`: implement phase is now host-aware. Inside Grok it uses `spawn_subagent` (`model: grok-4.5`) instead of nesting a `grok` CLI process. Claude Code and OpenCode still use the headless CLI. Generic "have grok implement this" moved to `imp-grok-4-6` so the two skills no longer collide; 4.5 keeps `/imp-grok-4-5` and "have grok 4.5 implement this".
@@ -21,6 +24,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - `session-handshake`, `session-init`, `session-start`, `session-check`, `session-snap`, `session-end`, `session-prune`, `session-help`.
 - `session-status`, `status-init`, `status-check`, `status-snap`, `status-end`.
+
+None of the removed skills appeared in a tagged release — they were added and
+replaced between 0.8.1 and 0.9.0 — so this is a minor, not a major. Anyone who
+installed from `main` during that window should re-point their symlinks at
+`skills/phase`.
 
 ## [0.8.1] - 2026-08-07
 
