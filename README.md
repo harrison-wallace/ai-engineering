@@ -13,7 +13,7 @@ skills/      Agent Skills — one folder per skill, each with a SKILL.md
 agents/      Subagent definitions — one .md file per agent
 commands/    Custom slash commands — one .md file per command
 hooks/       Hook scripts referenced from settings.json
-docs/        Supporting documentation
+docs/        Supporting documentation (templates, cheat sheets)
 CLAUDE.md    Instructions Claude reads when working in this repo
 ```
 
@@ -136,6 +136,18 @@ symlinked into place:
 - **Commands** → `~/.claude/commands/<name>.md` or `.claude/commands/<name>.md`.
   Invoked as `/<name>`.
 - **Hooks** → scripts wired up via `settings.json`; keep them executable.
+
+## OpenCode Zen models
+
+Dated cheat sheets of current models on OpenCode Zen (pay-as-you-go) and
+OpenCode Go ($10/month): daily driver, quality pick, cheap bulk, and prices.
+Re-check the **Updated** date at the top of each file — the catalog and prices
+move.
+
+| Sheet | What’s on it |
+|---|---|
+| [docs/opencode-zen-models.md](docs/opencode-zen-models.md) | Open-weight: MiniMax, GLM, Kimi, DeepSeek, Go |
+| [docs/opencode-zen-frontier.md](docs/opencode-zen-frontier.md) | Closed / frontier: Grok 4.6, Claude Opus/Fable 5, GPT 5.6, Gemini |
 
 ## AGENTS.md template
 

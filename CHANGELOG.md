@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `docs/opencode-zen-models.md` — dated cheat sheet of current open-weight models on OpenCode Zen and Go (picks, prices, what to actually run). Linked from the README.
+- `docs/opencode-zen-frontier.md` — matching dated cheat sheet for closed / frontier models (Grok 4.6 daily, Opus 5 quality, Fable 5 ceiling, GPT 5.6 Sol / Luna). Cross-linked from the open-weight sheet and the README.
+
+### Changed
+- Both Zen cheat sheets re-checked against the live `/zen/v1/models` and `/zen/go/v1/models` catalogs on 2026-08-26. Corrections: MiniMax M3 is 512K context on Zen (not 1M); DeepSeek peak hours are weekday-only; Qwen 3.7 Max/Plus are on Go, not live Zen PAYG; Sonnet 5 comparison price is $2/$10; added live-only free IDs (`deepseek-v4-flash-free`, `laguna-s-2.1-free`); Go usage numbers taken from the official estimate table.
+
 ## [0.9.0] - 2026-08-24
 
 ### Added
