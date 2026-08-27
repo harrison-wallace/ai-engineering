@@ -1,6 +1,6 @@
 {
   "name": "ai-engineering",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "private": true,
   "description": "Reusable Claude Code assets: skills, subagents, slash commands, and hooks."
 }

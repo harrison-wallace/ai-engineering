@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-08-27
+
 ### Added
 - `summarise-work` skill — report-only wrap-up of the current sitting: git + this chat classified into Achieved / Fixed / Implemented (omit empty categories; one item, one bucket), each a one-sentence bullet plus one-sentence sub-bullet, then a short executive summary of how the work solves the original problem. Does not write BOARD.md, commit, or keep implementing. Complementary to `/phase sync` (ticks the board) and `/bump-version` (writes the changelog).
 - `docs/opencode-zen-models.md` — dated cheat sheet of current open-weight models on OpenCode Zen and Go (picks, prices, what to actually run). Linked from the README.
@@ -16,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Both Zen cheat sheets re-checked against the live `/zen/v1/models` and `/zen/go/v1/models` catalogs on 2026-08-26. Corrections: MiniMax M3 is 512K context on Zen (not 1M); DeepSeek peak hours are weekday-only; Qwen 3.7 Max/Plus are on Go, not live Zen PAYG; Sonnet 5 comparison price is $2/$10; added live-only free IDs (`deepseek-v4-flash-free`, `laguna-s-2.1-free`); Go usage numbers taken from the official estimate table.
+- README: skills badge 17 → 18, and `summarise-work` added to the Repo workflow table.
 
 ## [0.9.0] - 2026-08-24
 

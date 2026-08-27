@@ -1,6 +1,6 @@
 # ai-engineering
 
-![Version](https://img.shields.io/badge/version-0.9.0-6366f1?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.10.0-6366f1?style=flat-square)
 ![Skills](https://img.shields.io/badge/skills-18-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
