@@ -68,7 +68,7 @@ Drop: test runs, "looked at the code", next-step ideas, leftover TODOs, process
 - One-sentence headline
   - One-sentence so-what (what this adds)
 
-## Summary
+## Executive summary
 Two to four sentences. Original problem, then how this work solves it. No new
 facts that were not in the bullets.
 ```
@@ -97,7 +97,7 @@ Rules:
 - `imp-grok-4-6` skill for the default Grok implementer
   - Generic "have grok implement this" now routes here so 4.5 and 4.6 no longer collide.
 
-## Summary
+## Executive summary
 Delegation to Grok was stalling in headless mode and the 4.5/4.6 skills were
 fighting over the same trigger. The deny-rules fix makes unattended Edit calls
 actually land, and 4.6 now owns the generic "have grok implement this" path.
