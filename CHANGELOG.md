@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `summarise-work` skill — report-only wrap-up of the current sitting: git + this chat classified into Achieved / Fixed / Implemented (omit empty categories; one item, one bucket), each a one-sentence bullet plus one-sentence sub-bullet, then a short executive summary of how the work solves the original problem. Does not write BOARD.md, commit, or keep implementing. Complementary to `/phase sync` (ticks the board) and `/bump-version` (writes the changelog).
 - `docs/opencode-zen-models.md` — dated cheat sheet of current open-weight models on OpenCode Zen and Go (picks, prices, what to actually run). Linked from the README.
 - `docs/opencode-zen-frontier.md` — matching dated cheat sheet for closed / frontier models (Grok 4.6 daily, Opus 5 quality, Fable 5 ceiling, GPT 5.6 Sol / Luna). Cross-linked from the open-weight sheet and the README.
 
@@ -72,7 +73,7 @@ installed from `main` during that window should re-point their symlinks at
 ## [0.7.1] - 2026-08-06
 
 ### Changed
-- `imp-grok-4-5`: the delegation command now runs Grok under `--always-approve` with explicit `--deny` rules (`git commit/push/add/tag/reset/checkout/stash`, `rm -rf`) instead of `--permission-mode acceptEdits`. In headless mode a permission prompt has nobody to answer it — it resolves as `cancelled`, ends the turn, and the process still exits 0, so `acceptEdits` silently killed runs on the first `search_replace`. Deny rules beat always-approve and are checked against every segment of a chained command, so "don't commit" becomes enforced rather than a request in the prompt file.
+- `imp-grok-4-5`: the delegation command now runs Grok under `--always-approve` with explicit `--deny` rules (`git commit/push/add/tag/reset/checkout/stash`, `rm -rf`) instead of `--permission-mode acceptEdits`. In headless mode a permission prompt has nobody to answer it — it resolves as `cancelled`, ends the turn, and the process still exits 0, so `acceptEdits` silently killed runs on the first `search_replace`. Deny rules beat always-approve and are checked against every segment of a chained command, so "don't commit" becomes enforced rather than a request in the prompt.
 - `imp-grok-4-5`: the run is now capped with `--max-turns 300` and redirected to `<scratchpad>/grok-run.log` (read back with `tail`) rather than piped, so evidence survives a bad run.
 - `imp-grok-4-5`: added a mandatory post-run check that `git status --short` / `git diff --stat` is non-empty before reading Grok's report — exit 0 and confident stdout narration are not evidence that anything was written.
 
