@@ -1,6 +1,6 @@
 # ai-engineering
 
-![Version](https://img.shields.io/badge/version-0.10.0-6366f1?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.11.0-6366f1?style=flat-square)
 ![Skills](https://img.shields.io/badge/skills-18-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
@@ -138,17 +138,14 @@ symlinked into place:
   Invoked as `/<name>`.
 - **Hooks** → scripts wired up via `settings.json`; keep them executable.
 
-## OpenCode Zen models
+## OpenCode Console models
 
-Dated cheat sheets of current models on OpenCode Zen (pay-as-you-go) and
-OpenCode Go ($10/month): daily driver, quality pick, cheap bulk, and prices.
-Re-check the **Updated** date at the top of each file — the catalog and prices
-move.
-
-| Sheet | What’s on it |
-|---|---|
-| [docs/opencode-zen-models.md](docs/opencode-zen-models.md) | Open-weight: MiniMax, GLM, Kimi, DeepSeek, Go |
-| [docs/opencode-zen-frontier.md](docs/opencode-zen-frontier.md) | Closed / frontier: Grok 4.6, Claude Opus/Fable 5, GPT 5.6, Gemini |
+[docs/opencode-console-models.md](docs/opencode-console-models.md) is the dated
+chart of current models on OpenCode Console (API-charged Zen credits) — list
+price, context, Go proxy availability + cap, benchmarks, cost reality, and best
+use per model, plus a what-to-actually-run ladder. It replaces the two old Zen
+sheets (open-weight + frontier). Re-check the **Updated** date at the top — the
+catalog and prices move.
 
 ## AGENTS.md template
 

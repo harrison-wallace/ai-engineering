@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-09-30
+
+### Added
+- `docs/opencode-console-models.md` — one dated chart of current models on OpenCode Console (API-charged Zen credits): list price (in/out/cached read), context, Go proxy availability + per-model monthly cap, benchmarks (Bito / DeepSWE / AA Index), cost reality, and best use in v2, plus a what-to-actually-run ladder. Replaces the two old Zen sheets.
+
+### Changed
+- README section retitled "OpenCode Console models" and now links the single chart instead of the two-sheet table.
+
+### Removed
+- `docs/opencode-zen-models.md` and `docs/opencode-zen-frontier.md` — superseded by `docs/opencode-console-models.md`.
+
 ## [0.10.0] - 2026-08-27
 
 ### Added
