@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-03
+
+### Added
+- `imp-grok-4-7` skill — the main agent plans the discussed changes, a headless `grok-4.7` process implements them, then the main agent reviews, scores the result out of 5, fixes, and summarizes. Owns the generic "have grok implement this" trigger. An optional leading level (`/imp-grok-4-7 high`, `--effort high`, or `effort: high`; also `none`, `minimal`, `low`, `medium`, `xhigh`, `max`) is passed only to that process via `--effort`. When the invocation names no level, the implementer runs at `medium`. This session's effort is left unchanged: a native subagent inherits it and has no effort argument, so the implementer is always the headless CLI.
+
+### Removed
+- `imp-grok-4-5` and `imp-grok-4-6` from the live skill set. Moved to `archive/skills` with `user-invocable: false` and `disable-model-invocation: true`. `/imp-grok-4-5`, `/imp-grok-4-6`, "have grok 4.5 implement this", and "have grok 4.6 implement this" no longer run. Breaking for those invoke names, which is why this is 1.0.0.
+
+### Changed
+- README: skills badge 18 → 17, the Repo workflow table lists `imp-grok-4-7` and points at the archive for 4.5 and 4.6.
+
 ## [0.11.0] - 2026-09-30
 
 ### Added

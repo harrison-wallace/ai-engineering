@@ -1,7 +1,7 @@
 # ai-engineering
 
-![Version](https://img.shields.io/badge/version-0.11.0-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-18-22c55e?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.0.0-6366f1?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-17-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -60,8 +60,9 @@ as an estimate; none of them mutate infrastructure.
 | [summarise-work](skills/summarise-work/SKILL.md) | End-of-block wrap-up: Achieved / Fixed / Implemented bullets (omit empty), one sub-bullet each, then a short executive summary. Report-only. |
 | [bump-version](skills/bump-version/SKILL.md) | Cut a release: bump the version, sync it into `README.md`, and write a `CHANGELOG.md` entry derived from the git diff. |
 | [bump-version-sonnet](skills/bump-version-sonnet/SKILL.md) | The same release split in two: the main agent derives it from the diff and writes the changelog prose, a Sonnet subagent applies the file edits verbatim, the main agent verifies. |
-| [imp-grok-4-5](skills/imp-grok-4-5/SKILL.md) | Main agent plans the discussed changes, Grok 4.5 implements them (native subagent inside Grok; otherwise the headless `grok` CLI), then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
-| [imp-grok-4-6](skills/imp-grok-4-6/SKILL.md) | Same split as `imp-grok-4-5`, with Grok 4.6 as the implementer. Generic "have grok implement this" trigger. |
+| [imp-grok-4-7](skills/imp-grok-4-7/SKILL.md) | Main agent plans, a headless Grok 4.7 process implements at `--effort` (default `medium`; the session effort stays unchanged), then the main agent reviews, scores the result out of 5, fixes, and summarizes. Generic "have grok implement this" trigger. Optional leading level: `/imp-grok-4-7 high`. |
+
+`imp-grok-4-5` and `imp-grok-4-6` are archived under [archive/skills](archive/skills). They are not installed and do not trigger.
 | [imp-sonnet](skills/imp-sonnet/SKILL.md) | Main agent plans the discussed changes, a Sonnet subagent implements them, then the main agent reviews, scores the result out of 5, fixes, and summarizes. |
 
 ### Phase board (`BOARD.md` + `NOW.md`)

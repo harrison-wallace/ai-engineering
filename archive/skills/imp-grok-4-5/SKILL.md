@@ -1,9 +1,13 @@
 ---
 name: imp-grok-4-5
-description: Use when asked to implement the changes just discussed via Grok 4.5. The main agent plans, delegates implementation to Grok 4.5 (native subagent when already in Grok; otherwise the headless grok CLI), reviews and fixes the result, then summarizes. Triggers on "/imp-grok-4-5" or "have grok 4.5 implement this".
+description: Archived. Superseded by imp-grok-4-7. Do not invoke.
+user-invocable: false
+disable-model-invocation: true
 ---
 
 # imp-grok-4-5
+
+Archived. Use `imp-grok-4-7`.
 
 Split the work just discussed in this conversation: **you plan it, Grok 4.5 implements it, you verify and fix it, then report.** Execute the phases in order — do not skip the review phase even if Grok reports success.
 

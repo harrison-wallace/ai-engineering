@@ -1,30 +1,39 @@
 ---
-name: imp-grok-4-6
-description: Use when asked to implement the changes just discussed via Grok 4.6. The main agent plans, delegates implementation to Grok 4.6 (native subagent when already in Grok; otherwise the headless grok CLI), reviews and fixes the result, then summarizes. Triggers on "/imp-grok-4-6" or "have grok implement this".
+name: imp-grok-4-7
+description: Use when asked to implement the changes just discussed via Grok 4.7. The main agent plans, a headless grok-4.7 process implements at a chosen reasoning effort (default medium; this session's effort stays unchanged), then the main agent reviews, scores, fixes, and summarizes. Triggers on "/imp-grok-4-7", "have grok implement this", or "have grok 4.7 implement this". Optional leading effort level.
+argument-hint: "[low|medium|high|xhigh]"
 ---
 
-# imp-grok-4-6
+# imp-grok-4-7
 
-Split the work just discussed in this conversation: **you plan it, Grok 4.6 implements it, you verify and fix it, then report.** Execute the phases in order — do not skip the review phase even if Grok reports success.
+Split the work just discussed in this conversation: **you plan it, a headless Grok 4.7 process implements it, you verify and fix it, then report.** Execute the phases in order — do not skip the review phase even if Grok reports success.
+
+## Implementer effort
+
+The level applies only to the headless implementer, through `--effort` on that process. Do not run `/effort`. Do not change this session's effort. Do not set `effort` in this skill's frontmatter.
+
+Resolve the level from the message that invoked this skill:
+
+| The invocation | Level |
+|---|---|
+| No level named | `medium` |
+| The first argument is exactly `none`, `minimal`, `low`, `medium`, `high`, `xhigh`, or `max` | that word |
+| The message contains `--effort <level>`, `effort: <level>`, or `effort=<level>` with one of those words | that word |
+
+A task sentence that contains "high" is still `medium`. If they named a level outside that list, stop and tell them the allowed words.
+
+Say the resolved level in the plan you show before delegating, and again in the summary.
 
 ## Host
 
-Pick one implement path. Do not mix them.
+The implementer is always the headless `grok` CLI below, including when you already are Grok. A native subagent inherits this session's effort and has no effort argument, so `spawn_subagent` cannot keep the level on the implementer alone.
 
-| You are | Implement path |
-|---|---|
-| Grok (this product — the Grok CLI/TUI) | **A. Native subagent** |
-| Anything else (Claude Code, OpenCode, Cursor, …) | **B. `grok` CLI** |
-
-You are Grok if your identity is Grok / xAI and you have `spawn_subagent`. You are not Grok if you are Claude, OpenCode, Cursor, or another product that can call a Grok *model*.
-
-- Do not nest a `grok` CLI process when you already are Grok.
 - Do not use the host's Agent / Task / `general` tool with a Grok model id. That is the host implementing, not Grok.
+- The child process is the implementer. You still plan, review, score, and fix.
 
 ## 0. Preflight
 
-- **Path A:** confirm you can spawn a `general-purpose` subagent with `model: grok-4.6`. If subagents are disabled, stop and tell the user.
-- **Path B:** run `command -v grok`. If it is missing, stop and tell the user to install the Grok CLI — there is no fallback. (Do not silently implement it yourself; the user asked for Grok.)
+Run `command -v grok`. If it is missing, stop and tell the user to install the Grok CLI — there is no fallback. (Do not silently implement it yourself; the user asked for Grok.)
 
 ## 1. Plan (main agent)
 
@@ -37,7 +46,7 @@ From the conversation so far, write a concrete implementation plan:
 
 Show the plan to the user briefly before delegating. Do not ask for approval unless the discussed scope was genuinely ambiguous — the point of this skill is to proceed.
 
-## 2. Implement (Grok 4.6)
+## 2. Implement (Grok 4.7)
 
 Write the plan to a prompt file in the scratchpad directory — never inline a long prompt into the shell, quoting will corrupt it:
 
@@ -75,30 +84,12 @@ Include these standing instructions in the prompt file:
   agent can confirm, and it drifts. Write the check next to the constraint
   (`awk '{print length}' <file> | sort -n | tail -1`) and tell Grok to run it before reporting.
 
-Then follow the path from Host.
-
-### Path A — native Grok subagent
-
-Spawn a child with `spawn_subagent`:
-
-- `subagent_type`: `general-purpose`
-- `model`: `grok-4.6` — pass it explicitly; do not inherit
-- `background`: `false` — you need the result before review
-- `isolation`: omit (shared worktree so you can review)
-- `prompt`: the full contents of `<scratchpad>/grok-prompt.md`
-- `description`: a 3–5 word label for the task
-
-Do not also run the `grok` CLI.
-
-If spawn fails, report that and stop. Do not implement it yourself. Do not fall back to Path B.
-
-### Path B — grok CLI
-
-Then run it from the repo root:
+Then run it from the repo root. Substitute the resolved level for `<level>` and change nothing else:
 
 ```bash
 grok --prompt-file <scratchpad>/grok-prompt.md \
-     --model grok-4.6 \
+     --model grok-4.7 \
+     --effort <level> \
      --always-approve \
      --deny 'Bash(git commit*)' \
      --deny 'Bash(git push*)' \
@@ -150,12 +141,12 @@ Grok's stdout is its report, not evidence. Treat it as a claim to be checked.
 
 ## 2b. Troubleshooting a run that did nothing
 
-An empty worktree after a confident report is a failed run on either path.
+An empty worktree after a confident report is a failed run.
 
-**Path A.** Re-spawn at most once with a more imperative prompt. If the worktree is still
+Re-run the same command at most once, with a more imperative prompt file. If the worktree is still
 unchanged, stop and report. Do not implement it yourself.
 
-**Path B.** A run that narrates a plan ("Implementing the backend first, then the frontend") and
+A run that narrates a plan ("Implementing the backend first, then the frontend") and
 then exits with a clean worktree has almost always been killed by a permission prompt. Do not
 guess — Grok writes a machine-readable trace of every tool call and permission decision:
 
@@ -261,7 +252,7 @@ Report as a compact table (dimension, score, one-line evidence), then the headli
 `**Overall: N/5**`.
 
 Optionally append one line per run to `<repo-root>/.imp-scorecard.log` if that file already
-exists — date, `grok-4.6`, task, the six scores, one-line failure note. The model field is what
+exists — date, `grok-4.7/<effort>`, task, the six scores, one-line failure note. The model field is what
 makes the log comparable across the `imp-*` skills. Do not create the file unprompted.
 
 ## 3c. Fix (main agent)
@@ -276,6 +267,7 @@ Now repair what the review found:
 End with a short report to the user:
 
 - **Plan** — one-line restatement of the goal.
+- **Effort** — the level passed to the implementer (`medium` when the invocation named none).
 - **Grok implemented** — files changed and what was done.
 - **Review** — what you checked, what you fixed (or "no fixes needed").
 - **Verification** — what you ran and the result.
