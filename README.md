@@ -1,7 +1,7 @@
 # ai-engineering
 
 ![Version](https://img.shields.io/badge/version-1.0.0-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-17-22c55e?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-18-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -57,6 +57,7 @@ as an estimate; none of them mutate infrastructure.
 
 | Skill | Description |
 |---|---|
+| [basic-summary](skills/basic-summary/SKILL.md) | Rewrite the previous assistant message in ASD-STE100 Simplified Technical English: one-sentence bullets, one longer sub-bullet each, then one summary paragraph. Report-only. |
 | [summarise-work](skills/summarise-work/SKILL.md) | End-of-block wrap-up: Achieved / Fixed / Implemented bullets (omit empty), one sub-bullet each, then a short executive summary. Report-only. |
 | [bump-version](skills/bump-version/SKILL.md) | Cut a release: bump the version, sync it into `README.md`, and write a `CHANGELOG.md` entry derived from the git diff. |
 | [bump-version-sonnet](skills/bump-version-sonnet/SKILL.md) | The same release split in two: the main agent derives it from the diff and writes the changelog prose, a Sonnet subagent applies the file edits verbatim, the main agent verifies. |
