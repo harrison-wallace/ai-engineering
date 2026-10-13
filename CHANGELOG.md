@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-13
+
+### Added
+- `basic-review` `Maintain` type — a fourth finding for code that works on today's paths when the next edit is easy to get wrong. The row has to name that edit. Severity 2 only when the diff already edits that logic in more than one place, or the area is in flux; otherwise severity 1. Never severity 3. A path that is already wrong stays a Bug, and extra code that can be removed stays Bloat.
+
+### Changed
+- `basic-review` report is a verdict line, then a severity 1–3 table of at most 8 rows, then a coverage line. The verdict is one of four closed sentences, so the pass no longer ends with a free-form "safe to commit". Each summary is one sentence in a fixed shape, and a line number is cited only after that file has been opened.
+- `basic-review` reads untracked text files, turns diff color off, and limits the diff when the user names paths. A clean tree reviews the last commit: the first parent when `HEAD` is a merge, and a stop when there is no parent. Callers are checked when a signature changes. Lockfiles, vendored trees, minified bundles, and generated dumps are skipped unless they add a credential, a script hook, or a huge dump.
+- `basic-review` security is exploitable behavior in the diff, plus a real credential. PII, internal URLs, and publish-hygiene stay with `check-diff-public-ready`. A finding without a concrete path is dropped. Branch and pull-request reviews are pointed at the review skill. `/basic-review` is unchanged.
+- README skills table: `basic-review` describes the verdict plus a severity 1–3 table, including maintainability.
+
+### Removed
+- `basic-review` severity 0. Formatting and lint rules are not findings.
+
 ## [1.0.0] - 2026-10-03
 
 ### Added
