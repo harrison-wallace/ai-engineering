@@ -1,6 +1,6 @@
 # ai-engineering
 
-![Version](https://img.shields.io/badge/version-1.0.1-6366f1?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.0.2-6366f1?style=flat-square)
 ![Skills](https://img.shields.io/badge/skills-18-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
@@ -23,7 +23,7 @@ CLAUDE.md    Instructions Claude reads when working in this repo
 
 | Skill | Description |
 |---|---|
-| [basic-review](skills/basic-review/SKILL.md) | Quick sanity check of the current diff for bugs, security issues, bloat, and maintainability, reported as a verdict plus a severity (1–3) table. |
+| [basic-review](skills/basic-review/SKILL.md) | Quick sanity check of the current diff for bugs, security issues, bloat, and maintainability, reported as a verdict, a severity (1–3) table with a fix per row, and a coverage line. `/basic-review staged` reviews only what the next commit holds. |
 | [check-diff-public-ready](skills/check-diff-public-ready/SKILL.md) | Pass over the working diff for secrets, PII, internal URLs, and other material unsafe to push to a public repo; report-only severity table. |
 | [check-repo-public-ready](skills/check-repo-public-ready/SKILL.md) | Whole-repo audit for the same public-exposure risks (plus `.gitignore`/hygiene); report-only before open-sourcing or keeping a repo public. |
 | [check-npm-supply-chain](skills/check-npm-supply-chain/SKILL.md) | Audit a repo for npm supply-chain compromise indicators (Shai-Hulud-style worms): malicious install hooks, stealer payloads, IOCs, lockfile and hardening gaps; report-only. |
@@ -59,7 +59,7 @@ as an estimate; none of them mutate infrastructure.
 |---|---|
 | [basic-summary](skills/basic-summary/SKILL.md) | Rewrite the previous assistant message in ASD-STE100 Simplified Technical English: one-sentence bullets, one longer sub-bullet each, then one summary paragraph. Report-only. |
 | [summarise-work](skills/summarise-work/SKILL.md) | End-of-block wrap-up: Achieved / Fixed / Implemented bullets (omit empty), one sub-bullet each, then a short executive summary. Report-only. |
-| [bump-version](skills/bump-version/SKILL.md) | Cut a release: bump the version, sync it into `README.md`, and write a `CHANGELOG.md` entry derived from the git diff. |
+| [bump-version](skills/bump-version/SKILL.md) | Cut a release in any repo: detect where the version lives (`package.json`, `Cargo.toml`, `pyproject.toml`, `VERSION`, tags only, or a mix), bump every mirror, and write a `CHANGELOG.md` entry from the diff in the repo's own format. Defers to a repo-local release skill or script. |
 | [bump-version-sonnet](skills/bump-version-sonnet/SKILL.md) | The same release split in two: the main agent derives it from the diff and writes the changelog prose, a Sonnet subagent applies the file edits verbatim, the main agent verifies. |
 | [imp-grok-4-7](skills/imp-grok-4-7/SKILL.md) | Main agent plans, a headless Grok 4.7 process implements at `--effort` (default `medium`; the session effort stays unchanged), then the main agent reviews, scores the result out of 5, fixes, and summarizes. Generic "have grok implement this" trigger. Optional leading level: `/imp-grok-4-7 high`. |
 

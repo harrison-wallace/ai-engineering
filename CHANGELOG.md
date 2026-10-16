@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-10-16
+
+### Changed
+- `bump-version` works in any repo, not only this one and the `web/` app it was copied from. It reads the repo's `AGENTS.md`, `CLAUDE.md`, and CHANGELOG header first; their SemVer table, changelog format, and git policy override the defaults. It defers to a repo-local release skill (but not to a copy of itself), a `scripts/bump-version.sh`, or CI release tooling (semantic-release, release-please, changesets). It finds every version mirror (`package.json`, `Cargo.toml` workspaces, `pyproject.toml`, `VERSION`, `tauri.conf.json`, source constants, and lockfile self-entries) and leaves independent sub-packages and `0.0.0` placeholders alone. Tag-only repos get a changelog and a tag command, with no manifest edit. When the tag and the files disagree, it asks.
+- `bump-version` pre-flight runs the repo's documented check, or `tsc`, `cargo check`, or `go build` by ecosystem, and skips with a note when none applies. Text under `## [Unreleased]` moves into the new block. The changelog heading and section style match the existing file. Pre-1.0 and pre-release bumps have explicit rules. The stale-version grep searches for the old version across tracked files. The report prints commit and tag commands in the repo's own style. It still makes no git writes.
+- `bump-version-sonnet` follows the generic `bump-version`: the main agent finds the mirrors and hands the subagent an explicit file list. The idempotency check runs after the mirrors are found, so it no longer reads `package.json` in a Cargo-only or tag-only repo. Verification reuses the `bump-version` old-version sweep rather than keeping its own copy. Pre-flight is no longer TypeScript-only.
+- `basic-review` searches in five passes: intent, a mechanical sweep of added lines (conflict markers, debug leftovers, focused tests, and credential patterns that ignore case and accept unquoted `.env` values), a hunk read against per-type checklists, a ripple check on changed symbols, env vars, config keys, and columns, and a verify step that drops any candidate without a failure path.
+- `basic-review` report: a `Fix` column on each row, and a verdict that gives the call (`Fix before commit` / `OK to commit; fix soon` / `OK to commit` / `No findings`) and then the counts by severity. The coverage line says when staged and unstaged changes are mixed, and how many changed symbols had their callers checked. `/basic-review staged` reviews only the index. Repos with no commits, root commits, binary files, and oversized untracked files are handled. Removed code cites the nearest surviving line.
+
 ## [1.0.1] - 2026-10-13
 
 ### Added

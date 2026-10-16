@@ -19,21 +19,26 @@ it.
 Follow [`bump-version`](../bump-version/SKILL.md) exactly for everything before the edits. All of
 it stays with you — do not delegate any of these:
 
+- **Orient and defer.** Read the repo's rules, and stop if a repo-local release skill, a
+  bump script, or CI release tooling owns the release (`bump-version` §1–§2).
 - **Decide the bump type** from the argument, or infer it from the diff against the SemVer table
   and state the choice before applying.
 - **Derive the release from the diff (MANDATORY)** — working tree first, commits since the last
   version bump if the tree is clean. **Never ask the user for a summary.**
-- **Idempotency.** If `package.json`, `CHANGELOG.md`, and `README.md` already carry the new
+- **Find the version.** Identify every mirror file, every independent one, and the lockfile
+  entries (`bump-version` §3). The subagent gets an explicit list — it never discovers mirrors
+  itself.
+- **Idempotency.** If the mirrors you just found and `CHANGELOG.md` already carry the new
   version for this exact work, stop here. Verify, expand any stub, report — do not delegate a
   second bump.
-- **Pre-flight.** Run the typecheck yourself (`npx tsc --noEmit --project tsconfig.json`, from
-  wherever `tsconfig.json` lives). If it fails, **abort — do not delegate.** A subagent must never
-  be the one that decides a failing pre-flight is acceptable. If the repo has no `tsconfig.json`,
-  skip the check and say so.
+- **Pre-flight.** Run the repo's documented check, or the ecosystem default
+  (`bump-version` §6). If it fails, **abort — do not delegate.** A subagent must never be the one
+  that decides a failing pre-flight is acceptable. If no check applies, skip it and say so.
 
 Then write the plan down concretely, because it becomes the subagent prompt: current version → new
-version, the **full CHANGELOG block already written out** (dated, sectioned, final prose), the
-exact README version strings to change, and the specific doc files the diff has made stale with
+version, the **full CHANGELOG block already written out** (dated, sectioned, in the file's existing
+heading format, final prose), every mirror file and lockfile entry to change, the exact README
+version strings to change, and the specific doc files the diff has made stale with
 what is wrong in each.
 
 Save that CHANGELOG block to `<scratchpad>/expected-block.md` as you draft it, then paste the same
@@ -59,12 +64,12 @@ task even if the bullet is better.
 The prompt must also carry:
 
 - **The exact insertion point** for the CHANGELOG block: directly under `## [Unreleased]`, above
-  the previous version block. Never below an existing version.
+  the previous version block. Never below an existing version. If `## [Unreleased]` had content,
+  your block already absorbed it — tell the subagent to empty that section.
 - **Replace, don't append**, if a local script already left a `### Changed - <summary>` stub.
-- **Change only the version number** in `package.json` — no reformatting, no other fields.
-- **Discover the toolchain; do not assume it.** `node -p "require('./package.json').version"` is
-  the reference command, not a guarantee — the repo may have no `node` on `PATH`. Tell the
-  subagent to read and edit `package.json` as text if so, and to report what it used.
+- **Change only the version value** in each listed mirror — no reformatting, no other fields, and
+  no files that are not on the list. Edit them as text; do not assume `node`, `cargo`, or `python`
+  are on `PATH`.
 - **No git writes** — no `git add`, `git commit`, `git push`, `git tag`. The owner handles version
   control manually.
 - **Report** the files changed and the old → new version it wrote.
@@ -76,14 +81,14 @@ second-hand:
 
 ```bash
 git -C <repo-root> diff
-grep -rnE "v?[0-9]+\.[0-9]+\.[0-9]+" README.md package.json | head
+# then the old-version sweep from bump-version §7, run from <repo-root>
 ```
 
 Check, in order:
 
-- **Version consistency** — `package.json`, the README version line (`**vX.Y.Z**`), and the README
-  shields.io badge (`version-X.Y.Z-`) all read the new version. No stale old version survives
-  anywhere in the README.
+- **Version consistency** — every mirror from your plan, the README version line (`**vX.Y.Z**`),
+  and the README shields.io badge (`version-X.Y.Z-`) all read the new version. The old-version grep
+  shows only the hits you chose to leave.
 - **CHANGELOG prose is yours, unaltered** — establish this with a diff, never by re-reading it.
   Extract what landed and compare it to the file you saved in step 1:
 
@@ -106,7 +111,7 @@ is wrong.
 
 ## 4. Report
 
-- Pre-flight result (passed, or skipped because the repo has no `tsconfig.json`).
+- Pre-flight: the command and its result, or why it was skipped.
 - One-sentence release headline derived from the diff.
 - Which docs were updated, and which were checked and left alone.
 - What you had to fix in the subagent's pass, or "no fixes needed".
@@ -117,4 +122,5 @@ Close with the one-liner:
 Bumped 0.9.4 → 0.9.5 · Pre-flight passed · CHANGELOG entry added · README updated
 ```
 
-Do NOT run `git add`, `git commit`, or `git push` — the owner handles all version control manually.
+Print the suggested commit and tag commands, as in `bump-version` §10. Do NOT run `git add`,
+`git commit`, `git push`, or `git tag` — the owner handles all version control manually.

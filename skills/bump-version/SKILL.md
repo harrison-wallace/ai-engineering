@@ -1,161 +1,257 @@
 ---
 name: bump-version
-description: Use when asked to bump the version, update the changelog, or release a new version. Triggers on "bump version", "update changelog", "release", or "bump patch/minor/major".
+description: Cut a release in any repo — detect where the version lives (package.json, Cargo.toml, pyproject.toml, VERSION, tags only, or a mix), bump it everywhere it is mirrored, and write a CHANGELOG entry derived from the diff in the repo's own format. Defers to a repo-local release skill or script. Triggers on "bump version", "update changelog", "release", or "bump patch/minor/major".
 ---
 
 # bump-version
 
-Bump the version, mirror it in `README.md`, and add a `CHANGELOG.md` entry — all in one step.
+Cut a release in whatever repo you are in: bump the version in every file that mirrors it, add a
+`CHANGELOG.md` entry, and sync stale docs — all derived from the diff. The repo's own rules win
+over anything here; this skill fills the gaps.
 
 ## Usage
 
 ```
-/bump-version
-/bump-version patch
-/bump-version minor
-/bump-version major
+/bump-version                 # infer the increment from the diff
+/bump-version patch|minor|major
+/bump-version prerelease      # 1.2.0-beta.1 → 1.2.0-beta.2
+/bump-version 2.0.0           # explicit version
 ```
 
-Optional type only. **Never ask the user for a summary** — derive everything from the git history / working-tree diff (see below).
+**Never ask the user for a summary.** Derive everything from the diff. Ask only when a step below
+says to.
 
-### Decide bump type
+## 1. Orient
 
-| Input | Action |
+```bash
+git rev-parse --show-toplevel        # work from the repo root
+git status --short
+git tag --sort=-creatordate | head -5
+```
+
+Not a git repo → say so in one line and stop.
+
+Read the repo's rules before deciding anything: `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, and
+the header of `CHANGELOG.md`. Look for a SemVer table, a changelog format, a release flow, a
+pre-flight command, and a git policy. **Every rule found there overrides the defaults below.**
+A rule like "do not bump a version on your own" is satisfied by the user invoking this skill; a
+rule that routes releases through a specific tool or skill is not — follow §2.
+
+## 2. Defer to the repo's own release flow
+
+Check in this order. The first hit wins.
+
+| Found | Do |
 |---|---|
-| User passed `patch` / `minor` / `major` | Use that type |
-| No type given | Infer from the diff against AGENTS.md SemVer rules, then state the choice briefly before applying. Only ask if genuinely ambiguous (e.g. equal case for minor vs major) |
+| A repo-local skill: `.claude/skills/*/SKILL.md` named `release`, `bump*`, or `*version*` — except a copy of `bump-version` or `bump-version-sonnet` itself | Stop and tell the user to run that skill (`/release` etc.). It knows things this one doesn't, and may carry git authorisation this one never has. |
+| `scripts/bump-version.sh` (or `scripts/release*.sh` documented as the bump flow) | Read it first. Run it with the bump type and a one-line summary you wrote. Then expand the stub it leaves (§7) and do §8–§10. Skip any step the script already did. |
+| CI-driven release tooling: `.releaserc*` / `release.config.*` (semantic-release), `release-please-config.json`, `.changeset/` | Do not bump by hand — CI owns the version. For changesets, offer to write a `.changeset/*.md` instead. Otherwise explain and stop. |
+| None | Continue. |
 
-SemVer quick reference (from AGENTS.md):
+`cliff.toml` (git-cliff) only generates changelog text. It does not own the version, so it is not a stop — but match the changelog format it produces.
+
+## 3. Find the version
+
+**Locate every candidate.** Tracked files only:
+
+```bash
+git ls-files | grep -E '(^|/)(package\.json|Cargo\.toml|pyproject\.toml|setup\.(py|cfg)|VERSION|version\.txt|tauri\.conf\.json|Chart\.yaml|pubspec\.yaml|composer\.json|manifest\.json|.*\.csproj)$' | grep -v -e node_modules -e vendor/
+```
+
+Read the version field in each. Also note these:
+
+- The latest release heading in `CHANGELOG.md`.
+- The latest SemVer tag (`git describe --tags --abbrev=0`). Note its prefix, `v` or none.
+- Source constants: `__version__` in `__init__.py`, `version.ts` / `version.go` exports.
+
+**Pick the release version.** It is the version the changelog and tags agree on. Then classify each
+file:
+
+- **Mirror** — it carries the same version as the release and describes this project. Examples:
+  root `package.json`, `src-tauri/tauri.conf.json`, root `Cargo.toml` `[workspace.package]`, and a
+  `web/package.json` that tracks the app. Bump all mirrors together.
+- **Independent** — a sub-package with its own number, such as `0.0.0` fuzz crates, a
+  `packages/*` library, or a `pyproject.toml` that stays at `0.1.0` while `web/package.json` is at
+  `2.40.1`. Leave it alone and list it in the report.
+- **Placeholder** — `"version": "0.0.0"` or `"private": true` with a version the release flow
+  does not use, as the repo docs say. Leave it alone.
+
+**Tag-only repos.** No manifest carries the version: Go modules, a `0.0.0` placeholder, or a docs
+or config repo with only a CHANGELOG. The version lives in the tags and the changelog. Make no
+manifest edits. Write the changelog, then print the tag command (§10).
+
+**Disagreement.** Example: `VERSION` says `3.0.20` and the latest tag is `v3.0.21`. Do not guess.
+Show the candidates and ask which one is current.
+
+**No version anywhere** (no manifest version, no tags, no changelog). Ask whether to start at
+`0.1.0`, and where the version should live.
+
+## 4. Derive the release from the diff (MANDATORY)
+
+Do this before you write any changelog prose.
+
+Find the last release point. Use the first of these that exists:
+
+```bash
+git rev-parse -q --verify "refs/tags/${PREFIX}${OLD}"                    # the release tag
+git log -1 --format=%H -S"$OLD" -- <primary-version-file> CHANGELOG.md   # the commit that set OLD
+```
+
+Collect everything since that point:
+
+```bash
+git log --oneline <base>..HEAD
+git diff <base> --stat          # base → working tree: committed AND uncommitted release work
+git diff <base>
+git ls-files --others --exclude-standard
+```
+
+Skip generated files and lockfiles when you read. Classify each change as Added, Changed, Fixed,
+Removed, or Security, or into the repo's own categories (§7).
+
+**Idempotency.** The new version may already be on disk for this exact work, from an earlier pass.
+Then do not bump again. Verify the mirrors, expand any stub, sync the docs, and report.
+
+## 5. Decide the increment
+
+1. An argument was given → use it.
+2. Otherwise use the repo's SemVer table (§1).
+3. Otherwise use the default:
 
 | Increment | When |
 |---|---|
-| `PATCH` | Bug fixes, performance, UI tweaks, error handling, copy, dead-code removal |
-| `MINOR` | New features, pages, endpoints, agents, significant UI redesigns |
-| `MAJOR` | Breaking architecture, schema migrations needing data migration, rewrites |
+| `PATCH` | Bug and security fixes, performance, copy, docs, dead-code removal, internal refactors |
+| `MINOR` | New features, endpoints, commands, pages, or assets; non-breaking additions |
+| `MAJOR` | A removed or renamed public interface (CLI flags, API, config keys, file formats, invoke names); a data migration users must run |
 
-## Project detection
+Rules:
 
-```bash
-test -f ./scripts/bump-version.sh && echo "local" || echo "manual"
-```
+- **Pre-1.0** (`0.y.z`) — a breaking change bumps MINOR unless the repo says otherwise. Never
+  jump to `1.0.0` yourself; ask.
+- **Pre-release** (`1.2.0-beta.1`) — `prerelease` increments the last numeric identifier. A plain
+  `patch`, `minor`, or `major` on a pre-release asks first: should it graduate to `1.2.0`, or start
+  a new pre-release line?
+- State the choice and a one-line reason before you edit. Ask only when the evidence is truly split,
+  for example a change that could be breaking or not.
 
-- **If `./scripts/bump-version.sh` exists** — after writing the summary yourself, run:
-  `./scripts/bump-version.sh (patch|minor|major) "one-line summary"`.
-  The script handles pre-flight, version bump, README badge, and a CHANGELOG stub. Then expand the stub (step 5) and do doc sync (step 6).
-- **If no local script** — follow all steps below manually, including pre-flight.
+Compute the new version by hand: split, increment, and reset the lower parts to 0. Keep the
+original string shape. Never add or drop a prefix.
 
-## Derive the release from the diff (MANDATORY)
+## 6. Pre-flight
 
-Do this **before** writing any CHANGELOG prose. The point of the skill is that the agent decides; the user should not have to narrate the release.
+Run the repo's documented check first. That is a release checklist in AGENTS.md or CLAUDE.md, a
+`typecheck` / `check` / `lint` script in `package.json`, or a `Makefile` target. If none is
+documented, use the fast default for each ecosystem present:
 
-1. **Find the previous released version** — read `web/package.json` (or root `package.json`) version field, and the latest `## [X.Y.Z]` block under `CHANGELOG.md`.
-2. **Collect what changed since that version**:
-   ```bash
-   # Working-tree + index (uncommitted release work is the common case)
-   git status --short
-   git diff HEAD --stat
-   git diff HEAD
+| Present | Check |
+|---|---|
+| `tsconfig.json` (root or app dir) | `npx tsc --noEmit -p <dir>` |
+| `Cargo.toml` | `cargo check --workspace --quiet` |
+| `go.mod` | `go build ./...` |
+| none of the above | skip, and say so |
 
-   # If the branch is ahead of main / last tag, also:
-   git log --oneline <last-version-commit>..HEAD
-   git diff <last-version-commit>..HEAD --stat
-   ```
-   Prefer the uncommitted working-tree diff when it contains the release work. If the tree is clean, use commits since the last version bump commit (the one that last touched `web/package.json` / CHANGELOG).
-3. **Classify** each change into Added / Changed / Fixed / Removed.
-4. **Write the summary** yourself:
-   - One-line summary for the script (if used): short, imperative, covers the headline.
-   - Full CHANGELOG body: what / why, only sections with content. Be concrete (files, behaviours, user-visible effects) — not "various improvements".
-5. **Idempotency**: if `package.json` / CHANGELOG / README already reflect the new version for this exact work (e.g. a prior agent pass), do **not** bump again. Verify pre-flight + docs, expand any stub, and report. Only bump when the version on disk still matches the *previous* release.
+Failure → **abort the bump.** Print the errors and stop. Run checks from the directory that owns
+the config. Do not run full test suites or builds unless the repo's release checklist says to.
 
-## Pre-flight Checks (MANDATORY — skip only if local script ran them)
+## 7. Apply the edits
 
-From the project root (or `web/` if that is where `tsconfig.json` lives):
+**Mirrors.** Change only the version value. Use an anchored, first-match edit so a dependency
+pinned to the same number is never touched:
 
-```bash
-npx tsc --noEmit --project tsconfig.json
-# this repo: ( cd web && npx tsc --noEmit --project tsconfig.json )
-```
+- `package.json` / `*.json` — the top-level `"version"`.
+- `Cargo.toml` — `version` under `[package]`, or `[workspace.package]` in a workspace. Members with
+  `version.workspace = true` follow along.
+- `pyproject.toml` — `[project].version` or `[tool.poetry].version`. Skip it when `dynamic =
+  ["version"]` is set; then the source is the tag or `__version__`.
+- `VERSION` / `version.txt` — the whole file. Keep the trailing newline exactly as it was.
+- Source constants that held the old version.
 
-If this fails → **abort the bump immediately**. Print the errors and tell the user they must be fixed before any version bump is allowed.
+**Lockfiles** that record the project's own version. Update them so the next install leaves no
+diff:
 
-## Steps (execute in order)
+- `package-lock.json` — the root `"version"` and `packages[""].version` only.
+- `Cargo.lock` — `cargo update --workspace --offline`. If that fails, edit the
+  `[[package]]` entries for the workspace's own crates by hand.
+- `uv.lock` / `poetry.lock` — the project's own entry only, if it has one.
 
-### 1. Read current version
+**README.** Look for a shields badge (`badge/version-X.Y.Z-<color>`) and for `**vX.Y.Z**` lines.
+Change only the number.
 
-```bash
-node -p "require('./package.json').version"
-# or, if the project lives under web/:
-node -p "require('./web/package.json').version"
-```
-
-### 2. Calculate new version
-
-Split `MAJOR.MINOR.PATCH`, increment the right segment, reset lower segments to 0.
-
-### 3. Update `package.json`
-
-Change the `"version"` field only. Do not touch anything else.
-
-### 4. Update `README.md`
-
-Update the version everywhere it appears near the top (a project may use one, both, or neither form — replace the number in-place and leave the rest of each line unchanged):
-
-- **Standalone version line** of the form `**vX.Y.Z**`.
-- **Shields.io version badge** of the form `version-X.Y.Z-` inside a badge URL, e.g.
-  `![Version](https://img.shields.io/badge/version-1.2.0-6366f1?style=flat-square)`.
-  Update only the `X.Y.Z` between `version-` and the trailing `-<color>`; keep the colour/style query intact.
-
-After editing, grep to confirm no stale version remains in the README:
+**Sweep for stragglers.** Search tracked files for the old version:
 
 ```bash
-grep -nE "v?[0-9]+\.[0-9]+\.[0-9]+" README.md | grep -v "NEW_VERSION"   # eyeball for any old version left behind
+git grep -nF "$OLD" -- ':!CHANGELOG*' ':!*.lock' ':!*-lock.json' ':!*lock.yaml'
 ```
 
-### 5. Update `CHANGELOG.md`
+Triage every hit. Is it this project's version (update it), or something that only shares the
+number, such as a dependency, a historical note, or an unrelated schema (leave it)?
 
-Insert a new block **between** `## [Unreleased]` and the previous latest version block. Format:
+**CHANGELOG.md.** Match the file as it is. Copy these from the existing entries:
 
-```markdown
-## [NEW_VERSION] - YYYY-MM-DD
+- **Heading shape** — `## [X.Y.Z] - DATE`, `## [X.Y.Z] — DATE`, or `## X.Y.Z (DATE)`.
+- **Section names** — Keep a Changelog `### Added` / `Changed` / `Fixed` / `Removed` / `Security`, or the repo's own keywords.
+- **Bullet style** and the date format.
 
-### Added
-- (omit section if nothing added)
+Placement:
 
-### Changed
-- (omit section if nothing changed)
+- The block goes directly under `## [Unreleased]` when that heading exists. Otherwise it goes above
+  the newest release.
+- If `## [Unreleased]` already has content, **move it into the new block** and merge it with what
+  the diff adds. Leave `## [Unreleased]` empty.
+- If the release script left a stub (`### Changed` + one line), expand it in place. Do not append
+  a second block.
+- Use today's date (`date +%Y-%m-%d`). Include only sections that have content.
+- Each bullet is concrete: what changed, where, and what effect a user sees. Never write "various
+  improvements". Never leave a placeholder.
+- If the changelog keeps link references at the bottom (`[1.2.0]: https://…/compare/…`), add one
+  for the new version and update `[Unreleased]`.
 
-### Fixed
-- (omit section if nothing fixed)
+No `CHANGELOG.md` → create one with a Keep a Changelog header and say so in the report. In a repo
+that keeps release notes somewhere else (GitHub Releases only), ask first.
 
-### Removed
-- (omit section if nothing removed)
+**Two releases in one tree.** One uncommitted tree may hold two separable releases, such as
+feature A and then a follow-up fix B. You may write two sequential blocks and set the mirrors to
+the tip version. Prefer one block.
+
+## 8. Sync the docs
+
+Use the same diff:
+
+- Update `README.md` and any `docs/` or root `.md` file that the diff has made wrong: a feature
+  list, a config table, a usage example, a CLI flag.
+- Update counts that come from the tree, such as a "skills: N" or "N endpoints" badge.
+- Touch only what the diff makes wrong. Nothing stale → skip this step and say so.
+
+## 9. Verify
+
+- Re-read every mirror. Each one holds the new version.
+- `git grep -nF "$OLD"` (with the §7 exclusions) shows only the hits you chose to leave.
+- The changelog block sits in the right place, has today's date, matches the heading format, and
+  has no empty sections or leftover stub.
+- `git diff --stat` holds only the files you meant to change.
+
+## 10. Report
+
+- **Pre-flight**: the command and its result, or why it was skipped.
+- **Version**: `OLD → NEW`, the increment, and a one-line reason.
+- **Files**: every mirror bumped; every file left independent or as a placeholder.
+- **Headline**: one sentence on the release, from the diff.
+- **Docs**: which docs were updated, and which were checked and left alone.
+- **Next**: the git commands, shaped like this repo's past releases. Copy the commit subject from
+  earlier release commits (`git log --format=%s` around the old tag), and the tag prefix from
+  existing tags:
+
+  ```
+  git add -A && git commit -m "Release 1.4.0: <headline>"
+  git tag v1.4.0
+  ```
+
+Close with:
+
+```
+Bumped 0.9.4 → 0.9.5 · Pre-flight passed · CHANGELOG entry added · 3 files mirrored
 ```
 
-- Use today's date (`date +%Y-%m-%d`).
-- Only include sections that have content — omit empty ones.
-- Each bullet: what changed, what was fixed, and why it matters (brief). Derived from the diff — never a placeholder the user must fill in.
-- Never push the new block below an existing version — it always goes directly under `## [Unreleased]`.
-- If the local script already inserted a stub `### Changed - <summary>`, **replace/expand** that stub into the full multi-section entry in the same pass.
-
-When one uncommitted tree clearly contains two separable releases (e.g. feature A then follow-up feature B), you may emit two sequential blocks (minor then patch, etc.) and set `package.json` to the tip version. Prefer one block when the work is a single coherent release.
-
-### 6. Sync docs with what shipped
-
-Using the same diff as step "Derive the release":
-
-- Update `README.md` if any feature description, config table, or usage example it contains is now out of date.
-- Update any other `.md` files in the repo root or `docs/` that describe behaviour this release changed — stale docs are bugs. Only touch sections that the diff actually makes wrong; leave everything else alone.
-- If nothing in the diff contradicts an existing doc, skip this step entirely.
-
-### 7. Confirm
-
-- State that pre-flight TypeScript check passed (or that the local script ran it).
-- One-sentence release headline derived from the diff.
-- List which docs were updated (and confirm any that were skipped as unaffected).
-- Print a one-line summary:
-
-```
-Bumped 0.9.4 → 0.9.5 · Pre-flight passed · CHANGELOG entry added · README updated
-```
-
-Do NOT run `git add`, `git commit`, or `git push` — the owner handles all version control manually (per AGENTS.md).
+**No git writes.** Do not run `git add`, `git commit`, `git push`, or `git tag`. Print them under
+**Next** for the owner. A repo-local release skill (§2) may carry that authorisation; this skill
+never does.
