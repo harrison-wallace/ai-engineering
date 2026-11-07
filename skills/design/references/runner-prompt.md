@@ -29,7 +29,12 @@ the main agent uses to choose, so commit to your premise. Do not hedge toward a 
      consume.
 
    Derive the sketch from the usage. If they disagree, change the sketch, not the usage.
-2. **Data and ownership first.** Get the core types, tables, or resources right. For every piece
+2. **Primitives, data, and ownership first.** Name the primitives before any logic: the core
+   types, the states each thing can be in, and the transitions between them. Make invalid states
+   impossible to write: a union or a state machine instead of flags that must agree, and a
+   registry or map instead of a branch for each kind. Add a structure only when it removes a
+   branch, a repeated rule, an invalid state, or a lifecycle risk. Get the core types, tables, or
+   resources right. For every piece
    of state and every resource, name exactly one owner, meaning the only writer. Trace each main
    access pattern through the structure. If the answer is "we'll add a cache or index later",
    the structure is wrong.

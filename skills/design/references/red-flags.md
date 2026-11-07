@@ -41,6 +41,18 @@ agent correct?
   fields that are always set in practice.
 - **Callers must know the rules.** Using it correctly needs knowledge that is not in its
   signature, such as "call init first" or "never pass both".
+- **Invalid states can be written.** Flags or optional fields must agree (`isLoading` and
+  `error`, `data?` and `error?`), or phase checks are spread across files. Fix: a discriminated
+  union or a state machine, with the transitions in one place.
+- **A branch for each kind.** The next kind, plan, provider, or role needs a new `case` or
+  `else if` in more than one file. Fix: a registry or map keyed by kind, or a union with an
+  exhaustive `switch`.
+- **Two owners of client state.** A React value lives in `useState` and also in the URL, a
+  store, or a context, or a `useEffect` copies it from props. Fix: one owner, and compute the rest
+  during render.
+
+The full list of these data-shape signs, with leads, is in
+`../../check-primitives/references/signs.md`.
 
 ## Infra
 

@@ -17,6 +17,7 @@ Claude Code, cheaper models, and infrastructure work.
 | [teach](skills/teach/SKILL.md) | `pstack/skills/teach` |
 | [fix-prose](skills/fix-prose/SKILL.md) | `pstack/skills/unslop` |
 | [summarise](skills/summarise/SKILL.md) (`plain` mode) | `pstack/skills/bro` |
+| [check-primitives](skills/check-primitives/SKILL.md), [design](skills/design/SKILL.md) (the data-shape red flags and runner step 2) | `pstack/skills/principle-model-the-domain` and `pstack/skills/principle-foundational-thinking` |
 | [summarise](skills/summarise/SKILL.md), [restate-ask](skills/restate-ask/SKILL.md) (clear-reading checks), [summarise-deep](skills/summarise-deep/SKILL.md) (voice) | `pstack/skills/technical-writing` |
 
 pstack is distributed under the MIT License:

@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-11-07
+
+### Added
+- `check-primitives` checks code for missing primitives, where the domain lives in conditionals instead of in a data structure, after pstack `principle-model-the-domain` and `principle-foundational-thinking`. `references/signs.md` lists 14 signs with stable IDs: state (flags that must agree, phase checks spread out, ad hoc mutation), data shape (a branch for each kind, the same switch twice, dependent optional fields, loose shapes, the wrong collection), modules (split by time, two writers), and React (`useState` clusters, stored derived state, state with two owners, boolean props that exclude each other), plus a do-not-flag list. `diff` (default) counts only signs the diff adds or grows, `staged` checks only the index, and paths check files in full. Each finding names a concrete invalid state or next edit, every site, and the primitive, with a short sketch for strong ones. Report-only, and it offers `/design lite`, `/delegate`, or `/prototype logic`.
+
+### Changed
+- `review-product` grounds Retention in the repo. A primitives map names at most 7 primitives with the model or type that holds each (Prisma, Drizzle, SQL migrations, Zod, core types), maps each feature onto one, marks one-offs (a table that repeats a primitive's fields, a column for one feature, a hardcoded list, a route that skips the primitive's module), and names a power-user unlock for each. It offers `/check-primitives` for one-offs that come from code shape. `feature <idea>` judges one planned feature as Extends, Exposes more, New primitive, or One-off, with the smallest data change that keeps it off One-off. Marketing and Aha moment are unchanged.
+- `design` screens candidates for three more software red flags (invalid states can be written, a branch for each kind, two owners of client state), and runner step 2 asks for the primitives, states, and transitions before any logic.
+
 ## [3.0.0] - 2026-11-07
 
 ### Added

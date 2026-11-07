@@ -12,8 +12,8 @@
                                              ░███████                                                              ░███████
 ```
 
-![Version](https://img.shields.io/badge/version-3.0.0-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-34-22c55e?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.1.0-6366f1?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-35-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -77,7 +77,8 @@ runs one or both and teaches the result. `research` covers what outside sources 
 | [check-public-ready](skills/check-public-ready/SKILL.md) | Check the diff, the whole repo, or its history for material that is unsafe on a public repo: secrets, PII, keys, internal URLs, and dumps. Report-only. |
 | [check-npm-supply-chain](skills/check-npm-supply-chain/SKILL.md) | Check a repo for npm supply-chain compromise: malicious install hooks, credential stealers, exfil workflows, and tampered lockfiles. Report-only. |
 | [check-ui-tells](skills/check-ui-tells/SKILL.md) | Scan a web UI's code or live URL for the typical AI-generated design tells, with evidence and a cluster score. Report-only. |
-| [review-product](skills/review-product/SKILL.md) | Review a product, feature, or launch plan against Dax Raad's three principles: shareable marketing, one Aha moment, and primitives-first retention. |
+| [check-primitives](skills/check-primitives/SKILL.md) | Check the diff for rules kept in `if`s and flags instead of a data structure: flags that must agree, a branch for each kind, `useState` clusters. Each finding names the primitive. Report-only. From pstack `principle-model-the-domain`. |
+| [review-product](skills/review-product/SKILL.md) | Review a product or launch plan against Dax Raad's principles: shareable marketing, one Aha moment, and primitives-first retention, mapped against the real data model. `feature` judges one planned feature. |
 | [review-site](skills/review-site/SKILL.md) | Review a website against the premium-website framework: the first impression, cognitive fluency, Peak-End micro-interactions, current trends, and ownership. |
 
 ### Ship & record
