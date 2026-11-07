@@ -2,3 +2,5 @@
 /docs/adr/
 docs/plans/
 docs/phases/
+__pycache__/
+*.pyc
