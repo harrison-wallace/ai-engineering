@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-07
+
+### Added
+- `check-ai-ui-tells`, a report-only scan of a web UI for 26 typical AI/template design tells. They cover colour and effects, typography, layout, motion, and copy. It reads the code with greps, and the rendered page with a read-only Playwright `probe.js`. The report is a fixed-order table with evidence for each tell, then a cluster score, the loudest tells with fixes, counterweights, and coverage. The catalogue is in `tells.md`.
+
 ## [1.0.2] - 2026-10-16
 
 ### Changed

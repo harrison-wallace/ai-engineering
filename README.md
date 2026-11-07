@@ -1,7 +1,7 @@
 # ai-engineering
 
-![Version](https://img.shields.io/badge/version-1.0.2-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-18-22c55e?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.1.0-6366f1?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-19-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -27,6 +27,7 @@ CLAUDE.md    Instructions Claude reads when working in this repo
 | [check-diff-public-ready](skills/check-diff-public-ready/SKILL.md) | Pass over the working diff for secrets, PII, internal URLs, and other material unsafe to push to a public repo; report-only severity table. |
 | [check-repo-public-ready](skills/check-repo-public-ready/SKILL.md) | Whole-repo audit for the same public-exposure risks (plus `.gitignore`/hygiene); report-only before open-sourcing or keeping a repo public. |
 | [check-npm-supply-chain](skills/check-npm-supply-chain/SKILL.md) | Audit a repo for npm supply-chain compromise indicators (Shai-Hulud-style worms): malicious install hooks, stealer payloads, IOCs, lockfile and hardening gaps; report-only. |
+| [check-ai-ui-tells](skills/check-ai-ui-tells/SKILL.md) | Scan a web UI (code and/or live URL) for 26 typical "AI-generated" design tells (purple gradients, glassmorphism, Inter-only type, pill-badge hero, three identical cards, left-border stripes, scroll fade-ins, buzzword copy), and list each one with evidence and a cluster score. Report-only. |
 
 ### AWS
 
