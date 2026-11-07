@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Block a commit when README.md and skills/ disagree. Enable once per clone:
+#   git config core.hooksPath .githooks
+exec "$(git rev-parse --show-toplevel)/scripts/check-readme.sh" --staged

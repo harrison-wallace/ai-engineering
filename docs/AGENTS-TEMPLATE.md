@@ -26,7 +26,8 @@ change. Always use the version in the repository.
 ## 1. Core Rules
 
 - **Think before you code.** State your assumptions. Ask when you are not sure.
-  Never guess.
+  Never guess. Ask as a numbered list. Each question must be answerable in a
+  few words.
 - **Goal-driven execution.** Change a vague instruction into a success criterion
   that you can verify. Do this before you write code.
 - **Simplicity first.** Write the minimum code that solves the problem. Do not
@@ -45,9 +46,9 @@ change. Always use the version in the repository.
 - **Phase board.** If `docs/plans/NOW.md` exists, read it first, then only the
   phase doc it names. `docs/plans/BOARD.md` owns phase status (at most one in
   progress). Checkboxes and Definition of Done stay in the phase doc.
-  `/phase sync` rewrites NOW and the active checkboxes. `/phase advance` closes
-  a slice or a phase. Do not invent a sitting file. Do not put a locked
-  decision or Later items in NOW.
+  `/phase sync` rewrites NOW and the active checkboxes. `/phase advance slice`
+  closes a slice. `/phase advance phase` closes a phase. Do not invent a
+  sitting file. Do not put a locked decision or Later items in NOW.
 
 <!--
 REPO: backward compatibility. Keep one of the two lines below. Delete the other.

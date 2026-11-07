@@ -1,8 +1,8 @@
 ---
 name: phase
-description: Long-horizon phase board for the cwd repo. BOARD.md tracks phases, NOW.md points at the current slice, phase docs hold checkboxes and DoD. Modes: status (default), init, sync, shape, advance, prune, help. Use when the user runs /phase, asks where we are on the plan, or names BOARD.md / NOW.md. Replaces session-* / SESSION.md.
+description: Long-horizon phase board for the cwd repo. BOARD.md tracks phases, NOW.md points at the current slice, phase docs hold checkboxes and DoD. Modes: status (default), init, sync, shape, advance slice|phase, prune, help. Use when the user runs /phase, asks where we are on the plan, or names BOARD.md / NOW.md. Replaces session-* / SESSION.md.
 user-invocable: true
-argument-hint: "[status|init|sync|shape|advance|prune|help]"
+argument-hint: "[status|init|sync|shape|advance [slice|phase]|prune|help]"
 ---
 
 # phase
@@ -28,7 +28,8 @@ Do not start Linear, GitHub issues, or a Projects board for this.
 | `init` | Once: `NOW.md`, `BOARD.md`, dirs, gitignore the two trees. Migrate `SESSION.md` / `STATUS.md`. |
 | `sync` | Rewrite NOW and the active phase checkboxes from git + this chat. Does not close a phase. |
 | `shape` | Write or sharpen the next phase doc. Board row → `shaped`. |
-| `advance` | Close the current slice or phase when its DoD is met. |
+| `advance slice` | Close the current slice. Bare `advance` means this. Never closes a phase. |
+| `advance phase` | Close the phase when its DoD is met. Pull the next `shaped` row in. |
 | `prune` | Propose archive of done/superseded docs. Confirm each. |
 | `help` | Print this table. One line: the board is the tracker; NOW is not the plan. |
 
@@ -36,7 +37,11 @@ Parse the first mode word after `/phase` or `phase`. Bare `/phase` is `status`.
 Old names: `session-init` → `init`; `session-check` / `session-start` → `status`;
 `session-snap` / `session-end` → `sync`; `session-prune` → `prune`;
 `session-help` → `help`. Say the new name once. `session-end` does not close a
-phase; that is `advance`.
+phase; that is `advance phase`.
+
+When you suggest the next command, write the full form: `/phase advance slice`
+when the current slice's items are all ticked, `/phase advance phase` when the
+phase DoD looks met. Never suggest bare `/phase advance`.
 
 ## Paths
 
@@ -119,8 +124,8 @@ Rewrite NOW and the active phase checkboxes. Do not append. Do not close a phase
 3. Tick checkboxes that actually landed (git + this conversation). Do not tick
    the rest. Adjust NOW `Slice` to the first remaining unchecked slice (or
    `none`). Refresh NOW `Blocked` and the in-progress board `Note`.
-4. Do not change a row's status to `done` (that is advance). Do not append the
-   log. Do not prune Later. Do not keep implementing unless the user asked.
+4. Do not change a row's status to `done` (that is `advance phase`). Do not
+   append the log. Do not prune Later. Do not keep implementing unless the user asked.
 
 ## Shape
 
@@ -141,19 +146,31 @@ Write or sharpen a phase doc. Do not implement.
 
 ## Advance
 
-Close work whose DoD is met. Do not invent remaining work as done.
+Close work whose DoD is met. Do not invent remaining work as done. The second
+word picks the target: `slice` (default) or `phase`. Bare `advance` is
+`advance slice`. Do not infer `phase` from a bare `advance`.
 
 1. If BOARD is missing, tell the user to run `/phase init`. Stop.
-2. If the **phase** DoD is met (deferred items do not block): set the row to
+
+### `advance slice`
+
+2. If every item of the **current slice** is ticked, or the user confirms the
+   rest are done: tick the slice, point NOW at the next unchecked slice (or
+   `none`). Optionally append one log line for the slice. Board status stays
+   `in progress`. Do not close the phase, even if this was the last slice.
+3. Else list what is left in the slice. Do not write.
+4. If no unchecked slice is left, say so and suggest `/phase advance phase`.
+
+### `advance phase`
+
+5. If the **phase** DoD is met (deferred items do not block): set the row to
    `done`, flip a **Status:** line on the phase doc if present, append one log
    line (`YYYY-MM-DD`, phase id, version if any), pull the next `shaped` row
    into `in progress` (or `none`). Rewrite NOW to that phase's first unchecked
    slice, or `Phase: none`.
-3. Else if the **current slice** is met: tick it, point NOW at the next
-   unchecked slice (or `none`). Optionally append one log line for the slice.
-   Board status stays `in progress`.
-4. Else list what is left. Do not write.
-5. Stop. Do not keep implementing.
+6. Else list the DoD lines that are not met. Do not write.
+
+7. Stop. Do not keep implementing.
 
 ## Prune
 

@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-07
+
+### Added
+- `basic-architect` designs a new feature, service, or component before code, for software, infra, or both. Haiku Explore agents ground it in the real system. Two Sonnet runners sketch structurally different shapes from forced premises (extend the current structure, or reshape it as if the requirement had been there from day one). The main agent screens both against software and infra red flags (`references/red-flags.md`), merges them, and writes a `proposed` ADR in the repo's `docs/adr/` format, then stops for sign-off and offers `/phase shape` with a design contract for the slices. `lite` uses no subagents, and `deep` adds one Opus-high runner. Sketch checks are read-only (`tsc --noEmit`, `terraform validate`, `docker compose config`), and it never applies infrastructure.
+- `basic-alignment` plays back an ask before any work starts: goal, problem, scope in and out, constraints heard, what done looks like, meaning-changing readings of unclear or dictated words, and numbered yes/no assumptions, in Simplified Technical English. It is report-only and makes no tool calls. `basic-architect` opens its grounding brief and its sign-off with the same block.
+- `basic-reflect` mines the current session, or `last <n>` sessions in the same project, for durable lessons. A bundled `digest.sh` (`jq`, read-only) shrinks a transcript to its user messages, commands, skill and agent calls, errors, and clipped replies, with `-b` for a brief multi-session digest. Two Sonnet reviewers ("what to encode", "what we missed") feed a main-agent filter for durability, decision change, and "already covered". Each lesson routes to an ai-engineering skill, the repo's `AGENTS.md`/`CLAUDE.md`, `AGENTS-TEMPLATE.md`, or memory, and only the numbered rows the user approves are applied. Hooks, settings, scripts, and lessons about skills the user does not own stay suggestions.
+- `basic-impact` finds what a change could break outside its diff, for software, infra, or both. It sweeps every repo in `~/git` with `rg`, works through a "where grep stops" checklist (`references/where-grep-stops.md`), and proves the one fact the change is safe because of on a 5-level ladder with read-only scripts and commands. Anything with side effects is printed as a `!` command for the user, and the repo's `AGENTS.md` overrides the allowed list. `deep` adds a Sonnet second opinion that runs without the main agent's conclusions.
+- `scripts/check-readme.sh` fails when the skills badge disagrees with the `skills/` folders, a skill has no README row or two, a row links a missing skill, or a `SKILL.md` `name` does not match its folder. `--staged` checks the index, and `.githooks/pre-commit` runs it that way (enable with `git config core.hooksPath .githooks`).
+- `scripts/install-skill.sh <name>... [--remove]` links skills into every `~/.claude*` profile. It skips a profile that holds a real directory, and `--remove` deletes only links that point into this repo.
+- `THIRD_PARTY_NOTICES.md` records the MIT license of pstack, which `basic-architect`, `basic-alignment`, `basic-reflect`, and `basic-impact` adapt.
+
+### Changed
+- `basic-review` ripple pass also checks infra names (compose networks, volumes, and containers, hostnames, buckets, Terraform addresses and outputs, IAM ARNs, secret names, cron paths, and image tags) in the current repo. A ripple it cannot settle in one pass ends the coverage line with `Unverified ripple: <names>. Run /basic-impact.`
+- `phase` splits `advance` into `advance slice` (the default for a bare `advance`, never closes a phase) and `advance phase` (closes the phase when its DoD is met). Suggestions always name the full form. The README cheatsheet and `AGENTS-TEMPLATE.md` follow.
+- `AGENTS-TEMPLATE.md` Core Rules: questions are asked as a numbered list, each answerable in a few words.
+- `CLAUDE.md`: adding or removing a skill also runs `check-readme.sh` and `install-skill.sh`. A new "Porting an upstream skill" section covers summarizing first, asking before building, `basic-<name>` naming, credit, the notices file, and never editing the upstream clone.
+
+### Fixed
+- README Repo workflow table: the `imp-sonnet` row sat below the archived-skills note, so it rendered outside the table.
+
 ## [1.1.0] - 2026-11-07
 
 ### Added

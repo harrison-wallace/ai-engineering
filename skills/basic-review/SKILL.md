@@ -59,13 +59,15 @@ For each changed hunk, read the whole enclosing function or block, not only the 
 
 ### D. Ripple check
 
-The diff may add, delete, or rename something other code depends on, or change its signature. That includes a function, type, export, route, CLI flag, env var, config key, DB column, or event name. Then search for every user the hunk does not show:
+The diff may add, delete, or rename something other code depends on, or change its signature. That includes a function, type, export, route, CLI flag, env var, config key, DB column, or event name. It also includes infra names: a compose network, volume, or container name, a hostname, a bucket, a Terraform resource address or output, an IAM ARN, a secret name, a cron or backup path, or an image tag. Then search for every user the hunk does not show:
 
 ```bash
 git grep -nw '<symbol>'
 ```
 
 Include tests, docs examples, `.env.example`, fixtures, and migrations. Report a user that now breaks. Leave every other pre-existing issue out.
+
+This pass stays inside the current repo. Note a ripple you could not settle in one pass for the coverage line. That includes a changed infra name, a shared contract (route, schema, wire format, Terraform output), or a symbol that other repos may use. Do not chase it further. That is `/basic-impact`'s job.
 
 ### E. Verify every candidate
 
@@ -196,6 +198,7 @@ Then add these, in order, only when they apply:
 - `Skipped <count>.` — when you skipped generated, lockfile, binary, or oversized paths.
 - `Large diff: source hunks only.` — when you could not read the whole diff.
 - `<count> further findings omitted.` — when you left rows out of the table.
+- `Unverified ripple: <names>. Run /basic-impact.` — when pass D noted a ripple it could not settle in this repo. List at most 3 names.
 
 Shapes for that line. Do not append these samples to a real report.
 
@@ -205,4 +208,8 @@ Reviewed 2 files (working tree: staged + unstaged): src/api.ts, src/api.test.ts.
 
 ```
 Reviewed 4 files (last commit abc1234). Skipped 1. 2 further findings omitted.
+```
+
+```
+Reviewed 3 files (staged): terraform/network.tf, compose.yml, README.md. Callers checked for 2 changed symbols. Unverified ripple: proxy, app_url. Run /basic-impact.
 ```
