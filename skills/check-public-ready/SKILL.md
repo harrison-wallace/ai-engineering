@@ -9,7 +9,7 @@ argument-hint: "[diff | repo [history]] [<paths>]"
 Would this be safe on a **public** GitHub or GitLab repo? **Report only.** Never fix, rewrite
 history, commit, or push.
 
-Not a general code review. For bugs and exploitable code, use `/basic-review` or
+Not a general code review. For bugs and exploitable code, use `/review` or
 `/security-review`.
 
 ## Scope

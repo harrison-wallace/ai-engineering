@@ -18,3 +18,17 @@ Read the reference for the mode and follow it in full, including its step 0 cost
 Explorer API calls cost money, so the gate always runs first.
 
 For per-bucket S3 security and cost, use `/aws-audit s3`.
+
+## Page (on request)
+
+End each report with one line: *"Reply `page` for charts of this report, served on your LAN."*
+When the user replies `page`, read `../serve-page/SKILL.md` (relative to this skill's folder, resolved with `readlink -f`) and follow its §1 to §4. Load the `dataviz` skill before you draw a chart. Write
+`<scratchpad>/aws-cost/<mode>-<date>/index.html`.
+
+- **`mtd`**: spend by service as a ranked bar chart, spend by region, this month against last
+  month, and the run-rate with the month-end forecast. Each figure is labelled as an estimate.
+- **`optimize`**: the savings as a ranked bar chart by estimated monthly saving, with each
+  resource, its action, and its risk in a table below.
+
+The page holds the account ID, spend figures, and resource IDs, so it carries the sensitive-page
+warning. Stop the server when the user says they are done.

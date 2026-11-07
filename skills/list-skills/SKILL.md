@@ -51,11 +51,11 @@ For each skill, write the house shape:
   - When to use it, in one sentence. When a close neighbour exists, add "Not for X: use `other`."
 
 - Take both lines from the skill's description. Do not add powers it does not claim.
-- Name the neighbour for each pair that is easy to confuse: `basic-` and `advanced-` pairs, review
+- Name the neighbour for each pair that is easy to confuse: `-deep` pairs, review
   and impact, summary and teach, and plugin skills that overlap yours (`code-review` and
-  `advanced-review`, `code-simplifier` and `simplify`, `basic-research` and the built-in
-  `deep-research`).
-- Use the STE rules and the clear-reading checks from `../basic-summary/SKILL.md` §3.
+  `review-deep`, `code-simplifier` and `simplify`, `research` and the built-in
+  `deep-research`, `check-architecture` and `design`).
+- Use the STE rules and the clear-reading checks from `../summarise/SKILL.md` §3.
 
 ## 4. Report
 
@@ -70,7 +70,7 @@ Leave out a section that is empty.
 
 ## Yours
 ### <README section>
-- **`basic-review`**: …
+- **`review`**: …
   - …
 
 ## Plugins

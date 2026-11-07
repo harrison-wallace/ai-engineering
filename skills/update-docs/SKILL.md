@@ -9,7 +9,7 @@ argument-hint: "[diff | repo | <paths>] [scan]"
 Find what the docs say that the code no longer does, prove it, and fix it. **Fix by default.**
 `scan` reports only. Never commit.
 
-This skill fixes facts, not style. For AI writing tells, use `/basic-unslop`. For how to write the
+This skill fixes facts, not style. For AI writing tells, use `/fix-prose`. For how to write the
 new text, follow §5.
 
 ## 1. Read the arguments
@@ -42,18 +42,19 @@ source, not docs, unless the user names it.
 | Doc | Owner | Do |
 |---|---|---|
 | `README*`, `docs/**` guides, `CONTRIBUTING*`, `.env.example` | This skill | Fix |
-| `AGENTS.md`, `CLAUDE.md` | The user (rules) and `basic-reflect` (lessons) | Fix facts only, such as a path, a command, or a count. Flag anything that would change a rule |
+| `AGENTS.md`, `CLAUDE.md` | The user (rules) and `reflect` (lessons) | Fix facts only, such as a path, a command, or a count. Flag anything that would change a rule |
 | `CHANGELOG.md` | `bump-version` | Flag a change that has no `[Unreleased]` entry. Never edit it |
 | `docs/plans/NOW.md`, `docs/plans/BOARD.md`, `docs/phases/*`, `docs/plans/mvp/*` | `phase` | Flag, and point to `/phase sync` |
-| `docs/adr/*` | `basic-architect` | Never rewrite it. An ADR is a historical record. Flag "possibly superseded by <change>" |
-| `docs/summary/*` | `advanced-summary` | Skip. A summary is a snapshot of its day |
+| `docs/adr/*` | `design` | Never rewrite it. An ADR is a historical record. Flag "possibly superseded by <change>" |
+| `docs/summary/*` | `summarise-deep` | Skip. A summary is a snapshot of its day |
+| `GLOSSARY.md`, `GLOSSARY-MAP.md` | `define-terms` | Flag a term the code no longer uses, and point to `/define-terms check` |
 
 ## 4. Check
 
 ### `diff`
 
-1. Collect the diff the way `basic-review` §1 does (`git diff HEAD` plus untracked files, `staged`,
-   or the last commit when the tree is clean). Read `../basic-review/SKILL.md` for the rules.
+1. Collect the diff the way `review` §1 does (`git diff HEAD` plus untracked files, `staged`,
+   or the last commit when the tree is clean). Read `../review/SKILL.md` for the rules.
 2. List the **changed names** from the removed and added lines: symbols, CLI flags, env vars,
    config keys, scripts and make targets, routes, file paths, and infra names (compose services,
    ports, volumes, hostnames, Terraform outputs and variables, cron and backup paths).
@@ -120,7 +121,7 @@ Then these sections, each left out when empty:
 - **Checks run**: each command from §4, with `pass`, `fail`, or `not run: <reason>`.
 - **Coverage**: `Checked <m> docs (<scope>). <k> claims checked.`
 
-End with one line: *"Run `/basic-unslop diff` to check the new wording?"*
+End with one line: *"Run `/fix-prose diff` to check the new wording?"*
 
 ### After `scan`
 

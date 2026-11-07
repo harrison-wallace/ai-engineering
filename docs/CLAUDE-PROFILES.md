@@ -58,8 +58,8 @@ echo "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
 Because profiles don't inherit from each other, anything you want everywhere must
 be installed into **each** profile's directory. Keep the canonical copy in this
 repo and symlink it into every profile directly — see
-[Installing (symlinks)](../README.md#installing-symlinks) in the README, including
-the warning about not chaining one profile's symlink through another's.
+[Install](../README.md#install) in the README, including the rule that a link never
+chains through another profile's link.
 
 ## Gotchas
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Check that README.md agrees with skills/: the badge count, one table row per
-# skill, no rows for missing skills, and frontmatter names that match folders.
+# skill, no rows for missing skills, rows of 300 characters or fewer, and frontmatter
+# names that match folders.
 # Usage: scripts/check-readme.sh [--staged]   (exit 1 on any mismatch). Read-only.
 #   --staged  check what the next commit holds (the index), not the working tree.
 #             The pre-commit hook uses this.
@@ -38,6 +39,14 @@ done
 for s in $(printf '%s\n' "$rows" | uniq -d); do
   err "skills/$s has more than one README table row"
 done
+
+# Each row is a short hook. The detail lives in the skill's SKILL.md (CLAUDE.md).
+while IFS= read -r line; do
+  [ -n "$line" ] || continue
+  name=$(printf '%s' "$line" | sed -E 's/^\| \[([^]]+)\].*/\1/')
+  cell=$(printf '%s' "$line" | sed -E 's/^\| \[[^]]+\]\(skills\/[^)]+\) \| //; s/ \|[[:space:]]*$//')
+  [ "${#cell}" -le 300 ] || err "skills/$name README row is ${#cell} characters, over 300"
+done <<< "$(printf '%s\n' "$readme" | grep -E '^\| \[[^]]+\]\(skills/[^/)]+/SKILL\.md\)' || true)"
 
 for s in $skills; do
   name=$(readf "skills/$s/SKILL.md" | sed -n '2,/^---$/{s/^name:[[:space:]]*//p}' | head -n 1 || true)

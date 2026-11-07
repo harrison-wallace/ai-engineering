@@ -1,0 +1,4 @@
+# Local decision records and the phase board stay out of git.
+/docs/adr/
+docs/plans/
+docs/phases/

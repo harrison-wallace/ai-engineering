@@ -114,6 +114,11 @@ Read only.
 4. Stale: commits after NOW `Updated`, or checkboxes that disagree with git →
    **stale → run `/phase sync`**. Two `in progress` rows → say so; do not pick.
 5. Do not start the slice unless the user also said to continue.
+6. End with one line: *"Reply `page` for the board on your LAN."* When the user replies `page`,
+   read `../serve-page/SKILL.md` (relative to this skill's folder, resolved with `readlink -f`)
+   and follow its §1 to §4. Write `<scratchpad>/phase/<repo>/index.html`: the board rows in order
+   with their status, the current phase with its slices and checkboxes as a progress bar, Blocked,
+   and the close log. It stays read-only. Stop the server when the user says they are done.
 
 ## Sync
 
