@@ -1,9 +1,4 @@
----
-name: aws-cost-optimize
-description: Find AWS cost savings — Cost Optimization Hub and Compute Optimizer recommendations plus direct sweeps for idle/orphaned resources (unattached EBS, unused EIPs, idle NAT gateways and load balancers, gp2 volumes, unretained log groups) and Savings Plans coverage gaps. Single account, report-only table ranked by estimated monthly saving. Triggers on "/aws-cost-optimize", "reduce my AWS bill", "AWS cost savings", "cost optimisation", or "what can I turn off".
----
-
-# aws-cost-optimize
+# aws-cost: optimize
 
 A read-only sweep for **actionable AWS savings** in one account, ranked by
 estimated monthly dollars, each with the effort and risk of acting on it.
@@ -16,8 +11,8 @@ Two sources, both needed:
    well, found by querying the services directly. This is where the surprise
    money usually is.
 
-For "what am I spending", use `aws-cost-mtd`. For S3 specifically, use
-`aws-s3-audit` — this skill defers to it rather than duplicating those checks.
+For "what am I spending", use `/aws-cost mtd` (`references/mtd.md`). For S3 specifically, use
+`/aws-audit s3` — this skill defers to it rather than duplicating those checks.
 
 **Scope: one account per run.** Do not assume-role into other accounts. If the
 profile is an Organizations management account, note that these findings cover
@@ -47,7 +42,7 @@ approval.
    spend, skip section 4 entirely, and say in the report that commitment
    coverage was not assessed.
 
-Same rules as `aws-cost-mtd`: the gate is blocking, prior approval in the
+Same rules as `/aws-cost mtd` (`references/mtd.md`): the gate is blocking, prior approval in the
 original request counts, re-runs bill again and re-ask, and once approved stay
 inside the approved request count rather than retrying speculatively.
 
@@ -58,7 +53,7 @@ aws sts get-caller-identity --output json
 aws ec2 describe-regions --query 'Regions[].RegionName' --output text
 ```
 
-Confirm the profile with the user if ambiguous (see `aws-cost-mtd` step 1).
+Confirm the profile with the user if ambiguous (see `/aws-cost mtd` (`references/mtd.md`) step 1).
 
 **Region strategy matters for runtime.** Sweeping 30+ regions is slow. Ask Cost
 Explorer which regions actually have spend (one $0.01 call) and sweep those in

@@ -1,22 +1,17 @@
----
-name: bump-version-sonnet
-description: Use when asked to cut a release with a Sonnet subagent applying the edits. The main agent derives the release from the diff and writes the changelog prose, a Sonnet subagent makes the file edits, the main agent verifies. Triggers on "/bump-version-sonnet" or "bump the version with sonnet".
----
+# bump-version: sonnet
 
-# bump-version-sonnet
-
-The same release as [`bump-version`](../bump-version/SKILL.md), split in two: **you decide what
+The same release as [`bump-version`](../SKILL.md), split in two: **you decide what
 the release is, a Sonnet subagent edits the files, you verify.** The judgement stays with you
 because it depends on this conversation; the edits go to Sonnet because they are mechanical,
 repetitive, and token-heavy.
 
-Reach for plain `bump-version` on a small release — one subagent round-trip costs more than the
+Reach for plain `/bump-version` on a small release — one subagent round-trip costs more than the
 three edits it saves. This skill earns its keep when the release also drags a pile of docs behind
 it.
 
 ## 1. Derive the release (main agent)
 
-Follow [`bump-version`](../bump-version/SKILL.md) exactly for everything before the edits. All of
+Follow [`bump-version`](../SKILL.md) exactly for everything before the edits. All of
 it stays with you — do not delegate any of these:
 
 - **Orient and defer.** Read the repo's rules, and stop if a repo-local release skill, a

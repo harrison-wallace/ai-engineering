@@ -1,6 +1,6 @@
 ---
 name: bump-version
-description: Cut a release in any repo — detect where the version lives (package.json, Cargo.toml, pyproject.toml, VERSION, tags only, or a mix), bump it everywhere it is mirrored, and write a CHANGELOG entry derived from the diff in the repo's own format. Defers to a repo-local release skill or script. Triggers on "bump version", "update changelog", "release", or "bump patch/minor/major".
+description: Cut a release in any repo — detect where the version lives (package.json, Cargo.toml, pyproject.toml, VERSION, tags only, or a mix), bump it everywhere it is mirrored, and write a CHANGELOG entry derived from the diff in the repo's own format. Defers to a repo-local release skill or script. Add `sonnet` to have a Sonnet subagent apply the edits. Triggers on "bump version", "update changelog", "release", "bump patch/minor/major", or "bump the version with sonnet".
 ---
 
 # bump-version
@@ -16,7 +16,14 @@ over anything here; this skill fills the gaps.
 /bump-version patch|minor|major
 /bump-version prerelease      # 1.2.0-beta.1 → 1.2.0-beta.2
 /bump-version 2.0.0           # explicit version
+/bump-version sonnet [...]    # same release, a Sonnet subagent applies the edits
 ```
+
+`sonnet` can go with any of the forms above. It splits the release in two: you derive it and write
+the changelog prose, a Sonnet subagent applies the file edits, and you verify. Read
+[`references/sonnet.md`](references/sonnet.md) and follow it instead of §7. Use it when the release
+drags many doc edits behind it. On a small release, one subagent round trip costs more than the
+edits it saves, so say so and run the release yourself.
 
 **Never ask the user for a summary.** Derive everything from the diff. Ask only when a step below
 says to.
@@ -43,7 +50,7 @@ Check in this order. The first hit wins.
 
 | Found | Do |
 |---|---|
-| A repo-local skill: `.claude/skills/*/SKILL.md` named `release`, `bump*`, or `*version*` — except a copy of `bump-version` or `bump-version-sonnet` itself | Stop and tell the user to run that skill (`/release` etc.). It knows things this one doesn't, and may carry git authorisation this one never has. |
+| A repo-local skill: `.claude/skills/*/SKILL.md` named `release`, `bump*`, or `*version*` — except a copy of `bump-version` itself | Stop and tell the user to run that skill (`/release` etc.). It knows things this one doesn't, and may carry git authorisation this one never has. |
 | `scripts/bump-version.sh` (or `scripts/release*.sh` documented as the bump flow) | Read it first. Run it with the bump type and a one-line summary you wrote. Then expand the stub it leaves (§7) and do §8–§10. Skip any step the script already did. |
 | CI-driven release tooling: `.releaserc*` / `release.config.*` (semantic-release), `release-please-config.json`, `.changeset/` | Do not bump by hand — CI owns the version. For changesets, offer to write a `.changeset/*.md` instead. Otherwise explain and stop. |
 | None | Continue. |
@@ -215,12 +222,14 @@ the tip version. Prefer one block.
 
 ## 8. Sync the docs
 
-Use the same diff:
+Hand this step to `update-docs`: read `../update-docs/SKILL.md` (relative to this skill's folder,
+resolved with `readlink -f`) and follow it with the `diff` scope, on the same diff as this release.
+It fixes the README, `docs/`, and root `.md` files that the diff made wrong, including counts that
+come from the tree, such as a "skills: N" badge. It never touches `CHANGELOG.md`, which this skill
+writes in §7.
 
-- Update `README.md` and any `docs/` or root `.md` file that the diff has made wrong: a feature
-  list, a config table, a usage example, a CLI flag.
-- Update counts that come from the tree, such as a "skills: N" or "N endpoints" badge.
-- Touch only what the diff makes wrong. Nothing stale → skip this step and say so.
+If `update-docs` is not installed, update only what the diff made wrong in `README.md`, `docs/`,
+and root `.md` files, including tree counts. Nothing stale → skip this step and say so.
 
 ## 9. Verify
 

@@ -1,16 +1,11 @@
----
-name: check-repo-public-ready
-description: Audit the whole repository for material that is unsafe on a public repo (secrets, PII, private keys, credentials, internal URLs, accidental dumps, bad .gitignore). Report-only severity table. Triggers on "/check-repo-public-ready", "is this repo public-ready", "safe to open-source", or "audit for public release".
----
-
-# check-repo-public-ready
+# check-public-ready: repo
 
 A focused, report-only audit of the **entire working tree** (tracked files, and
 untracked files that would ship if someone `git add`s carelessly) asking: is this
 repo safe to make **public** (or keep public)?
 
 Not a general security review of application logic. For a change-only pass before
-push, use `check-diff-public-ready`.
+push, use `/check-public-ready diff`.
 
 ## 1. Establish scope
 
@@ -88,7 +83,7 @@ publicly. Ignore docs that only describe patterns, and obvious fakes
 - **Docs & screenshots**: READMEs or assets that paste real tokens, invite URLs
   with secrets, or customer data.
 
-## 5. Categories (same as the diff skill)
+## 5. Categories (same as `diff`)
 
 | Type | Covers |
 |---|---|
@@ -133,7 +128,7 @@ Rules:
 
 ## 7. Optional deeper history pass
 
-Only if the user asks, or if you already found secrets in the tree:
+Only with `history`, or if you already found secrets in the tree:
 
 ```bash
 git log --all --full-history -- .env '*credentials*' '*.pem' 2>/dev/null | head

@@ -5,7 +5,7 @@ description: Quick sanity check of the current diff for bugs, security issues, b
 
 # basic-review
 
-A fast, single-pass sanity check of the working diff. Report what stands out. This skill only reports. Do not run tests, and do not fix anything. For a branch or pull-request review, use `/code-review`.
+A fast, single-pass sanity check of the working diff. Report what stands out. This skill only reports. Do not run tests, and do not fix anything. For a branch or pull-request review, use `/code-review`. For a deep review that explains the change and checks its history, use `/advanced-review`.
 
 ## 1. Collect the diff
 
@@ -69,6 +69,10 @@ Include tests, docs examples, `.env.example`, fixtures, and migrations. Report a
 
 This pass stays inside the current repo. Note a ripple you could not settle in one pass for the coverage line. That includes a changed infra name, a shared contract (route, schema, wire format, Terraform output), or a symbol that other repos may use. Do not chase it further. That is `/basic-impact`'s job.
 
+Also note each place where the diff deletes or loosens something that looks deliberate: a guard, a retry, a timeout, a threshold, a limit, a test, a health check, a permission check, or an `ignore_changes`. Do not dig into why it was there. Name it for the coverage line. That is `/advanced-review`'s job. A deletion that breaks a path that exists now is still a Bug row.
+
+Also note each changed or removed name that a doc still mentions: a CLI flag, env var, script, config key, route, port, or file path that appears in `README*`, `docs/`, `CONTRIBUTING*`, or `.env.example` (`rg -l -F -w '<name>' README* docs CONTRIBUTING* .env.example`). Do not fix the docs. Name them for the coverage line. That is `/update-docs`'s job.
+
 ### E. Verify every candidate
 
 Before a candidate becomes a row:
@@ -101,7 +105,7 @@ Check for exactly four types.
 - `eval` or unsafe deserialization of input. Raw HTML from input (`innerHTML`, `dangerouslySetInnerHTML`, `v-html`, `|safe`).
 - CORS `*` with credentials. TLS verification turned off. Non-crypto random used for tokens. Secrets written to logs.
 - A real credential added in this diff is always severity 3.
-- PII, internal URLs, and publish-hygiene belong to `check-diff-public-ready`.
+- PII, internal URLs, and publish-hygiene belong to `check-public-ready`.
 
 **Bloat** — code that can be removed:
 
@@ -199,6 +203,8 @@ Then add these, in order, only when they apply:
 - `Large diff: source hunks only.` — when you could not read the whole diff.
 - `<count> further findings omitted.` — when you left rows out of the table.
 - `Unverified ripple: <names>. Run /basic-impact.` — when pass D noted a ripple it could not settle in this repo. List at most 3 names.
+- `Undoes old decisions: <names>. Run /advanced-review.` — when pass D noted a deleted or loosened guard, retry, timeout, limit, test, or similar. Name each by what it is and where, such as `retry in fetchRoster`. List at most 3.
+- `Docs mention changed names: <names>. Run /update-docs.` — when pass D found a changed or removed name that a doc still mentions. List at most 3.
 
 Shapes for that line. Do not append these samples to a real report.
 
@@ -212,4 +218,8 @@ Reviewed 4 files (last commit abc1234). Skipped 1. 2 further findings omitted.
 
 ```
 Reviewed 3 files (staged): terraform/network.tf, compose.yml, README.md. Callers checked for 2 changed symbols. Unverified ripple: proxy, app_url. Run /basic-impact.
+```
+
+```
+Reviewed 2 files (working tree): src/sync.ts, src/sync.test.ts. Undoes old decisions: retry in fetchRoster, timeout in syncAll. Run /advanced-review.
 ```

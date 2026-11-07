@@ -7,6 +7,11 @@ This repo houses reusable Claude Code assets. It contains no application code.
 - `commands/<name>.md` — custom slash commands.
 - `hooks/` — executable hook scripts.
 
+Naming: `basic-` is the default prefix for ported skills and quick skills. `advanced-` marks the
+deep partner of a `basic-` skill, with the same core inputs (`basic-review` and `advanced-review`,
+`basic-summary` and `advanced-summary`). An input that only makes sense short, such as
+`basic-summary management`, can stay on the `basic-` side.
+
 When adding files, follow the existing structure — see README.md for the conventions.
 When adding or removing a skill, update the skills-count badge and the Skills table in README.md,
 then run `scripts/check-readme.sh`. Install it into every profile with

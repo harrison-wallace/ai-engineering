@@ -1,15 +1,10 @@
----
-name: check-diff-public-ready
-description: Pass over the current git diff for material that is unsafe to push to a public repository (secrets, PII, internal URLs, private keys, credentials, accidental dumps). Report-only severity table. Triggers on "/check-diff-public-ready", "is this diff public-ready", or "safe for public repo" (diff scope).
----
-
-# check-diff-public-ready
+# check-public-ready: diff
 
 A focused, report-only pass on the **working diff** (or last commit if clean) asking:
 would this be safe to land on a **public** GitHub/GitLab/etc. repo?
 
 Not a general code review. Only flag public-exposure risk introduced or touched by
-the diff. For a whole-tree audit, use `check-repo-public-ready`.
+the diff. For a whole-tree audit, use `/check-public-ready repo`.
 
 ## 1. Collect the diff
 

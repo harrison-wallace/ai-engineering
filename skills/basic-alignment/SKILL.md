@@ -35,6 +35,17 @@ Write in ASD-STE100 Simplified Technical English. These are the same rules as `b
 - Use the same word for the same idea each time.
 - Do not use idioms, slang, or unnecessary jargon.
 
+Then check that each sentence reads one way only:
+
+- Make each "it", "they", and "this" point to one clear thing. If you are not sure, repeat the noun.
+- Keep "only" and "not" next to the word they change.
+- Do not use slashes. Write "a, b, or both", not "a/b".
+- Break up long noun strings. "The proto import budget check script" becomes "the script that checks the proto-import budget".
+- Use periods, not semicolons. Do not use em dashes.
+- Use the real name of a file, command, flag, or skill, in code font.
+- Be specific. Write "a column rename fails the build", not "schema changes can cause issues".
+- If a rule makes a sentence worse, fix the sentence another way. Mix short and long sentences inside the 20-word limit, so the text does not read as if a machine wrote it.
+
 Use your own words. Do not copy the user's sentences back. Copied wording hides a misreading,
 and new wording shows it.
 

@@ -1,16 +1,11 @@
----
-name: aws-cost-mtd
-description: Month-to-date AWS cost breakdown by service and region via Cost Explorer, with run-rate, month-end forecast, and deltas vs last month. Single account, report-only tables. Triggers on "/aws-cost-mtd", "what am I spending on AWS", "AWS cost breakdown", or "month to date AWS bill".
----
-
-# aws-cost-mtd
+# aws-cost: mtd
 
 A read-only month-to-date spend report for **one AWS account**, rendered as
 tables: where the money went, how it compares to last month, and where the
 month is heading.
 
 Not an optimisation pass — for "what should I change to spend less", use
-`aws-cost-optimize`. Not a per-bucket S3 breakdown — that's `aws-s3-audit`.
+`/aws-cost optimize`. Not a per-bucket S3 breakdown — that's `/aws-audit s3`.
 
 **Scope: one account per run.** If the profile turns out to be an
 Organizations management account, say so and report the payer total, then ask
@@ -195,6 +190,6 @@ Rules:
   many services "Other" covers and what they total.
 - Close with 1–3 plain-language observations (a step change, a service that
   jumped, an unexpected region), **not** recommendations. If the user wants
-  recommendations, point them at `aws-cost-optimize`.
+  recommendations, point them at `/aws-cost optimize`.
 - If a query returns nothing, say the query and why it might be empty. Never
   present a zero as a fact without checking the account is right.

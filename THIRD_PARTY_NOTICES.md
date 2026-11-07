@@ -12,6 +12,12 @@ Claude Code, cheaper models, and infrastructure work.
 | [basic-alignment](skills/basic-alignment/SKILL.md) | `pstack/skills/in-your-own-words` |
 | [basic-reflect](skills/basic-reflect/SKILL.md) | `pstack/skills/reflect` |
 | [basic-impact](skills/basic-impact/SKILL.md) | `pstack/skills/blast-radius` |
+| [basic-how](skills/basic-how/SKILL.md) | `pstack/skills/how` |
+| [basic-why](skills/basic-why/SKILL.md) | `pstack/skills/why` |
+| [basic-teach](skills/basic-teach/SKILL.md) | `pstack/skills/teach` |
+| [basic-unslop](skills/basic-unslop/SKILL.md) | `pstack/skills/unslop` |
+| [basic-summary](skills/basic-summary/SKILL.md) (`plain` mode) | `pstack/skills/bro` |
+| [basic-summary](skills/basic-summary/SKILL.md), [basic-alignment](skills/basic-alignment/SKILL.md) (clear-reading checks), [advanced-summary](skills/advanced-summary/SKILL.md) (voice) | `pstack/skills/technical-writing` |
 
 pstack is distributed under the MIT License:
 
