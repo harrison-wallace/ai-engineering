@@ -12,8 +12,8 @@
                                              ░███████                                                              ░███████
 ```
 
-![Version](https://img.shields.io/badge/version-3.2.0-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-36-22c55e?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.3.0-6366f1?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-37-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -25,7 +25,7 @@ files.
 
 ```
 before work   /restate-ask → /design → /prototype → /phase shape
-understand    /explain-how · /explain-why · /teach · /research · /explain-again
+understand    /explain-how · /explain-why · /teach · /research → /advise · /explain-again
 build         /delegate · /diagnose · /guide-setup
 check         /review → /review-deep → /trace-impact
 ship          /summarise commit → /update-docs → /bump-version → /reflect
@@ -38,6 +38,7 @@ ship          /summarise commit → /update-docs → /bump-version → /reflect
 | Skill | What it does |
 |---|---|
 | [restate-ask](skills/restate-ask/SKILL.md) | Play back your ask before work starts: goal, scope, what done looks like, unclear words, and numbered yes or no assumptions. Report-only. From pstack `in-your-own-words`. |
+| [advise](skills/advise/SKILL.md) | Turn research or any skill's findings into the top three moves for this project, each tied to a tiered finding, with a plan-impact table, tests for the unknowns, and what not to do. `deep` adds an Opus contrarian. It edits the plan only after `apply`. |
 | [design](skills/design/SKILL.md) | Shape a new feature, service, or infra change before code: ground it in the real system, sketch two structurally different designs, screen them, and write a proposed ADR for sign-off. From pstack `architect`. |
 | [prototype](skills/prototype/SKILL.md) | Answer one design question that talk cannot settle with throwaway code: a clickable logic demo, or UI variants behind `?variant=`. It records the answer in an ADR, then deletes the code. From Matt Pocock's `prototype`. |
 | [define-terms](skills/define-terms/SKILL.md) | Settle the project's names in `GLOSSARY.md`, report drift between the glossary and the code, and write short decision ADRs. From Matt Pocock's `domain-modeling`. |
@@ -46,7 +47,8 @@ ship          /summarise commit → /update-docs → /bump-version → /reflect
 ### Understand
 
 Read-only. `explain-how` says what the code or infra does, `explain-why` says why, and `teach`
-runs one or both and teaches the result. `research` covers what outside sources say.
+runs one or both and teaches the result. `research` covers what outside sources say, and
+`advise` (under Plan & design) turns its findings into moves.
 
 | Skill | What it does |
 |---|---|

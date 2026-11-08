@@ -1,6 +1,6 @@
 ---
 name: research
-description: Research a question against outside sources (the web, official docs, changelogs, GitHub issues, papers, and on `deep` X posts through Grok) and report the answer first, with a confidence tier, a source, and a date on every claim. Inputs are `<topic>` (default), `decision <question>` (options against criteria from this repo, with a recommendation), `last` (fact-check my previous reply and give corrected statements), and `lib <name> [question]` (versions, breaking changes, and known bugs for the version this repo uses). It shows its strategy and plan and waits for your approval before it researches. Sonnet researchers work separate angles, and `deep` adds a Grok X researcher, an Opus synthesizer, and a Sonnet claim checker. Report-only, with an offer to save Markdown or PDF to `docs/research/`. Triggers on "/research", "research X", "what does the evidence say about X", "should we use A or B", "fact-check that", or "is that still true".
+description: Research a question against outside sources (the web, official docs, changelogs, GitHub issues, papers, and on `deep` X posts through Grok) and report the answer first, with a confidence tier, a source, and a date on every claim. Inputs are `<topic>` (default), `decision <question>` (options against criteria from this repo, with a recommendation), `last` (fact-check my previous reply and give corrected statements), and `lib <name> [question]` (versions, breaking changes, and known bugs for the version this repo uses). It shows its strategy and plan and waits for your approval before it researches. Sonnet researchers work separate angles, and `deep` adds a Grok X researcher, an Opus synthesizer, and a Sonnet claim checker. Report-only, with an offer to save Markdown or PDF to `docs/research/`, and an offer of `/advise` to turn the findings into moves for the project. Triggers on "/research", "research X", "what does the evidence say about X", "should we use A or B", "fact-check that", or "is that still true".
 argument-hint: "[lite|deep] [<topic> | decision <question> | last | lib <name> [question]]"
 disable-model-invocation: true
 ---
@@ -12,7 +12,7 @@ Find what outside sources say, rate how sure each finding is, and give the answe
 
 `explain-why` covers this repo's own history, and `explain-how` covers how the code works now. This
 skill covers what the rest of the world says. For an ADR after a `decision`, use
-`/design`.
+`/design`. For what the findings mean for this project's plan, use `/advise`.
 
 ## 1. Read the arguments
 
@@ -137,6 +137,10 @@ Write in STE, with the clear-reading checks in `../summarise/SKILL.md` §3 (rela
 skill's folder, resolved with `readlink -f`). Each claim carries its tier, a source number, and the
 source's date. Leave out a section that is empty.
 
+The report holds evidence, not a plan. Do not add a section on what the project should do or how
+its plan changes, such as "What this means for <project>". `/advise` does that, on top of the
+report. A `decision` still ends with its recommendation.
+
 ### `<topic>` and `lib`
 
 ```markdown
@@ -205,6 +209,11 @@ End with a coverage line, then the offer:
 *"Save this as Markdown or PDF in `docs/research/`?"* For a `decision`, or a report with a
 comparison of three or more options, add: *"Or reply `page` for the comparison on your LAN."*
 
+Then, after every report, on its own line: *"Or reply `advise` to turn this into moves for
+<project>, with the plan edits for your approval."* Name the project, or "your plan" outside a
+repo. When the user replies `advise`, load the `advise` skill with this report as its input. A bare
+"yes" answers the save offer only.
+
 When the work has a concrete result (a number, a before-and-after, a proved cause, a release),
 end with one line, at most once a session: `> Postable: <the specific>. Want /showcase pitches?`
 
@@ -226,7 +235,8 @@ server when the user says they are done.
 
 ## Rules
 
-- Report only, apart from §8. Never install a package, change a config, or edit code.
+- Report only, apart from §8. Never install a package, change a config, or edit code. Never
+  offer to edit the plan docs: offer `/advise`.
 - Never research before the user approves the plan in §4.
 - Never invent a source, a quote, a date, a version, or a URL. A claim with no source moves to
   **What we don't know**.

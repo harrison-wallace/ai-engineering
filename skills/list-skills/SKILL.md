@@ -54,7 +54,7 @@ For each skill, write the house shape:
 - Name the neighbour for each pair that is easy to confuse: `-deep` pairs, review
   and impact, summary and teach, and plugin skills that overlap yours (`code-review` and
   `review-deep`, `code-simplifier` and `simplify`, `research` and the built-in
-  `deep-research`, `check-architecture` and `design`).
+  `deep-research`, `research` and `advise`, `check-architecture` and `design`).
 - Use the STE rules and the clear-reading checks from `../summarise/SKILL.md` §3.
 
 ## 4. Report

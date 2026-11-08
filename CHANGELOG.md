@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-11-08
+
+### Added
+- `advise` skill: turns findings into the top three moves for the project you are in. Input is a
+  `/research` report, saved reports in `docs/research/` (`<path>...` or `all`), another skill's
+  report, a pasted document, and/or a free-text question. It reads the plan docs (product doc,
+  phases, `BOARD.md`/`NOW.md`, ADRs, `CLAUDE.md`/`AGENTS.md`), builds a ledger of tiered findings,
+  and labels each move by evidence (strong, mixed, thin), cost, and door (one-way or two-way). The
+  report adds a plan-impact table with `path:line`, what a newer report overturns, tests for the
+  unknowns, Don't do, and Watch. `deep` adds an Opus contrarian at `high`
+  (`references/contrarian-prompt.md`) that argues against the top move in a fresh context. `apply`
+  edits the picked plan docs only; phase shape goes to `/phase shape`, and a move against an
+  accepted ADR goes to `/design`. It never edits input reports, ADRs, or code, never takes its own
+  saved `*-advice-*.md` files as findings, and does no web search.
+- `advise` row in the `CLAUDE.md` Naming table (not `recommend`, `suggest`, or `consult`).
+
+### Changed
+- `research` reports hold evidence only: no "What this means for <project>" sections and no offer
+  to edit plan docs. Every report now ends with *"Or reply `advise`"* to hand the report to
+  `/advise`. A bare "yes" answers the save offer only.
+- `list-skills` names `research` and `advise` as neighbours that are easy to confuse.
+
 ## [3.2.0] - 2026-11-08
 
 ### Added

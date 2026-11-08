@@ -22,6 +22,7 @@ one meaning, and its synonyms are never used:
 | `guide` | Walk a human through steps only they can do | walkthrough, howto |
 | `define` | Settle the names of things | |
 | `research` | Find what outside sources say | |
+| `advise` | Turn findings into ranked moves for this project, and change the plan on approval | recommend, suggest, consult |
 | `summarise` | Restate work or a chat | recap |
 | `restate` | Play back an ask before work starts | |
 | `reflect` | Find lessons to encode | |
