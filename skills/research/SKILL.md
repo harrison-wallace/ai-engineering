@@ -205,6 +205,9 @@ End with a coverage line, then the offer:
 *"Save this as Markdown or PDF in `docs/research/`?"* For a `decision`, or a report with a
 comparison of three or more options, add: *"Or reply `page` for the comparison on your LAN."*
 
+When the work has a concrete result (a number, a before-and-after, a proved cause, a release),
+end with one line, at most once a session: `> Postable: <the specific>. Want /showcase pitches?`
+
 ### Page (on request)
 
 When the user replies `page`, read `../serve-page/SKILL.md` (relative to this skill's folder, resolved with `readlink -f`) and follow its §1 to §4. Write `<scratchpad>/research/<slug>/index.html`. The

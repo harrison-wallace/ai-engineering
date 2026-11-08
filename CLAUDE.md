@@ -28,6 +28,7 @@ one meaning, and its synonyms are never used:
 | `fix` | Change code to remove a known problem | repair, clean |
 | `update` | Bring something into line with its source | sync, refresh |
 | `serve` | Make a page open on the LAN | host, publish |
+| `showcase` | Pitch work just done as a post, article, or video idea | promote, market |
 | `list`, `bump`, `delegate`, `teach` | As the word says | |
 
 A domain group may lead with its noun (`aws-cost`, `aws-audit`), and `phase` stays a noun with

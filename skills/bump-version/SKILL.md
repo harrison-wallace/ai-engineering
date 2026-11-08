@@ -261,6 +261,9 @@ Close with:
 Bumped 0.9.4 → 0.9.5 · Pre-flight passed · CHANGELOG entry added · 3 files mirrored
 ```
 
+When the work has a concrete result (a number, a before-and-after, a proved cause, a release),
+end with one line, at most once a session: `> Postable: <the specific>. Want /showcase pitches?`
+
 **No git writes.** Do not run `git add`, `git commit`, `git push`, or `git tag`. Print them under
 **Next** for the owner. A repo-local release skill (§2) may carry that authorisation; this skill
 never does.

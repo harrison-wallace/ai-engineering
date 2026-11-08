@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.2.0] - 2026-11-08
+
+### Added
+- `showcase` skill: pitches the work just done as at most 3 X post, article, or video ideas,
+  each with a draft and the proof from the session. Grok checks the hooks on X when it is
+  installed, and `deep` reads this project's sessions from the last 7 days, and asks before it
+  reads other projects. Kept pitches go to `~/showcase/capture-<yy-mm-dd-hh-mm>-<repo>-<topic>.md`
+  through `scripts/showcase.sh`, the only writer. It refuses secret-like hooks before they reach
+  Grok, and secret-like lines in a kept pitch (X post URLs are masked first). `list`, `used`, and
+  `drop` track each pitch. It never posts.
+- `showcase` row in the `CLAUDE.md` Naming table (not `promote` or `market`).
+
+### Changed
+- `bump-version`, `diagnose`, `prototype`, `research`, and `teach` end with a one-line
+  `/showcase` offer when the work has a concrete result, at most once a session.
+
 ## [3.1.0] - 2026-11-07
 
 ### Added

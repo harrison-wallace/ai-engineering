@@ -109,6 +109,9 @@ demo. Show any other new or changed path, and stop.
   tests and minimal error handling, so the fold-in is a rewrite, not a copy. For `ui`, offer
   `/check-ui-tells` on the result after it lands.
 
+When the work has a concrete result (a number, a before-and-after, a proved cause, a release),
+end with one line, at most once a session: `> Postable: <the specific>. Want /showcase pitches?`
+
 ## Rules
 
 - Never commit, push, or merge. Never commit on the `prototype/<slug>` branch.

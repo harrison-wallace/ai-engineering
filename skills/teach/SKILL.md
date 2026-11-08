@@ -132,6 +132,9 @@ The explanation itself, never a report about what you did. Lead with the main po
 account of what it is, how it works, and why. Then, in one line, the threads worth chasing with
 `/explain-how` or `/explain-why`, and the offer to go deeper.
 
+When the work has a concrete result (a number, a before-and-after, a proved cause, a release),
+end with one line, at most once a session: `> Postable: <the specific>. Want /showcase pitches?`
+
 ## Rules
 
 - Read-only, apart from the LAN page in the scratchpad. Never edit the repo, commit, apply, or

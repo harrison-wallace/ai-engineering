@@ -215,3 +215,6 @@ On a yes:
 For **Next**, pick from: `/summarise commit` for the message (it names the confirmed guess, so the
 next person learns), `/check-architecture <area>` when no seam existed, and `/reflect` to ask what
 would have stopped this bug.
+
+When the work has a concrete result (a number, a before-and-after, a proved cause, a release),
+end with one line, at most once a session: `> Postable: <the specific>. Want /showcase pitches?`

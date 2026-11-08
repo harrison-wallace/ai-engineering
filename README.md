@@ -12,8 +12,8 @@
                                              ░███████                                                              ░███████
 ```
 
-![Version](https://img.shields.io/badge/version-3.1.0-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-35-22c55e?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.2.0-6366f1?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-36-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -89,6 +89,7 @@ runs one or both and teaches the result. `research` covers what outside sources 
 | [summarise-deep](skills/summarise-deep/SKILL.md) | The deep version of `summarise`: a technical report with the mechanism, the reasons, the trade-offs, what was verified, and the risks, with every claim checked against git. |
 | [update-docs](skills/update-docs/SKILL.md) | Find statements in the docs that the code has made wrong, prove each one, and fix it in place, or report with `scan`. |
 | [bump-version](skills/bump-version/SKILL.md) | Cut a release in any repo: bump every version mirror and write a CHANGELOG entry from the diff. It defers to a repo-local release flow. |
+| [showcase](skills/showcase/SKILL.md) | Pitch the work you just did as an X post, article, or video idea: drafts to rewrite, with proof from the session. Grok checks each hook on X when installed, and `deep` reads this project's last 7 days. It never posts. |
 | [reflect](skills/reflect/SKILL.md) | Mine this session, or the last few, for durable lessons, and route each to the narrowest home: a skill, `CLAUDE.md`, the AGENTS template, or memory. From pstack `reflect`. |
 
 ### Track
