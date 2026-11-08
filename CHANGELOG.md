@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.1] - 2026-11-08
+
+### Fixed
+- `bump-version` prints an annotated tag (`git tag -a vX.Y.Z -m "Release X.Y.Z"`) and
+  `git push --follow-tags` under **Next**. The old lightweight `git tag vX.Y.Z` was skipped by
+  `--follow-tags`, so a release reached the remote without its tag.
+
 ## [3.3.0] - 2026-11-08
 
 ### Added

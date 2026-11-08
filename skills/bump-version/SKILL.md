@@ -252,8 +252,12 @@ and root `.md` files, including tree counts. Nothing stale → skip this step an
 
   ```
   git add -A && git commit -m "Release 1.4.0: <headline>"
-  git tag v1.4.0
+  git tag -a v1.4.0 -m "Release 1.4.0"
+  git push --follow-tags
   ```
+
+  Always print an annotated tag (`-a`). `git push --follow-tags` skips a lightweight tag, so the
+  release would reach the remote without its tag.
 
 Close with:
 
