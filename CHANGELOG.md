@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.3.2] - 2026-11-09
+
+### Changed
+- `review` reports severity as `High`, `Medium`, or `Low` instead of `3`, `2`, or `1`. The `Sev`
+  column uses the words, and the verdict counts read `1 high, 2 medium`. What each level means
+  and how findings are ranked are unchanged.
+- `review-deep` and `trace-impact` use the same words, because both share `review`'s scale. In
+  `trace-impact` this covers the verdict rules, the risk table, and the page's colour key.
+- `docs/AGENTS-TEMPLATE.md` completion check: run only the checks that cover what changed during
+  a task, say which checks ran, and run the full set once at the end when shared code, a root
+  config, or the lockfile changed.
+
 ## [3.3.1] - 2026-11-08
 
 ### Fixed

@@ -132,9 +132,9 @@ Print exactly these parts, in order. No preamble, and no recap.
 
 | Situation | Call |
 |---|---|
-| A confirmed sev-3 risk | `**Will break.**` |
-| A confirmed sev-2 risk | `**Risky: check before merge.**` |
-| Safety fact at level 4 or 5, no sev-2 or sev-3 risk | `**Safe: proven (level N).**` |
+| A confirmed High risk | `**Will break.**` |
+| A confirmed Medium risk | `**Risky: check before merge.**` |
+| Safety fact at level 4 or 5, no High or Medium risk | `**Safe: proven (level N).**` |
 | Safety fact at level 2 or 3 | `**Likely safe: unproven (level N).**` |
 | No single fact makes it safe | `**No safety fact: see risks.**` |
 
@@ -147,14 +147,14 @@ its output, or the script and its output), in a code block.
 
 | Sev | Where | How it breaks | Likelihood | Check |
 |---|---|---|---|---|
-| 3 | `other-repo/compose.yml:14` | When the network is renamed, this stack's proxy joins nothing and its site goes down. | High | `! docker network inspect proxy` |
+| High | `other-repo/compose.yml:14` | When the network is renamed, this stack's proxy joins nothing and its site goes down. | High | `! docker network inspect proxy` |
 
-- Sev uses `/review`'s scale: 3 will break, 2 real risk, 1 small cost.
+- Sev uses `/review`'s scale: High will break, Medium real risk, Low small cost.
 - Where is a `path:line` (other repos included), a resource address, or a host.
 - How it breaks is one sentence: `When <condition>, <wrong result>.`
 - Likelihood is `High`, `Medium`, or `Low`, with a reason when it is not obvious.
 - Check is the cheapest command or test that would confirm it.
-- At most 8 rows. Drop sev-1 rows first.
+- At most 8 rows. Drop Low rows first.
 
 **Cleared**: one line each. What you checked, and why it is fine (the `file:line` or the
 command output).
@@ -169,7 +169,7 @@ The page shows:
 - The verdict and **Safe because**, with the proof.
 - A **radial map**: the change in the middle, and around it each repo, stack, service, host, or
   network it touches, joined by what links them (a network name, an output, a hostname). Colour
-  each node by its risk: red for sev 3, amber for sev 2, grey for cleared.
+  each node by its risk: red for High, amber for Medium, grey for cleared.
 - One card per risk, with **How it breaks**, the likelihood, and the check to run.
 - The cleared list.
 

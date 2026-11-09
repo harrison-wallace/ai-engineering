@@ -1,6 +1,6 @@
 ---
 name: review-deep
-description: Deep technical review of a change, for when you want to understand it, not only clear it to commit. It explains what the change does (explain-how), checks the history it undoes (explain-why), sweeps what it breaks outside the diff (the trace-impact method), runs the repo's tests and validators read-only, and has Sonnet lens reviewers (correctness, security and data, ripple) look with fresh eyes. The main agent verifies every lead. Report-only, on review's 1–3 scale. Triggers on "/review-deep", "/review-deep staged", "/review-deep branch", "review this properly", or "deep review of this change". Optional leading level. Use review for a quick pre-commit check.
+description: Deep technical review of a change, for when you want to understand it, not only clear it to commit. It explains what the change does (explain-how), checks the history it undoes (explain-why), sweeps what it breaks outside the diff (the trace-impact method), runs the repo's tests and validators read-only, and has Sonnet lens reviewers (correctness, security and data, ripple) look with fresh eyes. The main agent verifies every lead. Report-only, on review's High, Medium, Low scale. Triggers on "/review-deep", "/review-deep staged", "/review-deep branch", "review this properly", or "deep review of this change". Optional leading level. Use review for a quick pre-commit check.
 argument-hint: "[lite] [staged | branch [<base>] | <paths>]"
 disable-model-invocation: true
 ---
@@ -114,7 +114,7 @@ Lens reports hold **candidates**, not findings. For each one:
    already handles it.
 2. Push the proof as far as is cheap, on `trace-impact`'s ladder: pointed at it, walked it, or ran
    it.
-3. Rate it with `review` §3. Use the same types and the same 1–3 scale.
+3. Rate it with `review` §3. Use the same types and the same High, Medium, Low scale.
 
 A candidate that passes becomes a finding. A candidate you could neither prove nor disprove goes
 under **Leads not confirmed**. A candidate you disproved is dropped. Count it in the coverage line.
@@ -130,7 +130,7 @@ read in 30 seconds.
 ### Verdict
 
 The same call and counts as `review` §4, for example:
-`**Fix before commit.** 3 findings: 1 sev-3, 2 sev-2.`
+`**Fix before commit.** 3 findings: 1 high, 2 medium.`
 
 ### What the change does
 
@@ -144,11 +144,11 @@ side or one after the other.
 |---|---|---|---|---|---|
 
 The first five columns follow `review` §4. `Proof` is one of `read`, `walked`, `ran <check>`,
-`grep`, or `git`. Print at most 15 rows. Drop severity 1 first.
+`grep`, or `git`. Print at most 15 rows. Drop Low first.
 
 ### Details
 
-For each severity-3 and severity-2 finding, a short block:
+For each High and Medium finding, a short block:
 
 - **Failure path**: the input or state, each step, then the wrong result.
 - **Evidence**: the lines, the command output, or the history.

@@ -182,7 +182,10 @@ Before you report a task as complete, confirm each point:
 
 1. The change meets the success criterion that you stated at the start.
 2. You did not change unrelated code.
-3. The tests pass, or you report the failure with the output.
+3. The checks for what changed pass, or you report the failure with the
+   output. Say which checks you ran. During a task, run only the checks that
+   cover what changed. Run the full set once, at the end, when shared code, a
+   root config, or the lockfile changed.
 4. The documentation is correct, if the change made it incorrect.
 5. You state what you did not do, and you give the reason.
 

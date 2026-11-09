@@ -1,6 +1,6 @@
 ---
 name: review
-description: Quick sanity check of the current diff for bugs, security issues, bloat, and maintainability, reported as a verdict, a severity (1–3) table with a fix per row, and a coverage line. Use for a fast pre-commit gut check, not a branch or pull-request review. Triggers on "/review", "/review staged", or "sanity check the diff".
+description: Quick sanity check of the current diff for bugs, security issues, bloat, and maintainability, reported as a verdict, a severity (High, Medium, Low) table with a fix per row, and a coverage line. Use for a fast pre-commit gut check, not a branch or pull-request review. Triggers on "/review", "/review staged", or "sanity check the diff".
 ---
 
 # review
@@ -51,7 +51,7 @@ git diff HEAD -U0 | grep -nE '^\+' | grep -niE \
   'AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY|gh[pousr]_[A-Za-z0-9]{30,}|sk-[A-Za-z0-9_-]{20,}|xox[abpr]-|(password|secret|token|api_?key)\s*[:=]\s*["'\'']?[^"'\'' ]{8,}'
 ```
 
-Use the same base as the scope in §1 (`--cached`, or the commit range). Untracked files are not in `git diff`, so grep them directly. Leftover debug output is Bloat. A focused test (`.only`, `fit`) that silently skips the rest of the suite is a Bug. A conflict marker is a severity-3 Bug.
+Use the same base as the scope in §1 (`--cached`, or the commit range). Untracked files are not in `git diff`, so grep them directly. Leftover debug output is Bloat. A focused test (`.only`, `fit`) that silently skips the rest of the suite is a Bug. A conflict marker is a High Bug.
 
 ### C. Hunk read
 
@@ -104,7 +104,7 @@ Check for exactly four types.
 - An auth or permission check that is removed, bypassed, or moved after the action on a reachable handler.
 - `eval` or unsafe deserialization of input. Raw HTML from input (`innerHTML`, `dangerouslySetInnerHTML`, `v-html`, `|safe`).
 - CORS `*` with credentials. TLS verification turned off. Non-crypto random used for tokens. Secrets written to logs.
-- A real credential added in this diff is always severity 3.
+- A real credential added in this diff is always High.
 - PII, internal URLs, and publish-hygiene belong to `check-public-ready`.
 
 **Bloat** — code that can be removed:
@@ -120,15 +120,15 @@ Check for exactly four types.
 - A magic value that must match another file.
 - Hidden ordering or coupling.
 
-Severity 2 when the diff already edits this logic in more than one place, or the area is clearly in flux. Severity 1 when the cost is real and that edit is not imminent. Never severity 3. Use Bug when a path that exists now is already wrong. Use Bloat when the extra code can be removed.
+Medium when the diff already edits this logic in more than one place, or the area is clearly in flux. Low when the cost is real and that edit is not imminent. Never High. Use Bug when a path that exists now is already wrong. Use Bloat when the extra code can be removed.
 
 Formatting and lint rules are not findings.
 
 | Sev | Meaning |
 |---|---|
-| 3 | Will break, corrupt, or expose something on a path you can name. |
-| 2 | A real defect or risk on a path you can name. Survivable for a short time. |
-| 1 | A small defect, real bloat, or a maintainability cost. Worth a fix. It does not block the commit. |
+| High | Will break, corrupt, or expose something on a path you can name. |
+| Medium | A real defect or risk on a path you can name. Survivable for a short time. |
+| Low | A small defect, real bloat, or a maintainability cost. Worth a fix. It does not block the commit. |
 
 ## 4. Report
 
@@ -140,15 +140,15 @@ One line: the call, then the counts.
 
 | Highest sev | Call |
 |---|---|
-| 3 | `**Fix before commit.**` |
-| 2 | `**OK to commit; fix soon.**` |
-| 1 | `**OK to commit.**` |
+| High | `**Fix before commit.**` |
+| Medium | `**OK to commit; fix soon.**` |
+| Low | `**OK to commit.**` |
 | none | `**No findings.**` |
 
-After the call, add the counts: `N findings: X sev-3, Y sev-2, Z sev-1.` The counts include rows left out of the table. Drop a severity group with a count of 0. Use `finding` when N is 1. With no findings, the line is just the call.
+After the call, add the counts: `N findings: X high, Y medium, Z low.` The counts include rows left out of the table. Drop a severity group with a count of 0. Use `finding` when N is 1. With no findings, the line is just the call.
 
 ```
-**Fix before commit.** 3 findings: 1 sev-3, 2 sev-2.
+**Fix before commit.** 3 findings: 1 high, 2 medium.
 ```
 
 ### Table
@@ -157,12 +157,12 @@ Print the table only when there is at least one finding.
 
 | Sev | Type | Location | Problem | Fix |
 |---|---|---|---|---|
-| 3 | Bug | `src/api.ts:42` | When `id` is empty, the handler returns the previous user. | Return 400 before the lookup when `id` is empty. |
+| High | Bug | `src/api.ts:42` | When `id` is empty, the handler returns the previous user. | Return 400 before the lookup when `id` is empty. |
 
 The header row is exactly `Sev`, `Type`, `Location`, `Problem`, `Fix`.
 
-- `Sev` is `3`, `2`, or `1`. `Type` is `Bug`, `Security`, `Bloat`, or `Maintain`.
-- Sort by severity descending, then `Security`, `Bug`, `Bloat`, `Maintain`, then location.
+- `Sev` is `High`, `Medium`, or `Low`. `Type` is `Bug`, `Security`, `Bloat`, or `Maintain`.
+- Sort by severity, High first, then `Security`, `Bug`, `Bloat`, `Maintain`, then location.
 - One row per defect. When the same defect has several sites, cite the defining file and name the other sites in the Problem cell.
 - Location is `` `path:line` `` in the post-change file.
   - For a broken caller outside the diff, cite the caller.
@@ -175,7 +175,7 @@ The header row is exactly `Sev`, `Type`, `Location`, `Problem`, `Fix`.
   - Bloat: `<what was added> is unused.`, `<what was added> repeats <existing thing>.`, or `<dependency> is only used for <one trivial call>.`
   - Maintain: `When the next change <does this>, <this will be wrong>.`
 - Fix is one imperative sentence, 15 words or fewer, with no `|`. It names the smallest change that removes the problem: `Await the save before redirecting.`, `Delete the unused helper.`, or `Rotate the key, then load it from the env.` If no short fix exists, write what to decide: `Choose one owner for the retry logic.`
-- Print at most 8 rows. Drop severity 1 before severity 2. Drop a severity-3 row only when severity-3 rows alone exceed 8, and then keep the first 8 in location order.
+- Print at most 8 rows. Drop Low before Medium. Drop a High row only when High rows alone exceed 8, and then keep the first 8 in location order.
 
 The example row above shows the shape. Do not copy it into a real report.
 
