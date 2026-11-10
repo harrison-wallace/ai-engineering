@@ -27,6 +27,7 @@ one meaning, and its synonyms are never used:
 | `restate` | Play back an ask before work starts | |
 | `reflect` | Find lessons to encode | |
 | `fix` | Change code to remove a known problem | repair, clean |
+| `improve` | Find what to fix, simplify, or deepen in one existing area, and drive the chosen change | refactor, optimise, enhance |
 | `update` | Bring something into line with its source | sync, refresh |
 | `serve` | Make a page open on the LAN | host, publish |
 | `showcase` | Pitch work just done as a post, article, or video idea | promote, market |
@@ -45,6 +46,41 @@ credit for a port. The detail lives in the skill's `SKILL.md`.
 When adding or removing a skill, update the skills-count badge and the Skills table in README.md,
 then run `scripts/check-readme.sh`. Install it into every profile with
 `scripts/install-skill.sh <name>`, or remove the links with `scripts/install-skill.sh --remove <name>`.
+
+## Skill structure
+
+- Keep a `SKILL.md` body under 500 lines. Move detail into `references/`, and link each reference
+  from `SKILL.md`, one level deep.
+- A reference file over 100 lines starts with a `## Contents` list that links to its `##` headings.
+  Update the list when you add, rename, or remove a heading.
+- Keep the `description` under 1,024 characters. Say what the skill does and when to use it.
+- Put a repeatable step in a script under the skill's folder. Only the script's output costs
+  tokens, but prose instructions cost tokens on every load.
+- Write each subagent prompt so that it stands alone. A subagent starts with a fresh context. It
+  does not see this chat, the skills in use, or the files already read.
+
+## Model routing
+
+Every Agent call in a skill, and every `agents/<name>.md` definition, follows the table in
+`docs/AGENTS-TEMPLATE.md` §8. These rules add to it:
+
+- Name the `model` on every call. Set `effort` on every call, except a Haiku read, which runs at
+  the model default (`medium`).
+- Name the `model` on each `Explore` call, usually `haiku`. The built-in Explore runs on the main
+  model otherwise.
+- Never go above Opus `high`. Do not use `xhigh` or `max`. Past `high`, one more effort level
+  costs about as much as a bigger model, for a small gain.
+- Keep code edits and judgement calls that need the chat on the main session. Send reading,
+  search, and repeated review to subagents.
+- Use parallel subagents to read and to judge. Do not let two of them write the same files.
+- Escalate in this order: a self-check, then one effort level up, then one model size up at a
+  lower effort. In a retry, re-run only the failed units.
+- Do not set `model` in a skill's frontmatter. A model switch makes the session write its whole
+  prompt cache again. Set the model on the Agent call.
+- Do not rely on `CLAUDE_CODE_SUBAGENT_MODEL`. The per-call `model` wins, and the variable does
+  not change Explore.
+- Add a fan-out stage, or move a role to a cheaper model, only when a test on saved inputs shows
+  that it keeps the result. Compare it with one main-session run that uses no subagents.
 
 ## Porting an upstream skill
 

@@ -1,5 +1,14 @@
 # aws-cost: mtd
 
+## Contents
+
+- [0. Confirm the cost before spending anything](#0-confirm-the-cost-before-spending-anything)
+- [1. Establish the account](#1-establish-the-account)
+- [2. Fix the date window](#2-fix-the-date-window)
+- [3. Pick the metric deliberately](#3-pick-the-metric-deliberately)
+- [4. The breakdowns](#4-the-breakdowns)
+- [5. Report](#5-report)
+
 A read-only month-to-date spend report for **one AWS account**, rendered as
 tables: where the money went, how it compares to last month, and where the
 month is heading.

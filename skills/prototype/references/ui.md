@@ -1,5 +1,15 @@
 # UI prototype
 
+## Contents
+
+- [1. Branch and manifest](#1-branch-and-manifest)
+- [2. Pick the host page](#2-pick-the-host-page)
+- [3. Write the briefs, then the variants](#3-write-the-briefs-then-the-variants)
+- [4. Wire the switcher](#4-wire-the-switcher)
+- [5. Build the floating switcher](#5-build-the-floating-switcher)
+- [6. Page (with `page`)](#6-page-with-page)
+- [7. Clean up](#7-clean-up)
+
 Build several **structurally different** variants of one screen, switchable from a floating bar.
 The user flips between them, picks one or takes parts from each, and the rest is deleted.
 

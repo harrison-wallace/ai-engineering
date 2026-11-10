@@ -73,7 +73,7 @@ message**. Do not run `/effort` or `/model`.
 | **self** | Implement it yourself. Then check your own diff against the plan, and run the acceptance criteria. |
 | **balanced** | One Sonnet agent, `effort: medium`. |
 | **accuracy** | One Opus agent, `effort: high`. |
-| **speed** | One Sonnet agent per unit, `effort: low`, all in parallel. |
+| **speed** | One Sonnet agent per unit, `effort: low`, all in parallel. Each unit runs its own acceptance check. Re-run only the failed units at `effort: medium`. |
 | **cheap** | One Haiku agent. Make the brief tight: exact edits, exact paths, and exact checks. |
 | **grok** | One headless Grok run, per `references/grok.md`. The effort argument goes to Grok (default `medium`). |
 | **mixed** | Grok takes the units that are well specified, and one Sonnet agent (`medium`) takes the rest. Take a unit yourself instead when it leans on this chat's context. Run Grok and the Claude side in parallel. Each touches only its own files. |

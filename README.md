@@ -12,8 +12,8 @@
                                              ░███████                                                              ░███████
 ```
 
-![Version](https://img.shields.io/badge/version-3.3.2-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-37-22c55e?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.4.0-6366f1?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-38-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -43,6 +43,7 @@ ship          /summarise commit → /update-docs → /bump-version → /reflect
 | [prototype](skills/prototype/SKILL.md) | Answer one design question that talk cannot settle with throwaway code: a clickable logic demo, or UI variants behind `?variant=`. It records the answer in an ADR, then deletes the code. From Matt Pocock's `prototype`. |
 | [define-terms](skills/define-terms/SKILL.md) | Settle the project's names in `GLOSSARY.md`, report drift between the glossary and the code, and write short decision ADRs. From Matt Pocock's `domain-modeling`. |
 | [check-architecture](skills/check-architecture/SKILL.md) | Find shallow modules in existing code and infra, where the interface is nearly as complex as what it hides, and report at most five proven candidates. From Matt Pocock's `improve-codebase-architecture`. |
+| [improve](skills/improve/SKILL.md) | Look at one feature, service, or infra stack from first principles, prove what to fix, simplify, or deepen, and send each finding to its next skill: research, trace-impact, design, prototype, or delegate. |
 
 ### Understand
 
@@ -199,8 +200,8 @@ Hooks are wired up through `settings.json` and must stay executable.
   of the board.
 - [docs/AGENTS-TEMPLATE.md](docs/AGENTS-TEMPLATE.md): the starting point for a new repo's
   `AGENTS.md`. Copy it in, fill the `REPO:` blocks, and delete what does not apply. Sections 1, 2,
-  6, and 7 (Core Rules, Language Style, Definition of Done, Local Test-Serving Port) are the same
-  in every repo, so edit them here. Sections 3 to 5 are per repo.
+  6, 7, and 8 (Core Rules, Language Style, Definition of Done, Local Test-Serving Port, Subagent
+  Model Routing) are the same in every repo, so edit them here. Sections 3 to 5 are per repo.
 - [docs/opencode-console-models.md](docs/opencode-console-models.md): a dated chart of the models
   on OpenCode Console, with price, context, benchmarks, and best use. Check its **Updated** date,
   because the catalogue and prices move.

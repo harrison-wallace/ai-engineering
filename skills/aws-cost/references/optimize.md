@@ -1,5 +1,14 @@
 # aws-cost: optimize
 
+## Contents
+
+- [0. Confirm the cost before spending anything](#0-confirm-the-cost-before-spending-anything)
+- [1. Establish the account and regions](#1-establish-the-account-and-regions)
+- [2. AWS-native recommendations (fast, if enrolled)](#2-aws-native-recommendations-fast-if-enrolled)
+- [3. Direct sweeps (where the surprise money is)](#3-direct-sweeps-where-the-surprise-money-is)
+- [4. Commitment coverage (usually the biggest single lever)](#4-commitment-coverage-usually-the-biggest-single-lever)
+- [5. Report](#5-report)
+
 A read-only sweep for **actionable AWS savings** in one account, ranked by
 estimated monthly dollars, each with the effort and risk of acting on it.
 

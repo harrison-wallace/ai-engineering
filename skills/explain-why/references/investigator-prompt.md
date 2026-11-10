@@ -1,5 +1,17 @@
 # Digger prompt
 
+## Contents
+
+- [The question](#the-question)
+- [Repo root](#repo-root)
+- [The anchor](#the-anchor)
+- [Leads from the in-repo sweep](#leads-from-the-in-repo-sweep)
+- [Where to search](#where-to-search)
+- [Defensive code](#defensive-code)
+- [Investigation loop](#investigation-loop)
+- [Discipline](#discipline)
+- [Output](#output)
+
 Build the Sonnet digger's prompt from this template. Fill in the placeholders. At `lite`, the main
 agent uses the search list below itself.
 

@@ -1,5 +1,15 @@
 # check-public-ready: repo
 
+## Contents
+
+- [1. Establish scope](#1-establish-scope)
+- [2. Inventory high-risk paths](#2-inventory-high-risk-paths)
+- [3. Content greps (high-signal)](#3-content-greps-high-signal)
+- [4. Hygiene & policy checks](#4-hygiene--policy-checks)
+- [5. Categories (same as `diff`)](#5-categories-same-as-diff)
+- [6. Report](#6-report)
+- [7. Optional deeper history pass](#7-optional-deeper-history-pass)
+
 A focused, report-only audit of the **entire working tree** (tracked files, and
 untracked files that would ship if someone `git add`s carelessly) asking: is this
 repo safe to make **public** (or keep public)?

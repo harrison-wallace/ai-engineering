@@ -2,5 +2,7 @@
 /docs/adr/
 docs/plans/
 docs/phases/
+docs/research/
+docs/improve/
 __pycache__/
 *.pyc

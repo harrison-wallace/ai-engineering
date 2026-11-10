@@ -1,5 +1,12 @@
 # check-public-ready: diff
 
+## Contents
+
+- [1. Collect the diff](#1-collect-the-diff)
+- [2. Scan for public-exposure risks](#2-scan-for-public-exposure-risks)
+- [3. Heuristic greps (optional, on the diff)](#3-heuristic-greps-optional-on-the-diff)
+- [4. Report](#4-report)
+
 A focused, report-only pass on the **working diff** (or last commit if clean) asking:
 would this be safe to land on a **public** GitHub/GitLab/etc. repo?
 

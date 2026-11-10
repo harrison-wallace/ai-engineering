@@ -1,5 +1,16 @@
 # Epistemics
 
+## Contents
+
+- [Confidence tiers](#confidence-tiers)
+- [Wording](#wording)
+- [Memory and repo instructions](#memory-and-repo-instructions)
+- [Do not rationalize](#do-not-rationalize)
+- [The leading question](#the-leading-question)
+- [When sources disagree](#when-sources-disagree)
+- [When evidence is missing](#when-evidence-is-missing)
+- [Before you finish](#before-you-finish)
+
 How to rate confidence when the evidence is old, partial, and sometimes contradictory, and how to
 say it without turning it into false certainty. Code shows what it does, not why it exists. The
 why lives in commits, PRs, issues, ADRs, phase docs, changelogs, and notes. All of them are

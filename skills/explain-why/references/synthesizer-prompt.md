@@ -1,5 +1,18 @@
 # Synthesizer prompt
 
+## Contents
+
+- [The question](#the-question)
+- [Repo root](#repo-root)
+- [The anchor](#the-anchor)
+- [In-repo sweep (ADRs, phase docs, CHANGELOG, CLAUDE.md/AGENTS.md, memory)](#in-repo-sweep-adrs-phase-docs-changelog-claudemdagentsmd-memory)
+- [Digger report (git and GitHub)](#digger-report-git-and-github)
+- [Sources not searched](#sources-not-searched)
+- [Epistemics](#epistemics)
+- [Instructions](#instructions)
+- [Output format](#output-format)
+- [Check before you return](#check-before-you-return)
+
 The main agent follows this format at `lite` and default. At `deep`, it is the prompt for the Opus
 synthesizer, with the placeholders filled in.
 

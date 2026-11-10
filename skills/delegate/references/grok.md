@@ -1,5 +1,11 @@
 # Grok runbook
 
+## Contents
+
+- [1. Preflight and model](#1-preflight-and-model)
+- [2. Run](#2-run)
+- [3. Troubleshooting a run that did nothing](#3-troubleshooting-a-run-that-did-nothing)
+
 How `delegate` runs the headless `grok` CLI for the `grok`, `mixed`, and `a/b grok-sonnet` routes.
 The main agent still plans, reviews, scores, and fixes. The child process is the implementer.
 

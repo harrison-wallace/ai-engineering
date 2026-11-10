@@ -7,7 +7,7 @@ AGENTS-TEMPLATE.md — AI agent instructions for a repository.
 2. Fill every "REPO:" block below.
 3. Delete these comments when you are done.
 
-Sections 1, 2, 6, and 7 are standardized across repos. They work as they are.
+Sections 1, 2, 6, 7, and 8 are standardized across repos. They work as they are.
 Edit them here, not per-project. Sections 3, 4, and 5 need real values.
 Machine-specific values — absolute paths, hostnames, usernames — belong in the
 copy, not here. Keep them as <placeholders> in this template.
@@ -197,3 +197,31 @@ Before you report a task as complete, confirm each point:
 - **Always shut the test server down when finished** — never leave it running.
 - **Only kill the process you started.** Track its PID and `kill` that exact PID. Never broad-kill by name/pattern (e.g. `pkill -f next`, `pkill -f node`) — that can take down a real app the owner is running.
 - If `38080` is already in use, it's likely a leftover of yours: check `ss -ltnp | grep 38080`, confirm it's your process, and kill that PID before restarting.
+
+---
+
+## 8. Subagent Model Routing (standardized across all repos)
+
+- **Name the model on every subagent call.** Set `model` on each Agent call, and `effort` on
+  each one except a Haiku read. Do not run `/model` or `/effort` to change the session for one
+  subtask.
+- **Route by the job:**
+
+  | Job | `model` | `effort` |
+  |---|---|---|
+  | Find files, search code, read logs, summarise | `haiku` | Leave it unset. The model default applies. |
+  | Repeated review, investigation, research, drafting | `sonnet` | `medium` |
+  | A well-scoped edit with a check | `sonnet` | `medium`. Go to `high` only when the check fails. |
+  | One judgement in a fresh context: synthesis, final review, an argument against the plan | `opus` | `high` |
+  | Code edits and judgement calls that need this conversation | The main session | The session level |
+
+- **Never go above Opus `high`.** Past `high`, one more effort level can cost as much as a
+  bigger model.
+- **Escalate in this order:** the agent checks its own work, then effort goes up one level,
+  then the model goes up one size at a lower effort.
+- **Keep fan-out small.** Use parallel subagents to read and to judge. Do not let two of them
+  write the same files. Give each one an objective, an output format, its tools, and its limits.
+- **Name the model on Explore calls**, usually `haiku`. The built-in Explore agent runs on the
+  main model unless the call sets `model`.
+- **Check the alias on cloud providers.** On Amazon Bedrock, Google Cloud, and Microsoft Foundry,
+  `haiku` can resolve to an older model. Use the full model ID there.

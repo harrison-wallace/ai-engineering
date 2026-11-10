@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-11-10
+
+### Added
+- `improve` skill: look at one feature, service, or infra stack from first principles. It grounds
+  in the area's job, runs five lenses (simplify, deepen, data shape, ops and cost, docs drift), and
+  proves each finding. Then it sends each finding to its next skill: `research`, `trace-impact`,
+  `design`, `prototype`, `delegate`, or `advise`. `auto` runs `research lite` and `trace-impact`
+  without asking. `aws` adds the AWS sweeps. It never edits code before your yes. New verb
+  `improve` in the Naming table.
+- `docs/AGENTS-TEMPLATE.md` §8 Subagent Model Routing: a routing table by job (Haiku for reads,
+  Sonnet `medium` for repeated review and research, Opus `high` for one fresh-context judgement,
+  the main session for edits and judgement calls), the escalation order, and the Explore and
+  cloud-alias notes.
+- `CLAUDE.md` sections **Skill structure** and **Model routing**: the rules for new skills, from
+  the Claude 5 model-choice research. They cover the 500-line `SKILL.md` limit, a `## Contents`
+  list in each reference file over 100 lines, self-contained subagent prompts, `model` and
+  `effort` on every Agent call, no `model` in skill frontmatter, and fan-out only after a test.
+
+### Changed
+- `delegate` `speed` route: each unit runs its own acceptance check, and only the failed units
+  re-run at `effort: medium`.
+- `bump-version` `sonnet` mode sets `effort: medium` on its Sonnet subagent.
+- The 11 reference files over 100 lines now start with a `## Contents` list of their headings
+  (`aws-audit`, `aws-cost`, `bump-version`, `check-public-ready`, `delegate`, `explain-why`,
+  `prototype`).
+- `.gitignore` excludes `docs/research/` and `docs/improve/`, which hold local reports.
+
 ## [3.3.2] - 2026-11-09
 
 ### Changed

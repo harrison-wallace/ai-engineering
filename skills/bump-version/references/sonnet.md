@@ -1,5 +1,12 @@
 # bump-version: sonnet
 
+## Contents
+
+- [1. Derive the release (main agent)](#1-derive-the-release-main-agent)
+- [2. Apply (Sonnet subagent)](#2-apply-sonnet-subagent)
+- [3. Verify (main agent)](#3-verify-main-agent)
+- [4. Report](#4-report)
+
 The same release as [`bump-version`](../SKILL.md), split in two: **you decide what
 the release is, a Sonnet subagent edits the files, you verify.** The judgement stays with you
 because it depends on this conversation; the edits go to Sonnet because they are mechanical,
@@ -46,6 +53,7 @@ Launch a subagent with the Agent tool:
 
 - `subagent_type`: `general-purpose`
 - `model`: `sonnet`
+- `effort`: `medium`
 - `run_in_background`: `false` — you need the result before you can verify it.
 - `prompt`: the plan from step 1, self-contained. Absolute repo path, both version numbers, the
   CHANGELOG block verbatim, and the doc edits with enough context to land them.
