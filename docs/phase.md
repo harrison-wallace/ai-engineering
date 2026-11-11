@@ -19,6 +19,7 @@ repo's `docs/`, never this one.
 | `/phase sync` | Rewrites `NOW.md` and ticks the checkboxes that actually landed, from git + this chat. Does not close anything. |
 | `/phase advance slice` | Ticks the current slice and moves `NOW.md` to the next one. Bare `/phase advance` does the same. Never closes a phase. |
 | `/phase advance phase` | Closes the phase if its DoD is met: row `done`, log line, next `shaped` row into `in progress`. Otherwise lists what is left. |
+| `/phase map` | Writes `docs/plans/map.json` (the infra parts and edges, linked to slices and decisions) and renders the live board. |
 | `/phase prune` | Proposes archiving duplicate/superseded/orphan docs. Waits for confirmation, file by file. |
 | `/phase help` | Prints the modes table. |
 
@@ -60,3 +61,31 @@ Things worth knowing:
 - Old `/session-*` commands still route here: `session-init` → `init`,
   `session-check`/`session-start` → `status`, `session-snap`/`session-end` → `sync`.
 
+## The live board
+
+`/phase map` adds a picture of the infra to the plan. A script then renders one LAN page with
+five tabs: Now, Roadmap, Phase, Infra, and Decisions. No model runs to render it. Click a slice or
+a decision, and the map lights up the parts it touches.
+
+```bash
+S=~/.claude/skills/phase/scripts
+$S/board-server.py add ~/git/my-app      # once per repo
+$S/board-server.py serve                 # http://<lan-ip>:38090/my-app/
+```
+
+The server takes the first free port from 38090 to 38099, so several can run side by side. It
+renders a board again when the phase docs, `map.json`, the infra files, or git HEAD change, and
+open pages reload by themselves. `sync`, `advance`, and `shape` also update the map's states and
+render the page, so the board is current even when no server runs.
+
+To keep it up without a Claude session, install the systemd user unit:
+
+```bash
+$S/board-server.py unit > ~/.config/systemd/user/phase-board.service
+systemctl --user daemon-reload && systemctl --user enable --now phase-board
+loginctl enable-linger "$USER"
+```
+
+A Docker one-liner is in `skills/phase/references/map.md` §4. `map.json` sits in `docs/plans/`,
+so it stays gitignored with the rest of the board. `/teach where are we` uses the same renderer
+when a map exists.

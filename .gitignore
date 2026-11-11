@@ -6,3 +6,4 @@ docs/research/
 docs/improve/
 __pycache__/
 *.pyc
+.playwright-mcp/

@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.3] - 2026-11-11
+
+### Added
+- `/phase map`: writes `docs/plans/map.json` (the infra parts and edges in the `infra-diagrams`
+  grammar, plus links to slices and open decisions). The markdown stays the source of truth for
+  the board, NOW, slices, DoD, and decisions. The schema and steps are in `references/map.md`.
+- `phase/scripts/render-board.py`: renders the board, NOW, the current and parallel phase docs,
+  and the map into one LAN page with the tabs Now, Roadmap, Phase, Infra, and Decisions. No model
+  runs. Edges route through the gaps between lanes and rows, and a click on a slice or a decision
+  lights up the parts it touches.
+- `phase/scripts/board-server.py`: `add`, `list`, `render`, and `serve` for live boards at
+  `http://<lan-ip>:<port>/<repo>/`. It takes the first free port from 38090 to 38099, names other
+  board servers, re-renders when the docs, map, infra files, or git HEAD change, and open pages
+  reload by themselves. `unit` prints a systemd user unit, and `map.md` has a Docker one-liner.
+
+### Changed
+- `sync`, `advance`, and `shape` move the map's states (building to built, new slice parts to
+  building, shaped parts as planned) and render the board, so it stays current with no server.
+- `/phase` gives the live board URL when a server runs. Its `page` reply now uses the renderer.
+- `teach` builds its phase page with the same renderer when a map exists, and falls back to a
+  hand-built page otherwise.
+
 ## [3.4.2] - 2026-11-11
 
 ### Added

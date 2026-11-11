@@ -1,8 +1,8 @@
 ---
 name: phase
-description: Long-horizon phase board for the cwd repo. BOARD.md tracks phases, NOW.md points at the current slice, phase docs hold checkboxes and DoD. Modes: status (default), init, sync, shape, advance slice|phase, prune, help. Use when the user runs /phase, asks where we are on the plan, or names BOARD.md / NOW.md. Replaces session-* / SESSION.md.
+description: Long-horizon phase board for the cwd repo. BOARD.md tracks phases, NOW.md points at the current slice, phase docs hold checkboxes and DoD. Modes: status (default), init, sync, shape, advance slice|phase, map, prune, help. `map` writes docs/plans/map.json, the infra picture behind a live LAN board that re-renders as the plan changes. Use when the user runs /phase, asks where we are on the plan, or names BOARD.md / NOW.md. Replaces session-* / SESSION.md.
 user-invocable: true
-argument-hint: "[status|init|sync|shape|advance [slice|phase]|prune|help]"
+argument-hint: "[status|init|sync|shape|advance [slice|phase]|map|prune|help]"
 ---
 
 # phase
@@ -30,6 +30,7 @@ Do not start Linear, GitHub issues, or a Projects board for this.
 | `shape` | Write or sharpen the next phase doc. Board row → `shaped`. |
 | `advance slice` | Close the current slice. Bare `advance` means this. Never closes a phase. |
 | `advance phase` | Close the phase when its DoD is met. Pull the next `shaped` row in. |
+| `map` | Write or refresh `docs/plans/map.json` (infra parts, edges, slice and decision links), then render the live board. |
 | `prune` | Propose archive of done/superseded docs. Confirm each. |
 | `help` | Print this table. One line: the board is the tracker; NOW is not the plan. |
 
@@ -50,6 +51,7 @@ phase DoD looks met. Never suggest bare `/phase advance`.
 | `docs/plans/NOW.md` | Current phase id + path, the one slice in focus, one-line blocked, `Updated` |
 | `docs/plans/BOARD.md` | Ordered phase rows, status, doc link, close log |
 | `docs/phases/<id>.md` | Goal, appetite, checkboxes, DoD, deferred |
+| `docs/plans/map.json` | Optional. Infra parts and edges, and their links to slices and decisions. Never the plan itself |
 | `docs/plans/mvp/*.md` | Phase docs if that is where the repo already keeps them |
 
 If NOW and BOARD disagree, BOARD wins (the unique `in progress` row). Rewrite NOW.
@@ -115,13 +117,12 @@ Read only.
 4. Stale: commits after NOW `Updated`, or checkboxes that disagree with git →
    **stale → run `/phase sync`**. Two `in progress` rows → say so; do not pick.
 5. Do not start the slice unless the user also said to continue.
-6. End with one line: *"Reply `page` for the board on your LAN."* When the user replies `page`,
-   read `../serve-page/SKILL.md` (relative to this skill's folder, resolved with `readlink -f`)
-   and follow its §1 to §4. Write `<scratchpad>/phase/<repo>/index.html`: the board rows in order
-   with their status, the current phase with its slices and checkboxes as a progress bar, Blocked,
-   and the close log. It stays read-only. Stop the server when the user says they are done.
-   For diagrams of the slices, the infra as built and as planned, and the open
-   decisions, point to `/teach where are we` instead.
+6. End with one line: the live board URL when `scripts/board-server.py list` shows this repo and
+   a running server. Otherwise: *"Reply `page` for the board on your LAN."* When the user replies
+   `page`, run `scripts/render-board.py <repo> <scratchpad>/phase/<repo>`, then serve that folder
+   with `../serve-page/SKILL.md` §3 (relative to this skill's folder, resolved with `readlink -f`).
+   Without `map.json` the Infra tab says to run `/phase map`. Stop the server when the user says
+   they are done. For a live board that stays up, point to [references/map.md](references/map.md) §4.
 
 ## Sync
 
@@ -137,6 +138,7 @@ Rewrite NOW and the active phase checkboxes. Do not append. Do not close a phase
    was recorded. If it was settled but not recorded, keep the line and say so.
 4. Do not change a row's status to `done` (that is `advance phase`). Do not
    append the log. Do not prune Later. Do not keep implementing unless the user asked.
+5. Refresh the map ([references/map.md](references/map.md) §3).
 
 ## Shape
 
@@ -154,6 +156,7 @@ Write or sharpen a phase doc. Do not implement.
 4. Add or flip the board row to `shaped`. Do not set `in progress` unless
    nothing is in progress **and** the user asked to start it.
 5. Do not tick checkboxes. Do not start product work.
+6. Refresh the map ([references/map.md](references/map.md) §3).
 
 ## Advance
 
@@ -181,7 +184,15 @@ word picks the target: `slice` (default) or `phase`. Bare `advance` is
    slice, or `Phase: none`.
 6. Else list the DoD lines that are not met. Do not write.
 
-7. Stop. Do not keep implementing.
+7. After a write in step 2 or 5, refresh the map ([references/map.md](references/map.md) §3).
+8. Stop. Do not keep implementing.
+
+## Map
+
+Write or refresh `docs/plans/map.json`, and render the board. Follow
+[references/map.md](references/map.md) §1. Do not edit NOW, BOARD, or a phase doc here. When a doc
+and the code disagree, draw the code, and say so in the reply. Reply with the parts count, the
+links count, the board URL (or the setup line from §4), and the parts you could not place.
 
 ## Prune
 

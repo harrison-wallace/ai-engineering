@@ -59,8 +59,18 @@ database, an external API) is still a part. Draw it from the phase doc's text, a
 
 ## 3. Build the page
 
-Follow `../../serve-page/SKILL.md` §1 to §4, with the dynamic-page rules in its
-`references/page-rules.md`. Write `<scratchpad>/teach/<repo>-phase/index.html`.
+**When `docs/plans/map.json` exists**, the `phase` renderer builds this page with no model. Run
+`../../phase/scripts/render-board.py <repo> <scratchpad>/teach/<repo>-phase` (relative to this
+file, resolved with `readlink -f`), then serve the folder with `../../serve-page/SKILL.md` §3. It
+draws the tabs below from the files and the map, but the Infra tab has no stepper: teach the
+lanes one at a time in the reply instead. Do not hand-edit its output. When the map looks
+wrong or out of date, say so, and suggest `/phase map`. When `board-server.py list` shows a live
+board for this repo, give that URL as well.
+
+**When there is no map**, build the page by hand. Follow `../../serve-page/SKILL.md` §1 to §4,
+with the dynamic-page rules in its `references/page-rules.md`. Write
+`<scratchpad>/teach/<repo>-phase/index.html`. At the end of the reply, add one line: "For a board
+that stays up and updates itself, run `/phase map`."
 
 **Header**: the repo, today's date, the current phase and slice, a stale warning when §1 found
 one, and the legend (built, building, planned, decision).

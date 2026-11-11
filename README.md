@@ -12,7 +12,7 @@
                                              ░███████                                                              ░███████
 ```
 
-![Version](https://img.shields.io/badge/version-3.4.2-6366f1?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.4.3-6366f1?style=flat-square)
 ![Skills](https://img.shields.io/badge/skills-38-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
@@ -99,7 +99,7 @@ runs one or both and teaches the result. `research` covers what outside sources 
 
 | Skill | What it does |
 |---|---|
-| [phase](skills/phase/SKILL.md) | Long-horizon phase board for the repo you are in: `BOARD.md` for phases, `NOW.md` for the current slice, and phase docs with checkboxes, open decisions, and DoD. Commands and workflow are in [docs/phase.md](docs/phase.md). |
+| [phase](skills/phase/SKILL.md) | Long-horizon phase board for the repo you are in: `BOARD.md`, `NOW.md`, and phase docs with checkboxes, open decisions, and DoD. `map` adds a live LAN board with an infra diagram that updates as the plan does. See [docs/phase.md](docs/phase.md). |
 
 ### AWS
 
