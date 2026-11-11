@@ -44,7 +44,8 @@
     if (!src) return;
     if (active === src) { clear(); return; }
     clear();
-    var ids = (src.dataset.links || src.dataset.id).split(/\s+/);
+    var ids = (src.dataset.links || src.dataset.id || "").split(/\s+/).filter(Boolean);
+    if (!ids.length) return;  // nothing linked: leave the page as it is
     ids.forEach(function (id) {
       d.querySelectorAll('[data-id="' + id + '"], [data-links~="' + id + '"]')
         .forEach(function (e) { e.classList.add("hl"); });

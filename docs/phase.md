@@ -47,7 +47,8 @@ Day to day:
 
 Things worth knowing:
 
-- **`NOW.md` is not the plan.** It holds one phase, one slice, one blocked line.
+- **`NOW.md` is not the plan.** It holds one phase, one slice, one blocked line, and an optional
+  `Parallel:` line for a side track whose board row stays `shaped`.
   Checkboxes and DoD live in the phase doc; the board holds the ordering.
 - **`BOARD.md` wins.** If the two disagree, the unique `in progress` row is the
   truth and `sync` rewrites `NOW.md`.

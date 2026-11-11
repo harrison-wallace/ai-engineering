@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.4] - 2026-11-11
+
+### Changed
+- Phase board, Phase tab: a chip for each phase (current first, then side tracks), and one view
+  per phase with no dropdowns. The slice in focus sits in full in a highlighted card at the top.
+  Every slice follows in a vertical list with a marker, a state chip, its tick count, its detail,
+  and its checklist. Done slices show two lines until tapped, and the Definition of Done and the
+  no-gos sit beside the list. The chosen phase stays across live reloads (`?phase=`).
+- Phase board, Roadmap tab: a vertical rail grouped into Now, Up next, Other, and Done, with each
+  phase's note and a slice progress bar. A tap on a phase opens it in the Phase tab.
+- `phase`: NOW gains an optional `Parallel: <id> — <line>` for a side track whose row stays
+  `shaped`, and the board draws its slices. `sync`, `status`, and the pages drop an open decision
+  that a later owner decision (board log, a phase doc's `## Decisions`, or an ADR) settled, and
+  report a conflict with an unticked item or the DoD for `/phase shape`.
+- `teach`'s phase page also drops decisions with a later owner answer, and its tab spec matches
+  the new Roadmap and Phase layout.
+
+### Fixed
+- The renderer read only board ids with a digit, so rows such as `PF` and `P2B` were missing.
+- Nested checkboxes in a slice are now its checklist, nested bullets keep their own lines, and
+  Definition of Done items that wrap across lines are no longer cut off.
+- `dynamic.js` ignores a click on an element with empty `data-links`, so it no longer dims the
+  whole page. Tapping a slice to read it no longer dims the others; "Show on the map" does the
+  highlight.
+
 ## [3.4.3] - 2026-11-11
 
 ### Added

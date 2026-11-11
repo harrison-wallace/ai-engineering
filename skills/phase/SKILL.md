@@ -48,7 +48,7 @@ phase DoD looks met. Never suggest bare `/phase advance`.
 
 | File | Owns |
 |---|---|
-| `docs/plans/NOW.md` | Current phase id + path, the one slice in focus, one-line blocked, `Updated` |
+| `docs/plans/NOW.md` | Current phase id + path, the one slice in focus, one-line blocked, `Updated`, and optionally one `Parallel:` line |
 | `docs/plans/BOARD.md` | Ordered phase rows, status, doc link, close log |
 | `docs/phases/<id>.md` | Goal, appetite, checkboxes, DoD, deferred |
 | `docs/plans/map.json` | Optional. Infra parts and edges, and their links to slices and decisions. Never the plan itself |
@@ -62,6 +62,9 @@ root `ROADMAP.md` (outside these trees). Git + the close log are history.
 Do not write landed/did-not, Parking, or dirty-file lists into NOW.
 
 At most one `in progress` row. Next is the first `shaped` row after it.
+A side track that runs beside the current phase goes on NOW's optional `Parallel: <id> — <one line>`
+line. Its row may stay `shaped`. `status` names it, `sync` ticks its checkboxes too, and the board
+draws its slices.
 
 Appetite is a stop condition on the phase doc: DoD, slice count, no-gos.
 Do not put days, weeks, or sprints on the board or in a phase doc.
@@ -136,6 +139,11 @@ Rewrite NOW and the active phase checkboxes. Do not append. Do not close a phase
    In `## Open decisions`, add a decision this chat raised and left open, and
    delete one that an ADR, `DECISIONS.md`, or this chat settled. Say where it
    was recorded. If it was settled but not recorded, keep the line and say so.
+   Before you keep or list an open decision (here, in `status`, or on a page), check the board
+   log, every phase doc's `## Decisions`, and the ADRs for an owner decision dated after it. A
+   later decision settles it, even when an unticked item still says "the owner decides". When
+   that decision contradicts an unticked item or the DoD of the current phase, report the
+   conflict and suggest `/phase shape`. Do not leave the item blocked.
 4. Do not change a row's status to `done` (that is `advance phase`). Do not
    append the log. Do not prune Later. Do not keep implementing unless the user asked.
 5. Refresh the map ([references/map.md](references/map.md) §3).

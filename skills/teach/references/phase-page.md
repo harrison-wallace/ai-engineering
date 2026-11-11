@@ -40,7 +40,9 @@ Read in this order. Stop at what is missing, and say so on the page and in the r
 **Open decisions** come from the phase doc's `## Open decisions` section. Each line gives the
 question, the options, and what it blocks. When the section is missing, look for unticked items
 that start with "Decide", "Choose", or "TBD", and lines marked `?` or "open question". Label those
-"found in the text", not "recorded". Never invent a decision.
+"found in the text", not "recorded". Never invent a decision. Drop a found or recorded decision
+when the board log, a phase doc's `## Decisions`, or an ADR records a later owner answer, even
+when an unticked item still asks for it. Name the conflict on the page and in the reply.
 
 ## 2. Read the infra
 
@@ -81,13 +83,16 @@ one, and the legend (built, building, planned, decision).
    focus and its progress (`3 of 5 items`). Blocked, or "nothing blocked". The figure is the
    slice flow from the Phase tab, scaled down. Then the open-decision count, which links to the
    Decisions tab.
-2. **Roadmap** (`#roadmap`): the board rows as a horizontal timeline. Done rows in the
-   muted colour, the in-progress row in the accent colour with a "you are here" marker, shaped
-   rows dashed, Later rows grey at the end. Under it, the close log as a short list.
-3. **Phase** (`#phase`): the slices as a left-to-right flow of boxes (done, current, next), each
-   with its tick count. Click a slice to expand its checklist below the flow (a `<details>` per
-   slice). Beside the flow, the Definition of Done as a checklist and the appetite's no-gos.
-   Each slice box carries `data-links` with the ids of the infra parts it touches.
+2. **Roadmap** (`#roadmap`): the board rows as a vertical rail, grouped Now (the current phase,
+   marked "you are here", then side tracks), Up next (shaped), Other (parked), and Done (one
+   compact line each). Each row has its status, the note in two lines, and a slice progress bar.
+   A tap on a row opens that phase in the Phase tab. Then Later, and the recent close log.
+3. **Phase** (`#phase`): a chip per phase (current first), and one view per phase, never hidden
+   in a dropdown. The view has a header (name, status, goal, progress), then the slice in focus in
+   full in a highlighted card, then every slice as a vertical list: a marker (done, current,
+   waiting, to do), the name, a state chip with its tick count, the detail, and its checklist.
+   Done slices show two lines until tapped. Beside the list, the Definition of Done and the
+   no-gos. Each slice carries `data-links` with the ids of the infra parts it touches.
 4. **Infra** (`#infra`): the overlay diagram, with layer toggles for built, building, planned,
    and decisions. Under it, a stepper that teaches the system one lane at a time (the frame
    series from SKILL.md §5), ending with the overlay.

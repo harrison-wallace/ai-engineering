@@ -67,11 +67,14 @@ def find_section(secs, *names):
 
 
 # ---------- board and NOW ----------
+PHASE_ID = r"[A-Za-z]+\d*[A-Za-z]?|\d+[a-z]?"  # P1, P13b, P2B, PF, 3
+
+
 def parse_board(md):
     rows = []
     for line in md.splitlines():
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if len(cells) >= 4 and re.match(r"^[A-Za-z]*\d+[a-z]?$", cells[0]):
+        if len(cells) >= 4 and re.fullmatch(PHASE_ID, cells[0]) and cells[2].lower() != "status":
             link = re.search(r"\]\(([^)]+)\)", cells[3]) or re.search(r"`([^`]+\.md)`", cells[3])
             rows.append({"id": cells[0], "name": cells[1], "status": cells[2].lower(),
                          "doc": link.group(1) if link else "", "note": cells[4] if len(cells) > 4 else ""})
@@ -96,18 +99,37 @@ def parse_now(md):
 
 # ---------- phase doc ----------
 def parse_items(body):
-    """Top-level checklist items, with their continuation lines joined."""
-    items, cur = [], None
+    """Top-level checklist items, with their continuation lines joined, and nested checkboxes as `sub`."""
+    items, cur, tail = [], None, None
     for line in body.splitlines():
         m = re.match(r"^- \[([ xX])\]\s+(.*)$", line)
+        n = re.match(r"^\s{2,}[-*] \[([ xX])\]\s+(.*)$", line)
         if m:
-            cur = {"done": m.group(1) != " ", "text": m.group(2)}
+            cur = tail = {"done": m.group(1) != " ", "text": m.group(2), "sub": []}
             items.append(cur)
+        elif cur and n:
+            tail = {"done": n.group(1) != " ", "text": n.group(2)}
+            cur["sub"].append(tail)
         elif cur and line.startswith("  ") and line.strip():
-            cur["text"] += " " + line.strip()
+            t = line.strip()
+            tail["text"] += ("\n• " + t[2:]) if t[:2] in ("- ", "* ") else " " + t  # a nested bullet keeps its line
         elif line.strip() and not line.startswith(" "):
-            cur = None
+            cur = tail = None
     return items
+
+
+def bullets(body):
+    """Top-level '- ' list items with their wrapped lines joined. A checkbox shows as ☑ or ☐."""
+    out = []
+    for line in body.splitlines():
+        if line.startswith("- "):
+            out.append(line[2:].strip())
+        elif out and line.startswith("  ") and line.strip():
+            out[-1] += " " + line.strip()
+        elif line.strip():
+            out.append(None)  # a paragraph ends the list item
+    out = [re.sub(r"^\[[xX]\]\s*", "☑ ", re.sub(r"^\[ \]\s*", "☐ ", x)) for x in out if x]
+    return out
 
 
 def slice_key(text, n):
@@ -134,13 +156,14 @@ def parse_phase(md):
     if body:
         for n, it in enumerate(parse_items(body), 1):
             slices.append({"key": slice_key(it["text"], n), "name": slice_name(it["text"]),
-                           "done": it["done"], "text": it["text"], "items": []})
+                           "named": not re.search(r"\bSlice\s+[0-9]", it["text"]),
+                           "done": it["done"], "text": it["text"], "items": it["sub"]})
     else:  # numbered shape: ### N.M headings with their own checklists
         for m in re.finditer(r"^###\s+(\d+\.\d+[a-z]?)\s+(.+?)\n(.*?)(?=^###\s|^##\s|\Z)", md, re.M | re.S):
             its = parse_items(m.group(3))
             slices.append({"key": m.group(1), "name": m.group(2).strip(), "text": "",
                            "done": bool(its) and all(i["done"] for i in its), "items": its})
-    dod = [l[2:] for l in find_section(secs, "Definition of Done").splitlines() if l.startswith("- ")]
+    dod = bullets(find_section(secs, "Definition of Done"))
     nogo = re.search(r"No-gos:\s*(.+?)(?:\n- |\Z)", find_section(secs, "Appetite"), re.S)
     decisions = []
     for l in find_section(secs, "Open decisions").splitlines():
@@ -427,11 +450,51 @@ padding:8px 10px;background:var(--card);cursor:pointer;font-size:13px}.slice .k{
 .slice.done{border-color:var(--line);color:var(--muted)}.slice.current{border-color:var(--accent);background:var(--accent-soft)}
 .slice.open{border-style:dashed}.slice.waiting{border-color:var(--amber);border-style:dashed}
 details{margin:6px 0}summary{cursor:pointer}
-.road{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
-.ph{border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;background:var(--card)}
-.ph .k{font-weight:700}.ph.done{color:var(--muted)}.ph.inprogress{border-color:var(--accent);background:var(--accent-soft)}
-.ph.parked{border-color:var(--amber)}.ph.shaped{border-style:dashed;border-color:var(--fg)}
-.here{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase}
+.here{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em}.here.side{color:var(--amber)}
+.ghead{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:22px 0 6px}
+.rail{border-left:2px solid var(--line);margin-left:7px}
+.rrow{display:flex;gap:12px;padding:10px 12px 10px 0;color:var(--fg);text-decoration:none;position:relative}
+a.rrow:hover .rbody{background:var(--accent-soft)}
+.rrow .dot{flex:0 0 14px;height:14px;border-radius:50%;margin:4px 0 0 -8px;background:var(--bg);border:2px solid var(--muted)}
+.rrow.k-here .dot{background:var(--accent);border-color:var(--accent)}.rrow.k-side .dot{background:var(--amber);border-color:var(--amber)}
+.rrow.k-done .dot{background:var(--muted)}.rrow.k-done{padding:4px 12px 4px 0;color:var(--muted);font-size:14px}
+.rbody{flex:1;border-radius:8px;padding:2px 8px}
+.rrow.k-here .rbody{background:var(--accent-soft);border:1.5px solid var(--accent);padding:10px 12px}
+.rrow.k-side .rbody{border:1.5px dashed var(--amber);padding:10px 12px}
+.rtop{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.note{font-size:13px;color:var(--muted);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prog{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-top:6px}.prog .bar{width:140px}
+.chip{font-size:11px;border-radius:10px;padding:1px 8px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.inprogress,.chip.current{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip.done{color:var(--ok);border-color:var(--ok)}.chip.waiting,.chip.parked{color:var(--amber);border-color:var(--amber)}
+.small{font-size:13px}.later,.log{font-size:14px;padding-left:20px}.log li,.later li{margin:3px 0}
+.pick{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.pchip{font:600 13px system-ui;padding:5px 12px;border-radius:16px;border:1.5px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+.pchip.k-here{border-color:var(--accent)}.pchip.k-side{border-color:var(--amber)}.pchip.k-done{color:var(--muted)}
+.pchip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.phead .rtop{font-size:17px}.phead p{margin:6px 0}
+.spot{background:var(--accent-soft);border:2px solid var(--accent);border-radius:10px;padding:14px 16px;margin:12px 0}
+.spot .stop{font-size:17px}.spot .sdetail{font-size:15px}
+.srow.done .sdetail{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.srow.done.open .sdetail{display:block}.srow.done .chk{display:none}.srow.done.open .chk{display:block}
+.srow.done .stop::after{content:"tap to read";font-size:11px;color:var(--muted)}.srow.done.open .stop::after{content:""}
+.pgrid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:760px){.pgrid{grid-template-columns:1fr}}
+.pgrid aside h3{font-size:14px;margin:0 0 6px}.pgrid aside{margin-top:34px}.dod{padding-left:18px;margin:0;font-size:14px}
+ol.slices{list-style:none;padding:0;margin:10px 0;border-left:2px solid var(--line);margin-left:9px}
+.srow{display:flex;gap:12px;padding:8px 0;cursor:pointer}
+.srow .mark{flex:0 0 18px;height:18px;border-radius:50%;margin:3px 0 0 -10px;background:var(--bg);border:2px solid var(--muted);
+display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
+.srow.done .mark{background:var(--ok);border-color:var(--ok)}.srow.done .mark::after{content:"✓"}
+.srow.current .mark{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.srow.waiting .mark{border-color:var(--amber)}
+.sbody{flex:1;min-width:0;border-radius:8px;padding:4px 10px}
+.srow.current .sbody{border:1.5px solid var(--accent);padding:8px 12px}
+.srow.done .sbody{color:var(--muted)}.srow.done .sdetail{font-size:13px}
+.stop{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.skey{font:700 11px system-ui;color:var(--muted);min-width:22px}
+.sdetail{margin:4px 0;font-size:14px}.srow.current .sdetail{font-size:15px}
+ul.chk{list-style:none;padding:0;margin:6px 0;font-size:14px}ul.chk li{margin:2px 0}ul.chk li.ok{color:var(--muted)}
 .dcard{border-left:4px solid var(--amber)}.dcard .id{font-weight:700;color:var(--amber)}
 .map{font-size:12px;display:inline-block;margin-top:4px}
 .tag{font-size:11px;border:1px solid var(--line);border-radius:10px;padding:1px 7px;color:var(--muted)}
@@ -460,6 +523,16 @@ body.focus svg [data-id]:not(.hl){opacity:.22}body.focus .slice:not(.hl),body.fo
 code{font-size:.9em;background:var(--line);padding:0 4px;border-radius:4px}
 """
 
+PICK_JS = """(function(){var d=document;function pick(id,keep){var v=[].slice.call(d.querySelectorAll('.pview'));
+if(!v.some(function(e){return e.dataset.phase===id}))return false;
+v.forEach(function(e){e.hidden=e.dataset.phase!==id});d.querySelectorAll('.pchip').forEach(function(c){
+c.setAttribute('aria-pressed',c.dataset.phaseGo===id?'true':'false')});
+if(keep){var u=new URL(location.href);u.searchParams.set('phase',id);history.replaceState(null,'',u)}return true}
+d.addEventListener('click',function(e){var t=e.target.closest('[data-phase-go]');if(t)pick(t.dataset.phaseGo,true);
+var r=e.target.closest('.srow.done');if(r&&!e.target.closest('a'))r.classList.toggle('open')});
+var f=d.querySelector('.pview');if(f&&!pick(new URLSearchParams(location.search).get('phase')))
+pick((d.querySelector('.pview.cur')||f).dataset.phase)})();"""
+
 LIVE_JS = """(function(){var s=null;function poll(){fetch('stamp.txt',{cache:'no-store'}).then(function(r){return r.text()})
 .then(function(t){t=t.trim();if(s===null)s=t;else if(t!==s)location.reload()}).catch(function(){})}
 poll();setInterval(poll,4000)})();"""
@@ -476,11 +549,15 @@ def render(repo, out_dir, live=False):
         m = json.loads(read(os.path.join(plans, "map.json")) or "{}")
     except json.JSONDecodeError as e:
         m = {"_error": str(e)}
-    cur_id = (re.match(r"\s*([A-Za-z]*\d+[a-z]?)", now.get("Phase", "")) or [None, ""])[1]
+    cur_id = (re.match(rf"\s*({PHASE_ID})\b", now.get("Phase", "")) or [None, ""])[1]
     current = next((r for r in rows if r["id"] == cur_id), None) or next(
         (r for r in rows if r["status"] == "in progress"), None)
     phase = parse_phase(read(os.path.join(plans, current["doc"]))) if current and current["doc"] else None
     now_slice = (re.match(r"\s*([0-9]+[a-z]?)", now.get("Slice", "")) or [None, ""])[1]
+    # Side tracks: in-progress rows besides the current one, and the phases NOW's Parallel line names
+    # first (a side track's row may stay shaped). Only the ids before the first dash, colon, or bracket.
+    named = re.findall(rf"\b(?:{PHASE_ID})\b", re.split(r"\s[—–-]\s|[(:]", now.get("Parallel", ""))[0])
+    side = [r for r in rows if r is not current and (r["status"] == "in progress" or r["id"] in named)]
     stages, found = inventory_check(repo, m)
     slice_links = m.get("slices", {})
     title = m.get("title") or os.path.basename(os.path.abspath(repo))
@@ -499,7 +576,8 @@ def render(repo, out_dir, live=False):
     for grp in re.findall(r"\b[Ss]lices?\s+((?:[0-9]+[a-z]?(?:,\s*|\s+and\s+|\s+to\s+)?)+)", blocked):
         waiting.update(re.findall(r"[0-9]+[a-z]?", grp))
 
-    def slice_cards(sl, pid, small=False, blocked_keys=()):
+    def slice_cards(sl, pid, blocked_keys=()):
+        """The compact slice strip on the Now tab."""
         cards = []
         for s in sl:
             state = "done" if s["done"] else "current" if s["key"] == now_slice else (
@@ -508,12 +586,9 @@ def render(repo, out_dir, live=False):
             ticks = ""
             if s["items"]:
                 ticks = f' · {sum(i["done"] for i in s["items"])}/{len(s["items"])}'
-            body = "" if small else (f'<details><summary class="muted">Details</summary>{inline(s["text"])}'
-                                     + "".join(f'<div>{"☑" if i["done"] else "☐"} {inline(i["text"])}</div>'
-                                               for i in s["items"]) + "</details>")
-            show = ' <a class="map" href="#infra">Show on the map</a>' if links and not small else ""
-            cards.append(f'<div class="slice {state}" data-links="{esc(links)}"><div class="k">'
-                         f'{esc(s["key"])} · {state}{ticks}</div>{inline(s["name"])}{show}{body}</div>')
+            attr = f' data-links="{esc(links)}"' if links else ""
+            cards.append(f'<div class="slice {state}"{attr}><div class="k">'
+                         f'{esc(s["key"])} · {state}{ticks}</div>{inline(s["name"])}</div>')
         return '<div class="flow">' + "".join(cards) + "</div>"
 
     pid = current["id"] if current else ""
@@ -551,37 +626,120 @@ def render(repo, out_dir, live=False):
         pct = int(100 * done_n / len(sl)) if sl else 0
         now_tab.append(f'<div class="card"><b>{inline(phase["title"])}</b><p>{inline(phase["goal"])}</p>'
                        f'<div class="muted">{done_n} of {len(sl)} slices done</div><div class="bar"><i style="width:{pct}%"></i></div></div>')
-        now_tab.append(slice_cards(sl, pid, small=True, blocked_keys=waiting))
+        now_tab.append(slice_cards(sl, pid, blocked_keys=waiting))
     now_tab.append(f'<p><a href="#decisions">{len(decisions)} open decision{"s" if len(decisions) != 1 else ""}</a>'
                    + ("" if all(d["recorded"] for d in decisions) else ' <span class="tag">found in the text</span>') + "</p>")
     if found:
         now_tab.append(f'<div class="card">Now in the files, still marked planned: {esc(", ".join(found))}. Run <code>/phase sync</code>.</div>')
 
-    status_cls = lambda s: re.sub(r"[^a-z]", "", s)
-    road = ['<div class="road">']
+    # Every phase doc on the board, parsed once: the Roadmap counts its slices, the Phase tab shows it.
+    docs = {}
     for r in rows:
-        here = '<div class="here">You are here</div>' if current and r["id"] == current["id"] else (
-            '<div class="here">Parallel</div>' if r["status"] == "in progress" else "")
-        road.append(f'<div class="ph {status_cls(r["status"])}" title="{esc(r["note"])}">{here}'
-                    f'<div class="k">{esc(r["id"])} · {inline(r["name"])}</div><div class="muted">{esc(r["status"])}</div></div>')
-    road.append("</div>")
-    if later:
-        road.append("<h2>Later</h2><ul>" + "".join(f"<li>{inline(l)}</li>" for l in later) + "</ul>")
-    if log:
-        road.append("<h2>Recent log</h2><ul>" + "".join(f"<li><b>{esc(d)}</b> {inline(t)}</li>" for d, t in log[-10:][::-1]) + "</ul>")
+        if current and r["id"] == current["id"]:
+            docs[r["id"]] = phase
+        elif r["doc"]:
+            docs[r["id"]] = parse_phase(read(os.path.join(plans, r["doc"]))) or None
+    role = {r["id"]: ("here" if current and r["id"] == current["id"] else "side" if r in side else
+                      "done" if r["status"] == "done" else "next" if r["status"] == "shaped" else "other")
+            for r in rows}
 
+    def progress(rid):
+        ph = docs.get(rid)
+        if not ph or not ph["slices"]:
+            return ""
+        n, t = sum(x["done"] for x in ph["slices"]), len(ph["slices"])
+        return (f'<span class="prog"><span class="bar"><i style="width:{int(100 * n / t)}%"></i></span>'
+                f'{n} of {t} slices</span>')
+
+    def road_row(r):
+        k = role[r["id"]]
+        flag = {"here": '<span class="here">You are here</span>', "side": '<span class="here side">Side track</span>'}.get(k, "")
+        go = f' href="#phase" data-phase-go="{esc(r["id"])}"' if docs.get(r["id"]) else ""
+        tagname = "a" if go else "div"
+        note = f'<div class="note">{inline(r["note"])}</div>' if r["note"] and k != "done" else ""
+        return (f'<{tagname} class="rrow k-{k}"{go}><span class="dot"></span><div class="rbody">'
+                f'<div class="rtop"><span><b>{esc(r["id"])}</b> {inline(r["name"])}</span> {flag}'
+                f'<span class="chip {status_cls(r["status"])}">{esc(r["status"])}</span></div>'
+                f'{note}{progress(r["id"]) if k != "done" else ""}</div></{tagname}>')
+
+    status_cls = lambda s: re.sub(r"[^a-z]", "", s)
+    groups = [("Now", [r for r in rows if role[r["id"]] == "here"] + [r for r in rows if role[r["id"]] == "side"]),
+              ("Up next", [r for r in rows if role[r["id"]] == "next"]),
+              ("Other", [r for r in rows if role[r["id"]] == "other"]),
+              ("Done", [r for r in rows if role[r["id"]] == "done"])]
+    road = []
+    for name, grp in groups:
+        if grp:
+            road.append(f'<h3 class="ghead">{name}</h3><div class="rail">' + "".join(road_row(r) for r in grp) + "</div>")
+    if later:
+        road.append('<h3 class="ghead">Later</h3><ul class="later">' + "".join(f"<li>{inline(l)}</li>" for l in later) + "</ul>")
+    if log:
+        road.append('<h3 class="ghead">Recent log</h3><ul class="log">' + "".join(
+            f"<li><b>{esc(d)}</b> {inline(t)}</li>" for d, t in log[-10:][::-1]) + "</ul>")
+
+    def slice_detail(text):
+        """The slice's prose without its 'Slice N: **Name.**' lead."""
+        return re.sub(r"^(Slice\s+\S+:\s*)?(\*\*.+?\*\*)?[\s.:]*", "", text, count=1)
+
+    def phase_view(r, ph):
+        k = role[r["id"]]
+        sl_ = ph["slices"]
+        first_open = next((x["key"] for x in sl_ if not x["done"]), None)
+        cur_key = now_slice if k == "here" and now_slice else first_open if k in ("here", "side") else None
+        blocked_keys = waiting if k == "here" else ()
+        out = [f'<div class="pview k-{k}{" cur" if k == "here" else ""}" data-phase="{esc(r["id"])}">',
+               f'<div class="card phead"><div class="rtop"><span><b>{esc(r["id"])}</b> {inline(r["name"])}</span>'
+               f'<span class="chip {status_cls(r["status"])}">{esc(r["status"])}</span></div>']
+        if ph["goal"]:
+            out.append(f'<p>{inline(ph["goal"])}</p>')
+        out.append(progress(r["id"]))
+        def body(x, state, full=True):
+            label = {"done": "Done", "current": "You are here", "waiting": "Waiting", "open": "To do"}[state]
+            links = " ".join(slice_links.get(f'{r["id"]}:{x["key"]}', []))
+            ticks = (f' · {sum(i["done"] for i in x["items"])} of {len(x["items"])}' if x["items"] else "")
+            detail = slice_detail(x["text"])
+            items = "".join(f'<li class="{"ok" if i["done"] else "todo"}">{"☑" if i["done"] else "☐"} {inline(i["text"]).replace(chr(10), "<br>")}</li>'
+                            for i in x["items"])
+            key = "" if x.get("named") else esc(x["key"])  # the key is the name: say it once
+            top = (f'<div class="stop"><span class="skey">{key}</span><b>{inline(x["name"])}</b>'
+                   f'<span class="chip {state}">{label}{ticks}</span></div>')
+            if not full:
+                return top + '<div class="muted small">In full at the top of this phase.</div>'
+            return (top + (f'<p class="sdetail">{inline(detail).replace(chr(10), "<br>")}</p>' if detail else "")
+                    + (f'<ul class="chk">{items}</ul>' if items else "")
+                    + (f'<a class="map" href="#infra" data-links="{esc(links)}">Show on the map</a>' if links else ""))
+
+        states = {x["key"]: ("done" if x["done"] else "current" if x["key"] == cur_key else
+                             "waiting" if x["key"] in blocked_keys or re.search(r"\bwaits? on\b|\bblocked\b", x["text"], re.I)
+                             else "open") for x in sl_}
+        cs = next((x for x in sl_ if x["key"] == cur_key), None)
+        out.append("</div>")
+        if cs:  # the slice in focus, in full, before the list
+            out.append(f'<div class="spot">{body(cs, "current")}</div>')
+        out.append('<div class="pgrid"><div><h3 class="ghead">Every slice</h3><ol class="slices">')
+        for x in sl_:
+            out.append(f'<li class="srow {states[x["key"]]}"><span class="mark"></span>'
+                       f'<div class="sbody">{body(x, states[x["key"]], full=x is not cs)}</div></li>')
+        out.append('</ol></div><aside>')
+        if ph["dod"]:
+            out.append('<div class="card"><h3>Definition of Done</h3><ul class="dod">'
+                       + "".join(f"<li>{inline(x)}</li>" for x in ph["dod"]) + "</ul></div>")
+        if ph["nogo"]:
+            out.append(f'<div class="card"><h3>No-gos</h3><p>{inline(ph["nogo"])}</p></div>')
+        out.append("</aside></div></div>")
+        return "".join(out)
+
+    shown = [r for r in rows if docs.get(r["id"])]
+    order = sorted(shown, key=lambda r: ["here", "side", "next", "other", "done"].index(role[r["id"]]))
     phase_tab = []
-    if phase:
-        phase_tab.append(f'<p class="muted">{inline(phase["status"])}</p>')
-        phase_tab.append(slice_cards(sl, pid, blocked_keys=waiting))
-        phase_tab.append("<h2>Definition of Done</h2><ul>" + "".join(f"<li>{inline(x)}</li>" for x in phase["dod"]) + "</ul>")
-        if phase["nogo"]:
-            phase_tab.append(f'<h2>No-gos</h2><p>{inline(phase["nogo"])}</p>')
-    others = [r for r in rows if r["status"] == "in progress" and r is not current]
-    for r in others:
-        op = parse_phase(read(os.path.join(plans, r["doc"]))) if r["doc"] else None
-        if op:
-            phase_tab.append(f'<h2>Parallel: {esc(r["id"])} · {inline(r["name"])}</h2>' + slice_cards(op["slices"], r["id"]))
+    if order:
+        phase_tab.append('<div class="pick">' + "".join(
+            f'<button class="pchip k-{role[r["id"]]}" data-phase-go="{esc(r["id"])}">{esc(r["id"])}'
+            f'{" · now" if role[r["id"]] == "here" else " · side" if role[r["id"]] == "side" else ""}</button>'
+            for r in order) + "</div>")
+        phase_tab.extend(phase_view(r, docs[r["id"]]) for r in order)
+    else:
+        phase_tab.append('<p class="muted">No phase doc found from the board. Run <code>/phase shape</code>.</p>')
 
     infra = []
     if m.get("_error"):
@@ -604,7 +762,8 @@ def render(repo, out_dir, live=False):
         dec.append('<p class="muted">No <code>## Open decisions</code> section in the phase doc yet. These were found in the text. <code>/phase sync</code> records them.</p>')
     for d in decisions:
         opts = "".join(f"<li>{inline(o)}</li>" for o in d.get("options", []))
-        dec.append(f'<div class="card dcard" data-links="{esc(" ".join(d.get("parts", [])))}"><span class="id">{esc(d["id"])}</span> '
+        dlinks = f' data-links="{esc(" ".join(d["parts"]))}"' if d.get("parts") else ""
+        dec.append(f'<div class="card dcard"{dlinks}><span class="id">{esc(d["id"])}</span> '
                    f'{inline(d["question"])}' + (f"<ul>{opts}</ul>" if opts else "")
                    + (f'<div><b>Blocks:</b> {inline(d["blocks"])}</div>' if d.get("blocks") else "")
                    + f'<div class="muted">{inline(d.get("source", ""))}</div>'
@@ -626,7 +785,7 @@ def render(repo, out_dir, live=False):
 <div class="legend"><span><i class="sw"></i>Built</span><span><i class="sw building"></i>Building</span><span><i class="sw planned"></i>Planned</span><span><i class="sw decision"></i>Open decision</span></div>
 <nav class="tabs">{"".join(f'<a href="#{i}">{n}</a>' for i, n, _ in tabs)}</nav></header>
 <main>{"".join(f'<section class="panel" id="{i}"><h2>{n}</h2>{"".join(body)}</section>' for i, n, body in tabs)}</main>
-<script>{dynamic}</script>{f"<script>{LIVE_JS}</script>" if live else ""}
+<script>{dynamic}</script><script>{PICK_JS}</script>{f"<script>{LIVE_JS}</script>" if live else ""}
 </body></html>"""
     os.makedirs(out_dir, exist_ok=True)
     stamp = hashlib.sha1(page.replace(f"rendered {date.today().isoformat()}", "").encode()).hexdigest()[:12]

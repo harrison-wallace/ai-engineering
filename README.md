@@ -12,7 +12,7 @@
                                              ░███████                                                              ░███████
 ```
 
-![Version](https://img.shields.io/badge/version-3.4.3-6366f1?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.4.4-6366f1?style=flat-square)
 ![Skills](https://img.shields.io/badge/skills-38-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
