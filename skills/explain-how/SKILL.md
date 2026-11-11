@@ -3,6 +3,7 @@ name: explain-how
 description: Explain how code or infrastructure works today, at the level a senior engineer needs to start working in it: a subsystem, a runtime flow, a request path, or where something should live. Read-only. Haiku explorers trace complex areas, the main agent explains. Triggers on "/explain-how", "how does X work", "walk me through X", "where should this live", or "which layer owns this". Optional leading level. Use explain-why for the reasons.
 argument-hint: "[lite|deep] <question>"
 disable-model-invocation: true
+allowed-tools: Bash(bash *scripts/fable-tier.sh)
 ---
 
 # explain-how
@@ -23,7 +24,7 @@ Read the first argument:
 |---|---|---|---|
 | `lite` | lite | Main agent reads the code itself | Main agent |
 | none, or anything else | default | None for a simple question. 2–3 Haiku explorers for a complex one | Main agent |
-| `deep` | deep | 2–4 Haiku explorers | One Opus explainer at `high`. The main agent presents its answer |
+| `deep` | deep | 2–4 Haiku explorers | One explainer on the judge tier (Opus `high`, or Fable `medium` when `CLAUDE_FABLE_TIER=1`). The main agent presents its answer |
 
 Do not run `/effort` or `/model`. Set `model` and `effort` on each Agent call only. Never go above
 Opus `high`.
@@ -69,7 +70,7 @@ locates. It does not prove. Where two explorers disagree, check the code and set
 
 **deep**: launch one explainer:
 
-- `subagent_type`: `general-purpose`, `model`: `opus`, `effort`: `high`,
+- `subagent_type`: `general-purpose`, !`bash "${CLAUDE_SKILL_DIR}/../../scripts/fable-tier.sh"`,
   `run_in_background`: `false`.
 - Prompt: the full text of `references/explainer-prompt.md`, with the question, the repo root,
   and every explorer's findings filled in. Tell it that it is read-only and must not edit files.

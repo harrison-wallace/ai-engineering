@@ -215,6 +215,12 @@ Before you report a task as complete, confirm each point:
   | One judgement in a fresh context: synthesis, final review, an argument against the plan | `opus` | `high` |
   | Code edits and judgement calls that need this conversation | The main session | The session level |
 
+- **Fable tier.** When `CLAUDE_FABLE_TIER=1` is set, the "one judgement in a fresh context" row
+  runs on `fable` at `medium` in place of `opus` at `high`. Every other row stays the same. This
+  is one model size up at a lower effort, so it follows the escalation order. If a Fable call
+  fails (rate limit, refusal, no access), re-run that unit on `opus` at `high`. In this repo,
+  `scripts/fable-tier.sh` prints the pair, and skills call it at load time. Set the variable
+  in the `env` block of each profile whose account has Fable, and nowhere else.
 - **Never go above Opus `high`.** Past `high`, one more effort level can cost as much as a
   bigger model.
 - **Escalate in this order:** the agent checks its own work, then effort goes up one level,

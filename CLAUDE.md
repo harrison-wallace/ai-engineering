@@ -75,6 +75,11 @@ Every Agent call in a skill, and every `agents/<name>.md` definition, follows th
 - Use parallel subagents to read and to judge. Do not let two of them write the same files.
 - Escalate in this order: a self-check, then one effort level up, then one model size up at a
   lower effort. In a retry, re-run only the failed units.
+- A judge role that would run on Opus `high` reads the Fable tier at load time instead of naming
+  the model. Write `` !`bash "${CLAUDE_SKILL_DIR}/../../scripts/fable-tier.sh"` `` in place of
+  `model` and `effort`, and add `allowed-tools: Bash(bash *scripts/fable-tier.sh)` to the
+  frontmatter. The script prints `fable`/`medium` when `CLAUDE_FABLE_TIER=1` and `opus`/`high`
+  otherwise. Name the tier, not Opus, in the skill's level table and report.
 - Do not set `model` in a skill's frontmatter. A model switch makes the session write its whole
   prompt cache again. Set the model on the Agent call.
 - Do not rely on `CLAUDE_CODE_SUBAGENT_MODEL`. The per-call `model` wins, and the variable does

@@ -3,6 +3,7 @@ name: reflect
 description: Mine the current session (or the last n sessions in this project) for durable lessons and route each to the narrowest home — an ai-engineering skill, the repo's AGENTS.md/CLAUDE.md, the AGENTS template, or Claude Code memory — after a cheap jq digest and two Sonnet reviewers. Proposes a numbered table and applies only what the user approves; hooks, settings, and scripts stay suggestions. Triggers on "/reflect", "/reflect last 5", "reflect", or "capture what we learned so the next run doesn't repeat it". Optional leading level.
 argument-hint: "[lite|deep] [last <n>]"
 disable-model-invocation: true
+allowed-tools: Bash(bash *scripts/fable-tier.sh)
 ---
 
 # reflect
@@ -20,7 +21,7 @@ cheaper models, and routed to more homes than skills alone.
 |---|---|
 | `lite` | No subagents. The main agent reviews the digest itself. |
 | none | Default: 2 Sonnet reviewers at `medium` effort. |
-| `deep` | 3 reviewers: judgment and tooling on Sonnet `medium`, "missed" on Opus `high`. |
+| `deep` | 3 reviewers: judgment and tooling on Sonnet `medium`, "missed" on the judge tier (Opus `high`, or Fable `medium` when `CLAUDE_FABLE_TIER=1`). |
 | `last <n>` | Review the `n` most recent sessions in this project, including this one. Use with any level. |
 
 Never go above Opus `high`. Do not run `/effort` or `/model`. Set `model` and `effort` on each
@@ -83,8 +84,7 @@ lesson about one becomes a **suggestion**, usually "fork it here under a verb na
 | What we missed | [`references/reviewer-missed.md`](references/reviewer-missed.md) | `subagent_type: Explore`, `model: sonnet`, `effort: medium` |
 
 **deep**: three reviewers in one message. Run reviewer-encode twice, once with `FOCUS: judgment`
-and once with `FOCUS: tooling`, both on Sonnet `medium`. Run reviewer-missed on `model: opus`,
-`effort: high`.
+and once with `FOCUS: tooling`, both on Sonnet `medium`. Run reviewer-missed with !`bash "${CLAUDE_SKILL_DIR}/../../scripts/fable-tier.sh"`.
 
 **lite**: no agents. Read the digest yourself with both reviewer prompts as your checklist. Be
 strict with your own work: a fresh reviewer would not defend this session's decisions, so do not

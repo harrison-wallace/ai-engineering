@@ -3,6 +3,7 @@ name: improve
 description: Look at one existing area (a feature, a service, or an infra stack) from first principles and find what to fix, simplify, or deepen, then drive the chosen change through the other skills. It grounds in what the area is for, runs five lenses (simplify, deepen, data shape, ops and cost, docs drift), proves every finding, and routes each one to its next skill (research, trace-impact, design, prototype, delegate, or advise). A question after the area narrows the lenses to it. `auto` also runs `research lite` and `trace-impact` without asking. It never edits code before your yes. Report in the terminal, a LAN page on request, and a save to docs/improve/. Triggers on "/improve <area>", "/improve <area> <question>", "what would you change in X", "how could X be simpler", or "improve this service".
 argument-hint: "[lite|deep] <area> [<question>] [auto] [aws]"
 disable-model-invocation: true
+allowed-tools: Bash(bash *scripts/fable-tier.sh)
 ---
 
 # improve
@@ -21,7 +22,7 @@ its own (`/check-architecture` for deepening, `/check-primitives` for data shape
 |---|---|---|---|
 | `lite` | lite | The main agent runs each lens itself | Main agent |
 | none, or anything else | default | 2–3 Sonnet lens readers in parallel | Main agent |
-| `deep` | deep | 2–3 Sonnet lens readers | One Opus judge at `high`, in a fresh context |
+| `deep` | deep | 2–3 Sonnet lens readers | One judge on the judge tier (Opus `high`, or Fable `medium` when `CLAUDE_FABLE_TIER=1`), in a fresh context |
 
 The main agent proves every finding at every level (§5). Follow the Model routing rules in this
 repo's `CLAUDE.md`. Do not run `/effort` or `/model`. Never go above Opus `high`.
@@ -117,7 +118,7 @@ Give each finding a **kind** (Fix, Simplify, Deepen, Reshape, Harden, Cut cost, 
 Then give each finding its **next skill** from the table in §7.
 
 **deep**: give the proved findings and their proof to one judge: `subagent_type:
-general-purpose`, `model: opus`, `effort: high`, with the full text of
+general-purpose`, !`bash "${CLAUDE_SKILL_DIR}/../../scripts/fable-tier.sh"`, with the full text of
 [`references/judge-prompt.md`](references/judge-prompt.md). Apply its cuts and its order. Never
 raise a strength that it lowered.
 

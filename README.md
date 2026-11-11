@@ -12,7 +12,7 @@
                                              ░███████                                                              ░███████
 ```
 
-![Version](https://img.shields.io/badge/version-3.4.0-6366f1?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.4.1-6366f1?style=flat-square)
 ![Skills](https://img.shields.io/badge/skills-38-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
@@ -38,7 +38,7 @@ ship          /summarise commit → /update-docs → /bump-version → /reflect
 | Skill | What it does |
 |---|---|
 | [restate-ask](skills/restate-ask/SKILL.md) | Play back your ask before work starts: goal, scope, what done looks like, unclear words, and numbered yes or no assumptions. Report-only. From pstack `in-your-own-words`. |
-| [advise](skills/advise/SKILL.md) | Turn research or any skill's findings into the top three moves for this project, each tied to a tiered finding, with a plan-impact table, tests for the unknowns, and what not to do. `deep` adds an Opus contrarian. It edits the plan only after `apply`. |
+| [advise](skills/advise/SKILL.md) | Turn research or any skill's findings into the top three moves for this project, each tied to a tiered finding, with a plan-impact table, tests for the unknowns, and what not to do. `deep` adds a judge-tier (Opus or Fable) contrarian. It edits the plan only after `apply`. |
 | [design](skills/design/SKILL.md) | Shape a new feature, service, or infra change before code: ground it in the real system, sketch two structurally different designs, screen them, and write a proposed ADR for sign-off. From pstack `architect`. |
 | [prototype](skills/prototype/SKILL.md) | Answer one design question that talk cannot settle with throwaway code: a clickable logic demo, or UI variants behind `?variant=`. It records the answer in an ADR, then deletes the code. From Matt Pocock's `prototype`. |
 | [define-terms](skills/define-terms/SKILL.md) | Settle the project's names in `GLOSSARY.md`, report drift between the glossary and the code, and write short decision ADRs. From Matt Pocock's `domain-modeling`. |
@@ -151,6 +151,29 @@ The pre-commit hook runs it with `--staged`. Enable the hook once per clone:
 git config core.hooksPath .githooks
 ```
 
+### Fable tier
+
+Some skills hand one judgement to a subagent in a fresh context: a judge, a synthesizer, a
+contrarian, or an inverted design runner. By default that subagent runs on Opus at `high`. If your
+account has Fable, turn on the Fable tier and that one role runs on Fable at `medium` instead.
+Add this to the `env` block of the profile's `settings.json`:
+
+```json
+"env": { "CLAUDE_FABLE_TIER": "1" }
+```
+
+- It takes effect at the next session start. To turn it off, remove the line or set it to `0`.
+- Only the judge role changes. Haiku reads, Sonnet fan-out, and the main session stay the same,
+  so a profile without the flag runs exactly as before.
+- If a Fable call fails (rate limit, refusal, no access), the skill re-runs it on Opus `high`.
+- Fable costs twice as much per token as Opus, but at `medium` it uses fewer tokens. This
+  follows the escalation rule: one model size up, at a lower effort.
+- Skills that use it: `advise`, `check-architecture`, `design`, `explain-how`, `explain-why`,
+  `improve`, `reflect`, and `research`, each on its `deep` level.
+- Each skill runs `scripts/fable-tier.sh` when it loads, to get the model and effort. It finds the
+  script through its symlink into this repo, so install skills with `scripts/install-skill.sh`,
+  not by copying. The rule for new skills is in [CLAUDE.md](CLAUDE.md) under **Model routing**.
+
 ## Adding a skill
 
 Follow the checklist in [CLAUDE.md](CLAUDE.md): name it by a verb from the Naming table, add one
@@ -181,7 +204,7 @@ agents/      Subagent definitions: one .md file per agent
 commands/    Custom slash commands: one .md file per command
 hooks/       Hook scripts referenced from settings.json
 docs/        Supporting documentation (templates, cheat sheets)
-scripts/     Repo maintenance: install-skill.sh, check-readme.sh
+scripts/     Repo maintenance: install-skill.sh, check-readme.sh, fable-tier.sh
 .githooks/   Git hooks (pre-commit runs check-readme.sh)
 CLAUDE.md    Instructions Claude reads when working in this repo
 THIRD_PARTY_NOTICES.md  Licenses for adapted upstream work (pstack and Matt Pocock's skills, MIT)

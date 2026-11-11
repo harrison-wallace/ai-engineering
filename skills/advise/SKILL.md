@@ -1,7 +1,8 @@
 ---
 name: advise
-description: Turn findings into ranked moves for this project, and change the plan on your approval. Input is any findings (a `/research` report, a saved report in `docs/research/`, another skill's report such as `review-product` or `aws-cost optimize`, or a pasted document) and/or a free-text question. It reads the project's own plan (product doc, phases, board, ADRs) and reports the top three moves, each tied to a finding with its evidence tier, then a plan-impact table, what a newer report overturns, cheap tests for the unknowns, what not to do, and what to watch. `deep` adds an Opus contrarian that argues against the top move before you see it. It edits plan docs only after `apply`. Triggers on "/advise", "/advise deep", "/advise <report>", "/advise <question>", "what should we do with this research", "how does this change the plan", or "what's the move".
+description: Turn findings into ranked moves for this project, and change the plan on your approval. Input is any findings (a `/research` report, a saved report in `docs/research/`, another skill's report such as `review-product` or `aws-cost optimize`, or a pasted document) and/or a free-text question. It reads the project's own plan (product doc, phases, board, ADRs) and reports the top three moves, each tied to a finding with its evidence tier, then a plan-impact table, what a newer report overturns, cheap tests for the unknowns, what not to do, and what to watch. `deep` adds a judge-tier (Opus or Fable) contrarian that argues against the top move before you see it. It edits plan docs only after `apply`. Triggers on "/advise", "/advise deep", "/advise <report>", "/advise <question>", "what should we do with this research", "how does this change the plan", or "what's the move".
 argument-hint: "[deep] [<report path>... | all] [<question>]"
+allowed-tools: Bash(bash *scripts/fable-tier.sh)
 ---
 
 # advise
@@ -20,7 +21,7 @@ criteria. This skill picks the moves and changes the plan docs to match.
 | First word | Level | Who writes | Challenge |
 |---|---|---|---|
 | none, or anything else | default | The main agent | The main agent tests each move against the ledger |
-| `deep` | deep | The main agent | One Opus contrarian at `high`, in a fresh context (§4) |
+| `deep` | deep | The main agent | One contrarian on the judge tier (Opus `high`, or Fable `medium` when `CLAUDE_FABLE_TIER=1`), in a fresh context (§4) |
 
 **Input** is everything after `deep`, or every word when the first word is not `deep`. The
 parts combine, for example
@@ -93,7 +94,7 @@ evidence. Put the older claim under **Superseded**.
 
 ## 4. Challenge (deep only)
 
-Launch one contrarian: `subagent_type: general-purpose`, `model: opus`, `effort: high`,
+Launch one contrarian: `subagent_type: general-purpose`, !`bash "${CLAUDE_SKILL_DIR}/../../scripts/fable-tier.sh"`,
 `run_in_background: false`. Its prompt is the full text of
 [`references/contrarian-prompt.md`](references/contrarian-prompt.md), with the question, the
 ledger, the plan excerpts, and your draft moves filled in. It gets no chat history.
@@ -147,7 +148,7 @@ skill's folder, resolved with `readlink -f`). Leave out a section that is empty.
 End with a coverage line:
 
 ```markdown
-**Coverage:** <level>. <n> inputs (<names>). <k> plan docs read. Contrarian: <Opus `high` | not on this level>.
+**Coverage:** <level>. <n> inputs (<names>). <k> plan docs read. Contrarian: <the model and effort it ran on | not on this level>.
 ```
 
 Then the offers, each on its own line, and only when it applies:

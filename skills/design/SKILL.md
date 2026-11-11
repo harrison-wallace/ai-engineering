@@ -3,6 +3,7 @@ name: design
 description: Design the shape of a new feature, service, or component before code — software, infrastructure, or both. Ground in the real system, sketch two structurally different designs with cheap Sonnet runners, screen them against red flags, write a proposed ADR in docs/adr, then stop for sign-off and offer /phase shape. Triggers on "/design", "architect this", "design this first", or non-trivial work where jumping to code or IaC would lock in the wrong shape. Optional leading level.
 argument-hint: "[lite|deep] <what to design>"
 disable-model-invocation: true
+allowed-tools: Bash(bash *scripts/fable-tier.sh)
 ---
 
 # design
@@ -22,7 +23,7 @@ Read the first argument:
 |---|---|---|---|
 | `lite` | lite | Main agent reads the code itself | None. The main agent sketches both candidates inline, briefly |
 | none, or anything else | default | 1–2 Haiku Explore agents | 2 Sonnet runners at `medium` effort |
-| `deep` | deep | 1–2 Haiku Explore agents | 2 Sonnet runners at `medium`, plus 1 Opus runner at `high` |
+| `deep` | deep | 1–2 Haiku Explore agents | 2 Sonnet runners at `medium`, plus 1 runner on the judge tier (Opus `high`, or Fable `medium` when `CLAUDE_FABLE_TIER=1`) |
 
 The main agent (this session) does the judgment work in every level: it reads the grounding,
 screens and merges the candidates, and writes the ADR. Do not run `/effort` or `/model`. Set
@@ -98,7 +99,7 @@ each gets a forced starting premise:
 **default and deep**: launch every runner in **one message** so they run in parallel:
 
 - A and B: `subagent_type`: `general-purpose`, `model`: `sonnet`, `effort`: `medium`.
-- C: `subagent_type`: `general-purpose`, `model`: `opus`, `effort`: `high`.
+- C: `subagent_type`: `general-purpose`, !`bash "${CLAUDE_SKILL_DIR}/../../scripts/fable-tier.sh"`.
 - `run_in_background`: `false`.
 - Prompt: the full text of [`references/runner-prompt.md`](references/runner-prompt.md), then
   the runner's premise, the path to the grounding brief, the domain, the red-flag file path

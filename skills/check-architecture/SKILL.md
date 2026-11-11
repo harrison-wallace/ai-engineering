@@ -1,8 +1,9 @@
 ---
 name: check-architecture
-description: Survey existing code and infra for deepening opportunities, places where a shallow module (an interface nearly as complex as what it hides) should become a deep one, so changes, bugs, and tests concentrate in one place. It scans the hot spots from git history, the area you name, or what a plan will touch (`for <plan>`), including pass-through Terraform modules, copied stacks, and scripts with hidden ordering. Sonnet explorers find candidates, the main agent proves each one (callers, interface size, the deletion test, and narrow `explain-why` on old decisions), and `deep` adds an Opus judge. The terminal report has at most 5 candidates with strength badges and ASCII before/after diagrams, and it can serve an HTML page on the LAN. Then one round of questions on the candidate you pick, and a hand-off to `design`. Never edits code. Triggers on "/check-architecture", "where should we refactor", "find shallow modules", "how can we make this change easy", or "architecture review of this repo".
+description: Survey existing code and infra for deepening opportunities, places where a shallow module (an interface nearly as complex as what it hides) should become a deep one, so changes, bugs, and tests concentrate in one place. It scans the hot spots from git history, the area you name, or what a plan will touch (`for <plan>`), including pass-through Terraform modules, copied stacks, and scripts with hidden ordering. Sonnet explorers find candidates, the main agent proves each one (callers, interface size, the deletion test, and narrow `explain-why` on old decisions), and `deep` adds a judge-tier (Opus or Fable) judge. The terminal report has at most 5 candidates with strength badges and ASCII before/after diagrams, and it can serve an HTML page on the LAN. Then one round of questions on the candidate you pick, and a hand-off to `design`. Never edits code. Triggers on "/check-architecture", "where should we refactor", "find shallow modules", "how can we make this change easy", or "architecture review of this repo".
 argument-hint: "[lite|deep] [<path or area> | for <plan or phase doc>]"
 disable-model-invocation: true
+allowed-tools: Bash(bash *scripts/fable-tier.sh)
 ---
 
 # check-architecture
@@ -22,7 +23,7 @@ Adapted from Matt Pocock's `improve-codebase-architecture` and `codebase-design`
 |---|---|---|---|
 | `lite` | lite | Main agent, inline | Main agent |
 | none, or anything else | default | 2–3 Sonnet explorers, one per area | Main agent |
-| `deep` | deep | 2–3 Sonnet explorers | One Opus judge at `high`, in a fresh context |
+| `deep` | deep | 2–3 Sonnet explorers | One judge on the judge tier (Opus `high`, or Fable `medium` when `CLAUDE_FABLE_TIER=1`), in a fresh context |
 
 The main agent proves every candidate at every level (§5). Do not run `/effort` or `/model`. Set
 `model` and `effort` on each Agent call only.
@@ -99,7 +100,7 @@ Rate what survives:
 | **Speculative** | Plausible, with thin proof. List it in the table only |
 
 **deep**: give the proved candidates and their proof to one judge: `subagent_type:
-general-purpose`, `model: opus`, `effort: high`, with the full text of
+general-purpose`, !`bash "${CLAUDE_SKILL_DIR}/../../scripts/fable-tier.sh"`, with the full text of
 [`references/judge-prompt.md`](references/judge-prompt.md). Apply its cuts and order. Do not raise
 a strength it lowered.
 

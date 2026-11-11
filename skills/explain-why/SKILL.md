@@ -3,6 +3,7 @@ name: explain-why
 description: Find out why code or infrastructure is the way it is (a design choice, a threshold, a workaround, or a regression) from git history, GitHub PRs and issues, ADRs, phase docs, CHANGELOG, CLAUDE.md/AGENTS.md, and memory, and report each claim at a stated confidence (found, inferred, unknown) with a citation. Read-only. A Sonnet digger works the git and PR history. Before a change, it ends with a Preserve / Change / Avoid / Risk set. Triggers on "/explain-why", "why does X work this way", "why did we pick Y", "where did this number come from", or "is it safe to remove this". Optional leading level. Use explain-how for runtime behavior.
 argument-hint: "[lite|deep] <question>"
 disable-model-invocation: true
+allowed-tools: Bash(bash *scripts/fable-tier.sh)
 ---
 
 # explain-why
@@ -24,7 +25,7 @@ Read the first argument:
 |---|---|---|---|
 | `lite` | lite | Main agent, inline | Main agent |
 | none, or anything else | default | One Sonnet digger | Main agent |
-| `deep` | deep | One Sonnet digger | One Opus synthesizer at `high`, in a fresh context. The main agent presents its answer |
+| `deep` | deep | One Sonnet digger | One synthesizer on the judge tier (Opus `high`, or Fable `medium` when `CLAUDE_FABLE_TIER=1`), in a fresh context. The main agent presents its answer |
 
 `deep` puts the synthesis in a fresh context on purpose. The main agent has read the user's
 framing and is the most likely to confirm it. Do not run `/effort` or `/model`. Set `model` and
@@ -101,7 +102,7 @@ Launch one digger:
 
 **deep**: launch one synthesizer:
 
-- `subagent_type`: `general-purpose`, `model`: `opus`, `effort`: `high`,
+- `subagent_type`: `general-purpose`, !`bash "${CLAUDE_SKILL_DIR}/../../scripts/fable-tier.sh"`,
   `run_in_background`: `false`.
 - Prompt: the full text of `references/synthesizer-prompt.md`, with the question, the anchor, the
   repo root, your sweep findings (with paths and quotes), the digger's report, and the path to

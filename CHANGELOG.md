@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.1] - 2026-11-11
+
+### Added
+- Fable tier: set `CLAUDE_FABLE_TIER=1` in a profile's `env` block and each skill's one
+  fresh-context judge runs on Fable `medium` in place of Opus `high`, with a re-run on Opus `high`
+  if the Fable call fails. Unset, nothing changes. `scripts/fable-tier.sh` prints the pair, and
+  skills call it at load time through `${CLAUDE_SKILL_DIR}`.
+- README section **Fable tier**: how to turn it on per profile, what it changes, and its cost.
+
+### Changed
+- The judge roles in `advise`, `check-architecture`, `design`, `explain-how`, `explain-why`,
+  `improve`, `reflect`, and `research` read the Fable tier, and each skill allows the tier script
+  in `allowed-tools`. Their level tables, the README row, and the descriptions name the judge
+  tier, not Opus. The `advise` coverage line reports the model the contrarian ran on.
+- `docs/AGENTS-TEMPLATE.md` §8 and `CLAUDE.md` **Model routing** add the Fable-tier rule and how
+  a new judge role uses the script.
+
 ## [3.4.0] - 2026-11-10
 
 ### Added
