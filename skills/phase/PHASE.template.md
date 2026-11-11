@@ -26,6 +26,13 @@ One or two sentences: what this phase makes true.
 - [ ] Slice 1:
 - [ ] Slice 2:
 
+## Open decisions
+
+One line each: the question, the options, and what it blocks. When it is settled, record it in
+an ADR or `DECISIONS.md` and delete the line here.
+
+- D1: <question>? Options: <a> / <b>. Blocks: <slice or item>.
+
 ## Definition of Done
 
 -

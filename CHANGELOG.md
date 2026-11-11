@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.2] - 2026-11-11
+
+### Added
+- `teach` routes the ask with no flags. "Where are we", the phase, slices, or pending decisions
+  get a tabbed LAN page (`references/phase-page.md`): Now, Roadmap, Phase (slices as a flow, with
+  their checklists and the DoD), Infra (the diagram as built, building, and planned, with a
+  stepper), and Decisions. Clicking a decision or a slice lights up the infra parts it touches.
+  It reads both phase-doc shapes (`## Slices` lists and numbered `### N.M` slices) and says when
+  the board is stale.
+- `teach/scripts/infra-inventory.py`: lists the infra a repo's files define today (compose
+  services, `docker run` flags in Jenkinsfiles, Caddy routes, Terraform resources and their
+  references, k8s objects, and workflows), so every built box on a diagram comes from a file.
+  Infra subjects in `teach` run it first.
+- `serve-page/references/infra-diagrams.md`: one drawing grammar for infra pages. It covers
+  boundaries for Docker hosts, AWS, and k8s, fixed lanes, part shapes, edge labels, the built,
+  building, planned, and decision overlay, and fixed geometry so hand-written SVG does not
+  overlap.
+- `serve-page` dynamic pages: `assets/dynamic.js` drives tabs, layer toggles, click-to-highlight,
+  and steppers, with no fetch and no external code. `page-rules.md` gains a Dynamic pages section.
+- `phase` open decisions: `PHASE.template.md` has `## Open decisions` (question, options, what it
+  blocks). `/phase` shows the count, `sync` adds new ones and drops the ones an ADR or
+  `DECISIONS.md` settled, and the status page points to `/teach where are we`.
+
+### Security
+- The inventory never prints env values whose names hold a secret (KEY, SECRET, TOKEN, PASS,
+  PWD, CRED, AUTH), and it strips `user:password@` from URLs.
+
 ## [3.4.1] - 2026-11-11
 
 ### Added

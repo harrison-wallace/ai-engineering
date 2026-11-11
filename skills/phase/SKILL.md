@@ -109,8 +109,9 @@ Read only.
 2. Read NOW (if present), then BOARD, then **only** the current phase doc, then
    last ~10 commits and the dirty tree. Do not read `archive/` or every phase
    doc. Do not treat `ROADMAP.md` as Next.
-3. Brief in a few lines: Phase, Slice, Blocked, next `shaped` row (or `none`).
-   Mention dirty files in the **reply** only.
+3. Brief in a few lines: Phase, Slice, Blocked, open decisions (the count from
+   the phase doc's `## Open decisions`, with their ids), next `shaped` row (or
+   `none`). Mention dirty files in the **reply** only.
 4. Stale: commits after NOW `Updated`, or checkboxes that disagree with git →
    **stale → run `/phase sync`**. Two `in progress` rows → say so; do not pick.
 5. Do not start the slice unless the user also said to continue.
@@ -119,6 +120,8 @@ Read only.
    and follow its §1 to §4. Write `<scratchpad>/phase/<repo>/index.html`: the board rows in order
    with their status, the current phase with its slices and checkboxes as a progress bar, Blocked,
    and the close log. It stays read-only. Stop the server when the user says they are done.
+   For diagrams of the slices, the infra as built and as planned, and the open
+   decisions, point to `/teach where are we` instead.
 
 ## Sync
 
@@ -129,6 +132,9 @@ Rewrite NOW and the active phase checkboxes. Do not append. Do not close a phase
 3. Tick checkboxes that actually landed (git + this conversation). Do not tick
    the rest. Adjust NOW `Slice` to the first remaining unchecked slice (or
    `none`). Refresh NOW `Blocked` and the in-progress board `Note`.
+   In `## Open decisions`, add a decision this chat raised and left open, and
+   delete one that an ADR, `DECISIONS.md`, or this chat settled. Say where it
+   was recorded. If it was settled but not recorded, keep the line and say so.
 4. Do not change a row's status to `done` (that is `advance phase`). Do not
    append the log. Do not prune Later. Do not keep implementing unless the user asked.
 
@@ -142,7 +148,7 @@ Write or sharpen a phase doc. Do not implement.
 2. If that file exists, sharpen in place. Do not overwrite a filled DoD with
    the empty template.
 3. New file: write from [PHASE.template.md](PHASE.template.md). Fill Goal,
-   Appetite, In/Out of scope from what the user already said. Leave empty
+   Appetite, In/Out of scope, and Open decisions from what the user already said. Leave empty
    slices rather than inventing a full breakdown. If the file is not under
    `docs/phases/`, fix the `Board:` relative link.
 4. Add or flip the board row to `shaped`. Do not set `in progress` unless

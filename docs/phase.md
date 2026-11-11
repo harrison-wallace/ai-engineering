@@ -50,6 +50,9 @@ Things worth knowing:
   Checkboxes and DoD live in the phase doc; the board holds the ordering.
 - **`BOARD.md` wins.** If the two disagree, the unique `in progress` row is the
   truth and `sync` rewrites `NOW.md`.
+- **Open decisions live in the phase doc**, under `## Open decisions`: the question, the options,
+  and what it blocks. `/phase` shows the count, `sync` drops the ones that an ADR or
+  `DECISIONS.md` settled, and `/teach where are we` draws them on the infra diagram.
 - **`sync` never closes a phase** — that's `advance phase`, and only when the DoD is met.
 - **Both trees are gitignored** by `init`, so the board is local scratch, not a
   commitment you've published. Unshaped ideas go in the board's Later section or

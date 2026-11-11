@@ -1,7 +1,7 @@
 ---
 name: teach
-description: Explain a change, a subsystem, or a piece of infra so the user actually understands what it is, how it works, and why it is built that way, at their pace, in plain spoken English. Runs explain-how and explain-why and weaves the result into one account, small answer first, deeper on request. Diagrams build up one part at a time, in ASCII, or on a LAN page for three or more parts. Read-only. Triggers on "/teach", "teach me this", "help me really understand X", "explain this change to me", or "teach me what Sonnet just built". Optional leading level.
-argument-hint: "[lite|deep] <what to teach>"
+description: Explain a change, a subsystem, a piece of infra, or where a project stands in its plan, so the user actually understands it, at their pace, in plain spoken English. Runs explain-how and explain-why and weaves the result into one account, small answer first, deeper on request. Diagrams build up one part at a time, in ASCII or on a LAN page. Infra subjects get infra diagrams drawn from the repo's real compose, Jenkins, Caddy, Terraform, and k8s files. A question about the plan ("where are we", the phase, slices, decisions) gets a tabbed page: roadmap, current phase and slices, the infra as built and as planned, and open decisions. Read-only. Triggers on "/teach", "teach me this", "help me really understand X", "explain this change to me", "teach me what Sonnet just built", "teach me where we are", or "show me the plan for this repo". Optional leading level.
+argument-hint: "[lite|deep] <what to teach | where we are | phase>"
 disable-model-invocation: true
 ---
 
@@ -20,6 +20,19 @@ Inspired by the pstack `teach` skill.
 Read the first argument: `lite`, `deep`, or neither (default). Pass the same level to `explain-how`
 and `explain-why`. Their own Level tables say what each level spends. Do not run `/effort` or
 `/model`.
+
+## 0. Route the ask
+
+Read the ask and pick the path. There are no flags apart from the level.
+
+| The ask is about | Path |
+|---|---|
+| The plan: "where are we", the phase, a slice, "what's next", pending decisions, the roadmap, or the word `phase` | The phase page: follow [`references/phase-page.md`](references/phase-page.md). It uses §3 to §5 for the teaching and the stepper |
+| Infra: hosts, containers, networks, the proxy, a deploy, a pipeline, cloud resources, a cluster, or files such as compose, a Jenkinsfile, a Caddyfile, Terraform, or k8s manifests | §1 to §5, plus the infra steps in §2 and §5 |
+| Anything else: code, a change, a subsystem, a flow | §1 to §5 |
+
+An ask can be both: "teach me how the deploy works and where we are with it" is the phase page,
+and its Infra tab carries the deploy.
 
 ## 1. Pick the takeaways
 
@@ -60,6 +73,12 @@ that message.
 Do not redo their work. Reword freely for teaching, with one exception: **keep `explain-why`'s
 confidence words and tiers as they are.** Its hedges are findings, not style.
 
+**Infra subjects**: before the sibling skills, run `scripts/infra-inventory.py <repo-root>` (in
+this skill's folder). It lists the parts and edges that the repo's files define today: compose
+services, `docker run` flags in Jenkinsfiles, Caddy routes, Terraform resources and references,
+k8s objects, and workflows. Pass its output to the `explain-how` explorers as context. Every box
+you draw comes from this list, or is marked as unconfirmed.
+
 ## 3. Teach
 
 **Start with a plain definition.** Name the thing and say what it is in general terms, the way a
@@ -99,6 +118,11 @@ part, so the user watches the system assemble. To teach a flow from A to B to C:
 redraw and add C, then redraw and add the return edge or the next piece. One all-at-once diagram,
 especially one saved for the end, is a reference, not teaching.
 
+**Infra diagrams** follow `../serve-page/references/infra-diagrams.md` (relative to this
+skill's folder, resolved with `readlink -f`): its boundaries, lanes, part shapes, edge labels, and
+geometry. For infra, the series adds one lane or one boundary per frame: the host and the edge
+first, then compute, then data, then the deploy and observe bands.
+
 Where the diagrams go:
 
 - **One or two parts**: ASCII in the reply.
@@ -108,6 +132,8 @@ Where the diagrams go:
   `<scratchpad>/teach/<slug>/index.html`. When the user asks to go deeper, add frames to the same
   file, and the same server shows them on reload. The reply still holds the plain answer, the
   first frame in ASCII, and the URL. Stop the server when the user says they are done.
+- **Infra with three or more parts**: always a page. Show the series as a stepper, and the full
+  diagram after it on its own tab (page-rules, Dynamic pages).
 
 ## Voice
 
