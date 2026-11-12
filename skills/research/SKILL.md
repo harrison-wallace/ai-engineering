@@ -3,7 +3,7 @@ name: research
 description: Research a question against outside sources (the web, official docs, changelogs, GitHub issues, papers, and on `deep` X posts through Grok) and report the answer first, with a confidence tier, a source, and a date on every claim. Inputs are `<topic>` (default), `decision <question>` (options against criteria from this repo, with a recommendation), `last` (fact-check my previous reply and give corrected statements), and `lib <name> [question]` (versions, breaking changes, and known bugs for the version this repo uses). It shows its strategy and plan and waits for your approval before it researches. Sonnet researchers work separate angles, and `deep` adds a Grok X researcher, a judge-tier (Opus or Fable) synthesizer, and a Sonnet claim checker. Report-only, with an offer to save Markdown or PDF to `docs/research/`, and an offer of `/advise` to turn the findings into moves for the project. Triggers on "/research", "research X", "what does the evidence say about X", "should we use A or B", "fact-check that", or "is that still true".
 argument-hint: "[lite|deep] [<topic> | decision <question> | last | lib <name> [question]]"
 disable-model-invocation: true
-allowed-tools: Bash(bash *scripts/fable-tier.sh)
+allowed-tools: Bash(bash *scripts/fable-tier.sh), Bash(bash *scripts/grok-tier.sh)
 ---
 
 # research
@@ -23,7 +23,7 @@ skill covers what the rest of the world says. For an ADR after a `decision`, use
 |---|---|---|---|---|
 | `lite` | lite | The main agent, inline | Main agent | Main agent spot-checks |
 | none, or anything else | default | 2–3 Sonnet researchers, one per angle | Main agent | Main agent reads the key sources |
-| `deep` | deep | The default researchers, plus one Grok X researcher when Grok is available | One synthesizer on the judge tier (Opus `high`, or Fable `medium` when `CLAUDE_FABLE_TIER=1`), in a fresh context | One Sonnet claim checker, then the main agent |
+| `deep` | deep | The default researchers, plus one Grok X researcher when Grok is available and `CLAUDE_GROK_TIER` is not `0` | One synthesizer on the judge tier (Opus `high`, or Fable `medium` when `CLAUDE_FABLE_TIER=1`), in a fresh context | One Sonnet claim checker, then the main agent |
 
 **Input**, from the next word:
 
@@ -47,8 +47,9 @@ Opus `high`.
   page, use `WebFetch` if this session has it, else the `web-fetch` agent.
 - **GitHub**: for `lib`, check `gh auth status`. Use `gh` for issues, PRs, and releases.
 - **Firecrawl**: use the `firecrawl` plugin skills when they are signed in. Do not ask to sign in.
-- **Grok (`deep` only)**: follow §1 of [`references/grok-x.md`](references/grok-x.md). When Grok
-  is missing or not signed in, drop the X angle, say so in one line, and go on.
+- **Grok (`deep` only)**: !`bash "${CLAUDE_SKILL_DIR}/../../scripts/grok-tier.sh"`
+  When it is on, follow §1 of [`references/grok-x.md`](references/grok-x.md). When Grok is off,
+  missing, or not signed in, drop the X angle, say so in one line, and go on.
 
 ## 3. Ground
 
@@ -203,7 +204,7 @@ searched.
 End with a coverage line, then the offer:
 
 ```markdown
-**Coverage:** <level>. <n> researchers (<models>). <k> searches, <m> sources read. Grok X: <used | not available | not on this level>.
+**Coverage:** <level>. <n> researchers (<models>). <k> searches, <m> sources read. Grok X: <used | off | not available | not on this level>.
 ```
 
 *"Save this as Markdown or PDF in `docs/research/`?"* For a `decision`, or a report with a

@@ -2,6 +2,7 @@
 name: showcase
 description: Pitch the technical work you just did as things you could post: a short X post, an article or blog idea, or a video idea. Each pitch is a rough draft or a suggestion, not a final post. It reads this session, checks the hooks against X with Grok when Grok is installed, and keeps the pitches you pick as files in `~/showcase/`. `deep` also reads this project's sessions from the last 7 days, and asks before it reads other projects. Article and video pitches point to `/teach` for the outline. Offer it in one line after work with a concrete result (a number, a before-and-after, a proved cause, a release), at most once a session, and run it only after a yes. Never posts. Triggers on "/showcase", "/showcase lite", "/showcase deep", "/showcase list", "what could I post about this", or "give me post ideas".
 argument-hint: "[lite|deep] [save] | list | used <topic> | drop <topic>"
+allowed-tools: Bash(bash *scripts/grok-tier.sh)
 ---
 
 # showcase
@@ -19,7 +20,7 @@ are in [`references/pitch.md`](references/pitch.md). A pitch the user keeps is o
 | First argument | Does |
 |---|---|
 | `lite` | Pitch from this session. No Grok, no transcripts |
-| none | Pitch from this session, and check the hooks on X with Grok when Grok is installed |
+| none | Pitch from this session, and check the hooks on X with Grok when Grok is installed and `CLAUDE_GROK_TIER` is not `0` |
 | `deep` | The default, plus this project's sessions from the last 7 days |
 | `list` | `<script> list`: every kept pitch, with its state. Stop |
 | `used <topic>`, `drop <topic>` | `<script> mark <topic> used` or `dropped`. Show what it prints. Stop |
@@ -50,6 +51,8 @@ stop.
 
 ## 3. Check the hooks on X (not `lite`)
 
+!`bash "${CLAUDE_SKILL_DIR}/../../scripts/grok-tier.sh"` When it is off, skip this step.
+
 1. Do the preflight in `../research/references/grok-x.md` ("Preflight and model"): find Grok, check
    that it is signed in, and pick the model. When it fails, skip this step and say why in the header.
 2. Write one hook line for each moment: at most 140 characters, written for the pitch, not copied
@@ -62,7 +65,7 @@ stop.
 5. Read the log. For each hook, take one line: how much is already said on X, and the angle that is
    still open. An empty log is a failed run. Grok's report is a claim, not proof.
 
-Say `Grok X: used`, `Grok X: not installed`, `Grok X: not signed in`, or `Grok X: failed` in the
+Say `Grok X: used`, `Grok X: off`, `Grok X: not installed`, `Grok X: not signed in`, or `Grok X: failed` in the
 header.
 
 ## 4. Pitch

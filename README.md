@@ -12,7 +12,7 @@
                                              ░███████                                                              ░███████
 ```
 
-![Version](https://img.shields.io/badge/version-3.4.4-6366f1?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.4.5-6366f1?style=flat-square)
 ![Skills](https://img.shields.io/badge/skills-38-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
@@ -174,6 +174,24 @@ Add this to the `env` block of the profile's `settings.json`:
   script through its symlink into this repo, so install skills with `scripts/install-skill.sh`,
   not by copying. The rule for new skills is in [CLAUDE.md](CLAUDE.md) under **Model routing**.
 
+### Grok tier
+
+Some skills run the headless `grok` CLI on their own when it is installed: the X researcher on
+`research deep`, the X hook check on `showcase` (default and `deep`), and the Grok routes that
+`delegate` offers. To save Grok usage, turn it off in the profile's `settings.json`:
+
+```json
+"env": { "CLAUDE_GROK_TIER": "0" }
+```
+
+- Grok is on when the variable is unset, so a profile without the line runs as before.
+- When it is off, each skill takes its no-Grok path: `research deep` runs without the X angle,
+  but keeps the judge-tier synthesizer and the claim checker. `showcase` skips the X check.
+  `delegate` leaves the Grok routes out of its menu, and `a/b` defaults to `sonnet-opus`. Every
+  run reports Grok as `off`.
+- A Grok route that you name, such as `/delegate grok`, still runs.
+- Each skill runs `scripts/grok-tier.sh` when it loads, the same way as `fable-tier.sh`.
+
 ## Adding a skill
 
 Follow the checklist in [CLAUDE.md](CLAUDE.md): name it by a verb from the Naming table, add one
@@ -204,7 +222,7 @@ agents/      Subagent definitions: one .md file per agent
 commands/    Custom slash commands: one .md file per command
 hooks/       Hook scripts referenced from settings.json
 docs/        Supporting documentation (templates, cheat sheets)
-scripts/     Repo maintenance: install-skill.sh, check-readme.sh, fable-tier.sh
+scripts/     Repo maintenance: install-skill.sh, check-readme.sh, fable-tier.sh, grok-tier.sh
 .githooks/   Git hooks (pre-commit runs check-readme.sh)
 CLAUDE.md    Instructions Claude reads when working in this repo
 THIRD_PARTY_NOTICES.md  Licenses for adapted upstream work (pstack and Matt Pocock's skills, MIT)

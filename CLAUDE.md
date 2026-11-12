@@ -80,6 +80,10 @@ Every Agent call in a skill, and every `agents/<name>.md` definition, follows th
   `model` and `effort`, and add `allowed-tools: Bash(bash *scripts/fable-tier.sh)` to the
   frontmatter. The script prints `fable`/`medium` when `CLAUDE_FABLE_TIER=1` and `opus`/`high`
   otherwise. Name the tier, not Opus, in the skill's level table and report.
+- A skill that runs the `grok` CLI without the user naming Grok writes
+  `` !`bash "${CLAUDE_SKILL_DIR}/../../scripts/grok-tier.sh"` `` before that step, and adds
+  `Bash(bash *scripts/grok-tier.sh)` to `allowed-tools`. `CLAUDE_GROK_TIER=0` turns Grok off and
+  the skill takes its no-Grok path. Unset means on.
 - Do not set `model` in a skill's frontmatter. A model switch makes the session write its whole
   prompt cache again. Set the model on the Agent call.
 - Do not rely on `CLAUDE_CODE_SUBAGENT_MODEL`. The per-call `model` wins, and the variable does

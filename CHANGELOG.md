@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.4.5] - 2026-11-12
+
+### Added
+- `CLAUDE_GROK_TIER=0` turns off the Grok runs that skills start on their own, to save Grok
+  usage. Unset means on, so profiles without it run as before. `scripts/grok-tier.sh` prints the
+  state, and each skill reads it at load time, like `fable-tier.sh`.
+  - `research deep` drops the X angle but keeps the judge-tier synthesizer and the claim checker.
+  - `showcase` (default and `deep`) skips the X hook check.
+  - `delegate` leaves the Grok routes out of its menu and never recommends one. `a/b` with no
+    pair named defaults to `sonnet-opus`. A Grok route the user names still runs.
+  - Each run reports Grok as `off`. README has a Grok tier section, and CLAUDE.md's Model routing
+    has the rule for new skills.
+
 ## [3.4.4] - 2026-11-11
 
 ### Changed

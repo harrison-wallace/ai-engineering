@@ -2,6 +2,7 @@
 name: delegate
 description: Implement the changes just discussed by routing the work to the right implementer. The main agent plans, assesses the task, recommends a route, and shows a menu with relative cost and time for each one (self, balanced, accuracy, a/b, speed, cheap, grok, mixed, multi). You pick, and then the main agent reviews, scores, fixes, and summarises. Grok routes use the latest Grok model through the headless CLI. Triggers on "/delegate", "/delegate <route>", "have sonnet implement this", "have grok implement this", "delegate this", or "implement this cheaply". Replaces imp-sonnet and imp-grok-4-7.
 argument-hint: "[self|balanced|accuracy|a/b [grok-sonnet|sonnet-opus|sonnet-sonnet]|speed|cheap|grok|mixed|multi] [grok effort]"
+allowed-tools: Bash(bash *scripts/grok-tier.sh)
 ---
 
 # delegate
@@ -52,6 +53,7 @@ rule. Then stop and wait for the user to pick a number or a name.
 - **Cost** ($ to $$$) is the token cost to this account. Grok runs on its own account, so its cost
   here is only the plan and the review.
 - **Time** (# to ###) is wall-clock time to a reviewed result.
+- !`bash "${CLAUDE_SKILL_DIR}/../../scripts/grok-tier.sh"` When it is off, leave the Grok routes out of the menu and never recommend one. A Grok route the user names still runs.
 - Leave out a route that cannot run: Grok routes when `grok` is missing or not signed in, and
   split routes when the work does not split. Say why in one line under the table.
 - **Be honest about small tasks.** Writing the plan and reviewing the diff costs main-agent tokens
@@ -89,6 +91,9 @@ Two implementers build the same plan in two separate worktrees. Then you compare
 | `grok-sonnet` (default) | Grok, latest model | Sonnet `medium` |
 | `sonnet-opus` | Sonnet `medium` | Opus `high` |
 | `sonnet-sonnet` | Sonnet `medium`, premise **extend** | Sonnet `medium`, premise **reshape** (or the user's two briefs) |
+
+When the Grok tier is off and the user names no pair, the default is `sonnet-opus`. Run
+`grok-sonnet` only when the user names it.
 
 1. **Make two worktrees** from the current state, so that both sides start from what the user sees:
 
