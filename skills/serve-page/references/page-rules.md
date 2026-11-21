@@ -5,6 +5,16 @@ rules come from the HTML report in Matt Pocock's `improve-codebase-architecture`
 scripts removed: a page that loads Tailwind or Mermaid from a CDN breaks silently when the CDN is
 blocked, and the agent never sees it break.
 
+## Contents
+
+- [The folder](#the-folder)
+- [The page](#the-page)
+- [Screens](#screens)
+- [Diagrams](#diagrams)
+- [Dynamic pages](#dynamic-pages)
+- [Charts](#charts)
+- [Sensitive pages](#sensitive-pages)
+
 ## The folder
 
 - Write `<scratchpad>/<skill>/<slug>/index.html`. Put nothing else in the folder, apart from the
@@ -19,13 +29,31 @@ blocked, and the agent never sees it break.
 - **Theme**: colours as CSS variables on `:root`, redefined under
   `@media (prefers-color-scheme: dark)`. Give `body` an explicit background. One accent colour,
   red for problems, and amber for warnings.
-- **Layout**: works at phone width, with a 16px side gutter and no sideways scroll. Columns that
-  sit side by side on a wide screen stack on a narrow one.
+- **Layout**: see [Screens](#screens).
 - **Header**: the repo or subject, the date, the scope, and a legend when the diagrams use
   symbols. No introduction paragraph.
 - **Same facts as the reply.** The page shows the report the skill already wrote. It adds
   nothing new, so the reply and the page never disagree.
 - **Plain words**: the STE rules and clear-reading checks from `../../summarise/SKILL.md` §3.
+
+## Screens
+
+One page fits every screen, from a phone to a 4K monitor, and reflows when the window is resized.
+
+- Paste [`../assets/base.css`](../assets/base.css) whole at the top of the `<style>`, before the
+  page's own CSS. Do not write your own version. It scales the type with the screen, sets the page
+  column and gutters, and keeps media and tables inside the page.
+- Size text, gaps, padding, and boxes in `rem`, never `px`, so they grow on a big screen. Keep `px`
+  only for hairlines (borders of 1 to 2px) and for coordinates inside an SVG.
+- No fixed widths. Use `max-width`, `min()`, `%`, or `fr`. Put columns in `.cols`: they sit side by
+  side on a wide screen, add columns on 4K, and stack on a phone. Use `@media (max-width: 48rem)`
+  for any other narrow-screen change, in `rem`, not `px`.
+- A diagram SVG has a `viewBox` and `width="100%"`, with no `height`. It scales with the page and
+  stops at 75% of the window height.
+- Wrap a table wider than four columns in `<div class="scroll">`.
+- JS never sets a size. The layout is CSS only, so a resize needs no script.
+- When the Playwright MCP is loaded, check the page at 390, 1440, and 3840 px wide: no sideways
+  scroll, and the text reads at each width.
 
 ## Diagrams
 

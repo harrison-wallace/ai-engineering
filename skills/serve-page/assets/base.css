@@ -1,0 +1,33 @@
+/* serve-page base: one page that fits a phone, a laptop, and a 4K screen, and reflows on resize.
+   Paste whole at the top of the page's <style>, before the page's own CSS. */
+
+/* Type grows with the screen: 16px up to about 1600px wide, 24px at 3840px wide (4K at 100%).
+   Size text, gaps, and boxes in rem so they grow with it. */
+:root {
+  font-size: clamp(100%, 0.36vw + 0.65rem, 150%);
+  color-scheme: light dark;
+  --gutter: clamp(1rem, 2.5vw, 3rem);
+  --page: 75rem;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; line-height: 1.5; overflow-wrap: break-word; }
+
+/* Page column: a 16px gutter on a phone, wider gutters and a wider column on big screens. */
+header, main, footer, .page { width: min(100% - 2 * var(--gutter), var(--page)); margin-inline: auto; }
+.full { width: 100%; max-width: none; }
+
+/* Side by side on a wide screen, more columns on 4K, stacked on a phone. */
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 1rem 1.5rem; }
+.cols > *, .grid > * { min-width: 0; }
+
+/* Media never forces a sideways scroll. A diagram SVG (width="100%" plus a viewBox) keeps its
+   shape and never grows taller than the window. */
+img, video, canvas { max-width: 100%; height: auto; }
+svg[viewBox] { max-width: 100%; height: auto; }
+svg[width="100%"] { display: block; max-height: 75vh; }
+
+/* Wide tables and code scroll inside their own box, not the page. */
+.scroll, pre { overflow-x: auto; max-width: 100%; }
+table { border-collapse: collapse; }

@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.5.0] - 2026-11-21
+
+### Added
+- `fix-comments`: sort each code comment in the diff, the repo, or named paths as a tautology,
+  stale, an excuse, or a decision record. It deletes the first three in place, and lists each
+  excuse as a hack to fix. A decision that passes the ADR tests goes into a short ADR after
+  approval, with a pointer in place of the comment. `scan` reports only.
+  `scripts/comments.py` lists comments and deletes chosen ones, and skips directives, license
+  headers, and generated files. Adapted from a prompt by Matt Pocock.
+
+### Changed
+- `serve-page` pages fit every screen, from a phone to a 4K monitor, and reflow on resize. The
+  new `assets/base.css` scales the type with the screen and sets the page column, the gutters, a
+  `.cols` grid, and limits on media and tables. `page-rules.md` has a Screens section: paste
+  `base.css` first, size in `rem`, no fixed widths, and check at 390, 1440, and 3840 px. A
+  diagram SVG has no `height` and stops at 75% of the window height (`infra-diagrams.md`).
+- The phase board pastes `base.css` into its page, and its own CSS now sizes in `rem`.
+
 ## [3.4.5] - 2026-11-12
 
 ### Added

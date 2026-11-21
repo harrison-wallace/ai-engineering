@@ -116,7 +116,8 @@ one state class, so the page's layer toggles work (`page-rules.md`, Dynamic page
 
 ## Geometry
 
-- `viewBox="0 0 960 H"`, `width="100%"`, and the height from the content. Keep H at 540 or less.
+- `viewBox="0 0 960 H"`, `width="100%"`, no `height` attribute, and H from the content. Keep H at
+  540 or less. `base.css` scales the SVG with the page and caps it at 75% of the window height.
   A taller picture becomes two diagrams or a stepper.
 - Parts: 128 × 48. Gap between parts in a lane: 20. Gap between lanes: 56. Boundary padding: 16,
   plus 18 at the top for its label.
@@ -124,8 +125,8 @@ one state class, so the page's layer toggles work (`page-rules.md`, Dynamic page
   No text under 10px.
 - Lay parts out on the grid first (lane x, row y), then draw boundaries around them, then edges.
   Compute every coordinate from the grid. Do not eyeball positions.
-- On a phone the SVG scales down with the page. When a diagram has more than four lanes, also give
-  a stepper version that adds one lane per frame.
+- On a phone the SVG scales down with the page, and on a 4K screen it scales up. When a diagram
+  has more than four lanes, also give a stepper version that adds one lane per frame.
 
 ## SVG skeleton
 

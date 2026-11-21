@@ -12,8 +12,8 @@
                                              ░███████                                                              ░███████
 ```
 
-![Version](https://img.shields.io/badge/version-3.4.5-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-38-22c55e?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.5.0-6366f1?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-39-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -67,6 +67,7 @@ runs one or both and teaches the result. `research` covers what outside sources 
 | [diagnose](skills/diagnose/SKILL.md) | Find and prove the cause of one reported failure: a loop that goes red first, ranked guesses you approve, one probe at a time, then a fix after your yes. From Matt Pocock's `diagnosing-bugs`. |
 | [guide-setup](skills/guide-setup/SKILL.md) | Write a bash script that walks you through steps only you can do (dashboards, keys, CI and Jenkins credentials, SSM), for you to run in your own terminal. From Matt Pocock's `wizard`. |
 | [fix-prose](skills/fix-prose/SKILL.md) | Cut AI writing tells from the repo's prose and fix them in place, or report them with `scan`. From pstack `unslop`. |
+| [fix-comments](skills/fix-comments/SKILL.md) | Delete code comments that repeat the code, tell its history, or excuse a shortcut, and list each shortcut as a hack to fix. Decisions go into ADRs after your approval. From a Matt Pocock prompt. |
 | [fix-react-doctor](skills/fix-react-doctor/SKILL.md) | Run `react-doctor` and fix the React anti-patterns it reports until the score reaches 100, checking the build along the way. |
 | [fix-input-overflow](skills/fix-input-overflow/SKILL.md) | Check whether native date and time inputs overflow on iOS Safari, and apply the global CSS reset if they do. |
 

@@ -61,6 +61,10 @@ bounded question rounds, approved writes, infra coverage, and cheaper models.
 | [guide-setup](skills/guide-setup/SKILL.md) | `skills/engineering/wizard`, including the library in `template.sh` |
 | [explain-again](skills/explain-again/SKILL.md) | `skills/productivity/wait-what` |
 
+[fix-comments](skills/fix-comments/SKILL.md) adapts a comment-sorting prompt that Matt Pocock
+shared (tautology, excuse, stale, and decision record). The prompt is not part of
+mattpocock/skills, and it was published with no license file.
+
 mattpocock/skills is distributed under the MIT License:
 
 ```
