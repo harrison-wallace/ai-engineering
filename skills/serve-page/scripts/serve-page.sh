@@ -5,12 +5,19 @@
 #   serve-page.sh start <dir> <port> <ip>   run the server in the foreground (use a background task)
 #   serve-page.sh check <port>              wait up to 5 s for the port to listen; exit 0 when it does
 #   serve-page.sh stop  <port> <dir>        stop the http.server on <port> only if it serves <dir>
+# plan and start also copy the theme fonts (../assets/fonts) into <dir>/fonts when the page uses them.
 # Exit codes: 1 usage or failed check, 2 no free port, 3 no LAN address.
 set -euo pipefail
 
 FIRST=38081
 LAST=38089
-usage() { sed -n '2,9p' "$0" >&2; exit 1; }
+usage() { sed -n '2,10p' "$0" >&2; exit 1; }
+FONTS="$(cd "$(dirname "$(readlink -f "$0")")/../assets/fonts" && pwd)"
+
+fonts() { # <dir> → copy the theme fonts next to a page that links fonts/
+  grep -q 'url("fonts/' "$1/index.html" 2>/dev/null || return 0
+  mkdir -p "$1/fonts" && cp -p "$FONTS"/*.woff2 "$1/fonts/"
+}
 
 listening() { # <port> → exit 0 when something listens on it
   if command -v ss >/dev/null; then
@@ -46,6 +53,7 @@ case "$cmd" in
     [ $# -eq 1 ] || usage
     [ -f "$1/index.html" ] || { echo "serve-page: $1/index.html not found" >&2; exit 1; }
     dir=$(cd "$1" && pwd)
+    fonts "$dir"
     ip=$(lan_ip)
     [ -n "$ip" ] || { echo "path=$dir/index.html"; echo "serve-page: no LAN address" >&2; exit 3; }
     for p in $(seq "$FIRST" "$LAST"); do
@@ -57,6 +65,7 @@ case "$cmd" in
     echo "path=$dir/index.html"; echo "serve-page: ports $FIRST-$LAST are all in use" >&2; exit 2 ;;
   start)
     [ $# -eq 3 ] || usage
+    fonts "$1"
     exec python3 -m http.server "$2" --bind "$3" --directory "$1" ;;
   check)
     [ $# -eq 1 ] || usage

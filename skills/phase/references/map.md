@@ -18,12 +18,12 @@ map never repeats them. It holds only what the markdown cannot: parts, edges, an
 ## 1. Write the map
 
 1. If BOARD is missing, tell the user to run `/phase init`. Stop.
-2. Run `../../teach/scripts/infra-inventory.py <repo>` (relative to this skill's folder, resolved
-   with `readlink -f`). It lists the services, ports, networks, volumes, deploy stages, and proxy
+2. Run `../../draw-infra/scripts/infra-inventory.py <repo>` (relative to this skill's folder,
+   resolved with `readlink -f`). It lists the services, ports, networks, volumes, deploy stages, and proxy
    routes it can see.
 3. Read NOW, BOARD, and the current phase doc, plus the other `in progress` or `Parallel` phase
    docs that NOW names. Read the ADRs that those docs name, titles only.
-4. Draw the parts with the grammar in `../../serve-page/references/infra-diagrams.md`: lanes left
+4. Draw the parts with the grammar in `../../draw-infra/references/spec.md`: lanes left
    to right (clients, edge, compute, data, external), nested boundaries, one state per part.
    A part that the inventory cannot see (a host process, a table, an outside API) is still a part
    when a doc names it. Put the doc path in its `caption` or `source`.
@@ -52,13 +52,15 @@ token, or a password in the map. Hostnames and internal IPs are fine, but the pa
 }
 ```
 
-- `kind`: client, edge, compute, data, schedule, or external.
+- `kind`: client, edge, compute, data, queue, schedule, or external. The map is a `draw-infra`
+  spec (`../../draw-infra/references/spec.md`), so `diagram.py check docs/plans/map.json` checks
+  it, and it may hold `flows` too.
 - `lane`: clients, edge, compute, data, or external. `row` is the order in the lane, from 0.
   Parts that talk to each other sit on the same row or the next one.
 - `boundary`: the outer boundary first. Several parts share a boundary path.
 - `state`: built, building, planned, removed, or decision. `building` means the current slice
   adds or changes it.
-- Edge `kind`: request, data, or event. Edge labels are short and upper case.
+- Edge `kind`: request, data, or event. Edge labels are short, written as people say them.
 - `slices` keys are `<phase id>:<slice key>`, as the phase doc numbers them (`P13:7`, `P13:6b`).
 - `match` lists strings that find the part in the inventory. When a `planned` part's string
   shows up there, the Now tab says the part has landed and suggests `/phase sync`.
@@ -114,7 +116,7 @@ docker run -d --name phase-board --restart unless-stopped --network host \
   python:3-alpine python /skills/phase/scripts/board-server.py serve --bind 0.0.0.0
 ```
 
-`<skills-dir>` is the folder that holds `phase`, `teach`, and `serve-page`. The image has no git,
+`<skills-dir>` is the folder that holds `phase`, `teach`, `serve-page`, and `draw-infra`. The image has no git,
 so the page skips its stale check.
 
 The pages show hostnames and internal IPs. Serve them on a trusted LAN only. There is no login.

@@ -151,12 +151,13 @@ def write_index():
     os.makedirs(CACHE, exist_ok=True)
     rows = "".join(f'<li><a href="/{n}/">{html.escape(n)}</a> <small>{html.escape(r)}</small></li>'
                    for r, n in names().items())
+    rb.copy_fonts(CACHE)
+    style = rb.read(rb.BASE_CSS) + rb.read(rb.THEME_CSS) + "li{margin:.75rem 0}small{color:var(--muted);display:block}"
     with open(os.path.join(CACHE, "index.html"), "w") as fh:
-        fh.write("<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content='width=device-width,"
-                 "initial-scale=1'><title>Phase boards</title><style>body{font:16px system-ui;margin:24px;"
-                 "max-width:640px}li{margin:10px 0}small{color:#888;display:block}</style></head><body>"
-                 f"<h1>Phase boards</h1><ul>{rows or '<li>No repos. Run <code>board-server.py add &lt;repo&gt;</code>.</li>'}"
-                 "</ul></body></html>")
+        fh.write("<!DOCTYPE html><html lang=en><head><meta charset=utf-8><meta name=viewport content='width=device-width,"
+                 f"initial-scale=1'><title>Phase boards</title><style>{style}</style></head><body><header>"
+                 f"<h1>Phase boards</h1></header><main><ul>{rows or '<li>No repos. Run <code>board-server.py add &lt;repo&gt;</code>.</li>'}"
+                 "</ul></main></body></html>")
     with open(os.path.join(CACHE, ".phase-board"), "w") as fh:
         fh.write("phase-board\n")
 

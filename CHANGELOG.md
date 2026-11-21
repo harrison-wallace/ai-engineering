@@ -9,6 +9,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.0] - 2026-11-21
+
+### Added
+- `draw-infra`: draw infra or app architecture from the repo's real files. The model writes a JSON
+  spec, and `scripts/diagram.py` lays it out, routes the edges, and checks it (overlaps, edges
+  through boxes, flow steps with no edge, secrets). The page has the diagram with layer toggles,
+  a build-up stepper where each new lane fades in, one tab per flow where a packet runs along the
+  lit hop of each step, and a parts table. It writes the spec and a companion Markdown file to
+  `docs/diagrams/`. Adapted from vidanov's and konraddzbik's diagram skills.
+- `draw-infra` modes: a spec can list `modes` (dev and prod, v1 and v2). Parts, edges, and flows
+  take `only`, and parts and edges take `per_mode` labels. The page gets a mode switch in its
+  header, and every part keeps its place in every mode.
+- `draw-infra drawio`: `diagram.py drawio` writes an editable draw.io file with the page's layout,
+  one page per mode, boundaries as containers, and AWS icons (`icon` on a part, `kind` on a
+  boundary). It checks the file (ids, parents, edge ends, broken icon names) and exports a PNG of
+  each page with the draw.io CLI, through the snap's own folder when draw.io is a snap.
+
+### Changed
+- Every served page uses one theme: Editorial, always dark (ADR 0003). serve-page adds
+  `assets/theme.css` (warm charcoal, cream text, a pale ink-blue accent, serif headings, rules
+  instead of boxes, italic tags, underlined text buttons) and the Source Serif 4 and Source Sans 3
+  fonts (OFL) in `assets/fonts/`. `serve-page.sh` copies the fonts next to a page that uses them.
+  `draw-infra` and the phase board load the theme in place of their own colours, and diagram labels
+  keep the case they are written in. The page rules drop the light theme, the upper-case labels,
+  and left-border stripes.
+- `teach`, `phase`, and the serve-page page rules draw infra through `draw-infra`. The phase
+  board imports its renderer. `infra-inventory.py` moved from `teach` to `draw-infra`, and
+  `serve-page/references/infra-diagrams.md` became `draw-infra/references/spec.md`.
+- Edge labels that collide are moved apart, and arrow heads keep one size on thick edges.
+- serve-page's `dynamic.js` adds choices: a radio with `data-choose="mode"` sets
+  `body[data-mode]`, and a tab that the choice hides falls back to the first open tab.
+- serve-page steppers take an optional `data-play` button that steps through the frames on its
+  own. The page rules add a motion rule: CSS only, off under `prefers-reduced-motion`, and only
+  on what the reader picked. Each flow hop plays twice (moving dashes and a packet), then stays
+  still; `dynamic.js` starts it again when its step or tab comes into view. A clicked part gets a
+  solid accent outline, not a glow.
+
 ## [3.5.0] - 2026-11-21
 
 ### Added

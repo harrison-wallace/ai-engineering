@@ -46,8 +46,10 @@ when an unticked item still asks for it. Name the conflict on the page and in th
 
 ## 2. Read the infra
 
-Run `../scripts/infra-inventory.py <repo-root>` (relative to this file, resolved with
-`readlink -f`). Then follow `../../serve-page/references/infra-diagrams.md` to draw it.
+Run `../../draw-infra/scripts/infra-inventory.py <repo-root>` (relative to this file, resolved
+with `readlink -f`). Then write a spec by `../../draw-infra/references/spec.md`, in this page's
+scratchpad folder, and draw it with `draw-infra`'s "Use from another skill". When the repo has
+`docs/plans/map.json`, use it as the spec. It is one already.
 
 Mark each part with one state:
 

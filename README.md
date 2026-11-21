@@ -12,8 +12,8 @@
                                              ░███████                                                              ░███████
 ```
 
-![Version](https://img.shields.io/badge/version-3.5.0-6366f1?style=flat-square)
-![Skills](https://img.shields.io/badge/skills-39-22c55e?style=flat-square)
+![Version](https://img.shields.io/badge/version-3.6.0-6366f1?style=flat-square)
+![Skills](https://img.shields.io/badge/skills-40-22c55e?style=flat-square)
 ![Claude Code](https://img.shields.io/badge/Claude_Code-assets-d97757?style=flat-square)
 
 A home for reusable AI agent and Claude Code files: skills, subagents, slash commands, and hooks.
@@ -25,7 +25,7 @@ files.
 
 ```
 before work   /restate-ask → /design → /prototype → /phase shape
-understand    /explain-how · /explain-why · /teach · /research → /advise · /explain-again
+understand    /explain-how · /explain-why · /teach · /draw-infra · /research → /advise · /explain-again
 build         /delegate · /diagnose · /guide-setup
 check         /review → /review-deep → /trace-impact
 ship          /summarise commit → /update-docs → /bump-version → /reflect
@@ -47,7 +47,7 @@ ship          /summarise commit → /update-docs → /bump-version → /reflect
 
 ### Understand
 
-Read-only. `explain-how` says what the code or infra does, `explain-why` says why, and `teach`
+Read-only, apart from `draw-infra`, which writes its spec to `docs/diagrams/`. `explain-how` says what the code or infra does, `explain-why` says why, and `teach`
 runs one or both and teaches the result. `research` covers what outside sources say, and
 `advise` (under Plan & design) turns its findings into moves.
 
@@ -56,6 +56,7 @@ runs one or both and teaches the result. `research` covers what outside sources 
 | [explain-how](skills/explain-how/SKILL.md) | Explain how code or infra works today as a senior-engineer mental model, with `file:line` citations and ASCII diagrams. From pstack `how`. |
 | [explain-why](skills/explain-why/SKILL.md) | Find why code or infra is the way it is from git history, PRs, ADRs, and docs, with a confidence tier and a source on every claim. From pstack `why`. |
 | [teach](skills/teach/SKILL.md) | Teach code, infra, or where a project stands in plain English, with diagrams built up one part at a time. Infra is drawn from the repo's real files. "Where are we" gets a tabbed page of roadmap, slices, infra as built and planned, and open decisions. From pstack `teach`. |
+| [draw-infra](skills/draw-infra/SKILL.md) | Draw infra or app architecture from the repo's real files: a spec you write, laid out by a script, served as a page with build-up, animated flows, and a dev/prod switch. Writes the spec to docs/diagrams/, and a draw.io file on ask. From vidanov and konraddzbik diagram skills. |
 | [research](skills/research/SKILL.md) | Research a question against outside sources and give the answer first, with a confidence tier, a source, and a date on every claim. It waits for your approval of its plan. |
 | [explain-again](skills/explain-again/SKILL.md) | Type it when a reply did not land. The agent re-pitches it with the context you were missing, in plain English and the project's glossary terms. From Matt Pocock's `wait-what`. |
 
@@ -113,7 +114,7 @@ runs one or both and teaches the result. `research` covers what outside sources 
 
 | Skill | What it does |
 |---|---|
-| [serve-page](skills/serve-page/SKILL.md) | Serve a self-contained HTML page on your LAN, on the first free port from 38081, and stop it when you are done. Other skills build their pages through it, with shared rules for tabs, layers, steppers, and infra diagrams. |
+| [serve-page](skills/serve-page/SKILL.md) | Serve a self-contained HTML page on your LAN, on the first free port from 38081, and stop it when you are done. Other skills build their pages through it, with one shared dark theme and rules for tabs, layers, steppers, and infra diagrams. |
 | [list-skills](skills/list-skills/SKILL.md) | List every skill this profile and project can run, with when to use each, or recommend the right one with `for <task>`. |
 
 `imp-grok-4-5`, `imp-grok-4-6`, `imp-grok-4-7`, and `imp-sonnet` (merged into `delegate`), and

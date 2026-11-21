@@ -18,17 +18,25 @@ blocked, and the agent never sees it break.
 ## The folder
 
 - Write `<scratchpad>/<skill>/<slug>/index.html`. Put nothing else in the folder, apart from the
-  page's own images (for example the screenshots of `check-ui-tells`).
+  page's own images (for example the screenshots of `check-ui-tells`) and the theme's `fonts/`,
+  which `serve-page.sh` copies in.
 - The server serves the whole folder. Never serve a repo, a home folder, or a folder with other
   files in it.
 
 ## The page
 
 - **Self-contained**: inline `<style>`, inline `<svg>`, and no external scripts, fonts, or
-  stylesheets. Images are files in the same folder, linked by a relative path.
-- **Theme**: colours as CSS variables on `:root`, redefined under
-  `@media (prefers-color-scheme: dark)`. Give `body` an explicit background. One accent colour,
-  red for problems, and amber for warnings.
+  stylesheets. Images and the theme fonts are files in the same folder, linked by a relative path.
+- **Theme**: paste [`../assets/theme.css`](../assets/theme.css) whole after `base.css`. It is the
+  one look for every page: Editorial, always dark (`docs/adr/0003-editorial-dark-page-theme.md`).
+  - Use its variables (`--bg`, `--fg`, `--muted`, `--line`, `--accent`, `--accent-soft`,
+    `--on-accent`, `--amber`, `--red`, `--ok`, `--serif`, `--sans`, `--mono`) and its classes
+    (`.tabs`, `.card`, `.spot`, `.tag`, `.chip`, `.legend`, `.toggles`, `.nav`, tables, `code`).
+    Never define your own colours, fonts, or a light theme.
+  - A section starts with a rule, not a box. Tags are italic text, not pills. Buttons are
+    underlined text. Fill only the one block that is "now" (`.spot`), with `--accent-soft`.
+  - Accent for the current or chosen thing, red for problems, amber for warnings, green for done.
+    Never a left-border stripe, a gradient, or a shadow.
 - **Layout**: see [Screens](#screens).
 - **Header**: the repo or subject, the date, the scope, and a legend when the diagrams use
   symbols. No introduction paragraph.
@@ -68,11 +76,13 @@ Draw them as inline SVG. Pick the pattern that fits, and vary them:
 | **Radial map** | One change in the middle, and what it touches around it |
 | **Frame series** | One part added per frame, each with a one-line caption |
 
-Label boxes in small upper-case text, so they read as a schematic. Keep each diagram about 320px
+Label boxes in short sentence-case text, in `--sans`, with `fill: var(--fg)`. Keep each diagram about 320px
 tall.
 
-For infra (hosts, containers, networks, cloud resources, clusters), follow
-[`infra-diagrams.md`](infra-diagrams.md) instead of free-drawing boxes.
+For infra or architecture (hosts, containers, networks, cloud resources, clusters, services,
+queues, flows between them), do not draw boxes by hand. Use `draw-infra`: read
+`../../draw-infra/SKILL.md` (relative to this file, resolved with `readlink -f`), and follow
+"Use from another skill".
 
 ## Dynamic pages
 
@@ -83,21 +93,30 @@ diagram has layers or steps:
   `#id` links. The URL hash picks the tab, so a tab can be linked and reloads stay on it.
 - **Layer toggles**: a checkbox with `data-layer="planned"` hides every element with
   `class="planned"`. Use one per state or concern (built, building, planned, decisions).
+- **Choices**: radios with `data-choose="mode"` set `<body data-mode="<value>">`. Give `<body>`
+  the first value in the HTML, and hide with CSS such as `body[data-mode="dev"] .not-dev{display:none}`.
 - **Click to highlight**: give each SVG part `data-id`. An element with `data-links="a b"` (a
   decision card, a slice row) lights up those parts on click, and dims the rest.
 - **Steppers**: a frame series as `<div class="stepper">`, one `.step` per frame, with previous
-  and next buttons (`data-step="-1"`, `data-step="1"`) and a `.count`.
+  and next buttons (`data-step="-1"`, `data-step="1"`) and a `.count`. An optional
+  `<button data-play>` steps through the frames on its own, 2.5 s each (`data-delay` on the
+  stepper, in ms), and stops at the last frame or on any button press.
+- **Motion**: CSS animation only, and always inside
+  `@media (prefers-reduced-motion:reduce){...animation:none}`. Move only what the reader picked
+  (a flow step, a clicked part, a new frame), and let it run a set number of times, never
+  `infinite`. Keep the default view of a page still. No glows: show a chosen thing with a solid
+  accent outline.
 
 Paste [`../assets/dynamic.js`](../assets/dynamic.js) whole into one inline `<script>` at the end
 of `<body>`. Do not write your own version. Add this CSS:
 
+`theme.css` already styles the tabs, the steppers, `.hl`, and the hidden panels. Add only the
+layer rules your page uses:
+
 ```css
-.js section.panel[hidden], .js .step[hidden] { display: none; }
-.tabs a[aria-current="page"] { border-bottom: 2px solid var(--accent); }
 body.hide-built .built, body.hide-building .building, body.hide-planned .planned,
 body.hide-decision .decision { display: none; }
 body.focus [data-id]:not(.hl) { opacity: .25; }
-.hl { outline: 2px solid var(--accent); }
 svg .hl { outline: none; filter: drop-shadow(0 0 3px var(--accent)); }
 ```
 

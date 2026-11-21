@@ -4,7 +4,8 @@
 Usage: render-board.py <repo> [<out-dir>] [--live]
 
 Reads   docs/plans/BOARD.md, docs/plans/NOW.md, the current phase doc, docs/plans/map.json,
-        and the infra inventory (../../teach/scripts/infra-inventory.py).
+        and the infra inventory (../../draw-infra/scripts/infra-inventory.py). The SVG comes
+        from ../../draw-infra/scripts/diagram.py.
 Writes  <out-dir>/index.html and <out-dir>/stamp.txt (default out-dir: <repo>/docs/plans/board).
 --live  adds a poll of stamp.txt, so an open page reloads when the board changes.
 
@@ -23,7 +24,11 @@ from datetime import date
 HERE = os.path.dirname(os.path.realpath(__file__))
 DYNAMIC_JS = os.path.join(HERE, "..", "..", "serve-page", "assets", "dynamic.js")
 BASE_CSS = os.path.join(HERE, "..", "..", "serve-page", "assets", "base.css")
-INVENTORY = os.path.join(HERE, "..", "..", "teach", "scripts", "infra-inventory.py")
+THEME_CSS = os.path.join(HERE, "..", "..", "serve-page", "assets", "theme.css")
+DRAW = os.path.join(HERE, "..", "..", "draw-infra", "scripts")
+INVENTORY = os.path.join(DRAW, "infra-inventory.py")
+sys.path.insert(0, DRAW)
+from diagram import LANES, SVG_CSS, copy_fonts, render_svg, valid_map  # noqa: E402  the shared renderer
 
 
 def esc(s):
@@ -177,237 +182,13 @@ def parse_phase(md):
 
 
 # ---------- infra ----------
-LANES = ["clients", "edge", "compute", "data", "external"]
-BOX_W, BOX_H, PAD, LABEL = 150, 50, 9, 15
-LEVEL = PAD + LABEL
-
-
-def lane_index(parts):
-    lanes = [l for l in LANES if any(p["lane"] == l for p in parts)]
-    return lanes, {l: i for i, l in enumerate(lanes)}
-
-
-def plan_routes(parts, edges, byid):
-    """Pick the gaps (between lanes) and channels (between rows) each edge runs through."""
-    lanes, li = lane_index(parts)
-    last = len(lanes) - 1
-    rows = sorted({p["row"] for p in parts})
-    plans = []
-    for e in edges:
-        a, b = byid.get(e["from"]), byid.get(e["to"])
-        if not a or not b:
-            continue
-        ia, ib = li[a["lane"]], li[b["lane"]]
-        if ia == ib:
-            lo, hi = sorted((a["row"], b["row"]))
-            blocked = any(p["lane"] == a["lane"] and lo < p["row"] < hi for p in parts)
-            if not blocked:
-                plans.append((e, a, b, "vertical", None, None))
-            else:
-                g = ia if ia < last else ia - 1
-                plans.append((e, a, b, "side", g, None))
-        elif abs(ia - ib) == 1 or a["row"] == b["row"] and not any(
-                p["row"] == a["row"] and min(ia, ib) < li[p["lane"]] < max(ia, ib) for p in parts):
-            plans.append((e, a, b, "one-gap", min(ia, ib) if abs(ia - ib) == 1 else None, None))
-        else:
-            g1 = ia if ib > ia else ia - 1
-            g2 = ib - 1 if ib > ia else ib
-            ri = rows.index(b["row"])
-            ch = ri if ri > 0 else 1  # the channel above b's row, or below the first row (route() falls back)
-            plans.append((e, a, b, "channel", (g1, g2), ch))
-    return plans
-
-
-def layout(parts, plans):
-    """Grid positions. Gaps grow with boundary levels and with the edges that run through them."""
-    lanes, li = lane_index(parts)
-    by_lane = {l: [p for p in parts if p["lane"] == l] for l in lanes}
-    in_gap = {}
-    for _, _, _, kind, g, _ in plans:
-        for x in (g if isinstance(g, tuple) else (g,)):
-            if x is not None:
-                in_gap[x] = in_gap.get(x, 0) + 1
-
-    def change(a, b):
-        ca, cb = a.get("boundary", []), b.get("boundary", [])
-        common = 0
-        while common < min(len(ca), len(cb)) and ca[common] == cb[common]:
-            common += 1
-        return (len(ca) - common) + (len(cb) - common)
-
-    xs, x = {}, 20 + LEVEL
-    for i, l in enumerate(lanes):
-        if i:
-            need = max((change(a, b) for a in by_lane[lanes[i - 1]] for b in by_lane[l]), default=0)
-            x += BOX_W + max(need * PAD + 2 * PAD + 10 * in_gap.get(i - 1, 0), 40)
-        xs[l] = x
-    side_gap = 10 * in_gap.get(len(lanes) - 1, 0)
-    width = x + BOX_W + 20 + LEVEL + side_gap
-    rows = sorted({p["row"] for p in parts})
-    in_ch = {}
-    for _, _, _, kind, _, ch in plans:
-        if ch is not None:
-            in_ch[ch] = in_ch.get(ch, 0) + 1
-    ys, y = {}, 20 + 2 * LEVEL
-    for i, r in enumerate(rows):
-        if i:
-            a_row = [p for p in parts if p["row"] == rows[i - 1]]
-            b_row = [p for p in parts if p["row"] == r]
-            need = max((change(a, b) for a in a_row for b in b_row), default=0)
-            y += BOX_H + max(30, need * LEVEL + 16 + 8 * in_ch.get(i, 0))
-        ys[r] = y
-    for p in parts:
-        p["x"], p["y"] = xs[p["lane"]], ys[p["row"]]
-    gaps = {i: (xs[lanes[i]] + BOX_W, xs[lanes[i + 1]]) for i in range(len(lanes) - 1)}
-    gaps[len(lanes) - 1] = (xs[lanes[-1]] + BOX_W, xs[lanes[-1]] + BOX_W + 2 * PAD + side_gap + 10)
-    chans = {i: (ys[rows[i - 1]] + BOX_H, ys[rows[i]]) for i in range(1, len(rows))}
-    return width, y + BOX_H + 20 + 2 * LEVEL, gaps, chans
-
-
-def boundary_rects(parts, meta):
-    paths = set()
-    for p in parts:
-        b = p.get("boundary", [])
-        for i in range(1, len(b) + 1):
-            paths.add(tuple(b[:i]))
-    rects = {}
-    for path in sorted(paths, key=lambda q: (-len(q), q)):
-        boxes = [(p["x"], p["y"], p["x"] + BOX_W, p["y"] + BOX_H) for p in parts
-                 if tuple(p.get("boundary", [])) == path]
-        boxes += [rects[c] for c in rects if len(c) == len(path) + 1 and c[:len(path)] == path]
-        x0 = min(b[0] for b in boxes) - PAD
-        y0 = min(b[1] for b in boxes) - PAD - LABEL
-        x1 = max(b[2] for b in boxes) + PAD
-        y1 = max(b[3] for b in boxes) + PAD
-        rects[path] = (x0, y0, x1, y1)
-    return [(path, r, meta.get(path[-1], {}).get("label", path[-1])) for path, r in
-            sorted(rects.items(), key=lambda kv: (len(kv[0]), kv[0]))]
-
-
-SHAPE = {
-    "data": lambda x, y: (f'<rect class="part" x="{x}" y="{y}" width="{BOX_W}" height="{BOX_H}" rx="6"/>'
-                          f'<path class="drum" d="M{x},{y + 7} q{BOX_W / 2},10 {BOX_W},0"/>'),
-    "external": lambda x, y: f'<rect class="part ext" x="{x}" y="{y}" width="{BOX_W}" height="{BOX_H}" rx="6"/>',
-    "client": lambda x, y: f'<rect class="part" x="{x}" y="{y}" width="{BOX_W}" height="{BOX_H}" rx="25"/>',
-    "edge": lambda x, y: (f'<rect class="part" x="{x}" y="{y}" width="{BOX_W}" height="{BOX_H}" rx="6"/>'
-                          f'<path class="edgebar" d="M{x + 2},{y + 6} V{y + BOX_H - 6}"/>'),
-    "schedule": lambda x, y: (f'<rect class="part" x="{x}" y="{y}" width="{BOX_W}" height="{BOX_H}" rx="6"/>'
-                              f'<circle class="clock" cx="{x + BOX_W - 13}" cy="{y + 13}" r="6"/>'
-                              f'<path class="clock" d="M{x + BOX_W - 13},{y + 9} v4 h3"/>'),
-}
-
-
-def fit(text, size, room, cls, x, y):
-    """A text element, squeezed with textLength when its estimated width exceeds the room."""
-    est = len(text) * size * (0.66 if cls == "lbl" else 0.52)
-    squeeze = f' textLength="{room}" lengthAdjust="spacingAndGlyphs"' if est > room else ""
-    return f'<text class="{cls}" x="{x}" y="{y}"{squeeze}>{esc(text)}</text>'
-
-
-class Slots:
-    """Spread parallel lines in one gap or channel 8px apart, around its centre."""
-    def __init__(self):
-        self.n = {}
-
-    def take(self, key, lo, hi):
-        k = self.n.get(key, 0)
-        self.n[key] = k + 1
-        step = (k + 1) // 2 * 8 * (1 if k % 2 else -1)
-        return (lo + hi) / 2 + step
-
-
-def route(plan, gaps, chans, slots):
-    e, a, b, kind, g, ch = plan
-    ay, by_ = a["y"] + BOX_H / 2, b["y"] + BOX_H / 2
-    if kind == "vertical":
-        x = a["x"] + BOX_W / 2 + slots.take(("v", a["lane"]), -4, 4)
-        y0, y1 = (a["y"] + BOX_H, b["y"]) if a["y"] < b["y"] else (a["y"], b["y"] + BOX_H)
-        return f"M{x},{y0} V{y1}", (x + 5, (y0 + y1) / 2 + 3, "start")
-    if kind == "side":
-        gx = slots.take(("g", g), *gaps[g])
-        right = gx > a["x"]
-        sx = a["x"] + BOX_W if right else a["x"]
-        return f"M{sx},{ay} H{gx} V{by_} H{sx}", (gx + 4, (ay + by_) / 2, "start")
-    l2r = a["x"] < b["x"]
-    x0 = a["x"] + BOX_W if l2r else a["x"]
-    x1 = b["x"] if l2r else b["x"] + BOX_W
-    if kind == "one-gap":
-        if abs(ay - by_) < 1:
-            return f"M{x0},{ay} H{x1}", ((x0 + x1) / 2, ay - 5, "middle")
-        gx = slots.take(("g", g), *gaps[g])
-        return f"M{x0},{ay} H{gx} V{by_} H{x1}", (gx + 4, (ay + by_) / 2, "start")
-    g1, g2 = g
-    gx1 = slots.take(("g", g1), *gaps[g1])
-    gx2 = slots.take(("g", g2), *gaps[g2])
-    lo_hi = chans.get(ch) or (b["y"] + BOX_H + 4, b["y"] + BOX_H + 20)  # one row only: run just below it
-    cy = slots.take(("c", ch), *lo_hi)
-    return (f"M{x0},{ay} H{gx1} V{cy} H{gx2} V{by_} H{x1}", ((gx1 + gx2) / 2, cy - 4, "middle"))
-
-
-def valid_map(m):
-    """The parts and edges the layout can place, and the ids it had to drop."""
-    parts, bad = [], []
-    for p in m.get("parts", []):
-        ok = isinstance(p, dict) and p.get("id") and p.get("lane") in LANES and isinstance(p.get("row"), int)
-        if ok:
-            parts.append(dict(p, label=str(p.get("label", p["id"]))))
-        else:
-            bad.append(str(p.get("id", "?")) if isinstance(p, dict) else "?")
-    ids = {p["id"] for p in parts}
-    edges = [e for e in m.get("edges", []) if isinstance(e, dict) and e.get("from") in ids and e.get("to") in ids]
-    return parts, edges, bad
-
-
 def infra_svg(m, decisions):
-    parts, edges, bad = valid_map(m)
+    svg, bad = render_svg(m, decisions)
     warn = (f'<div class="card">Left off the map (needs an id, a lane from {", ".join(LANES)}, and a whole-number row): '
             f'{esc(", ".join(bad))}. Run <code>/phase map</code>.</div>' if bad else "")
-    if not parts:
+    if not svg:
         return warn + '<p class="muted">No <code>docs/plans/map.json</code> yet. Run <code>/phase map</code>.</p>'
-    byid = {p["id"]: p for p in parts}
-    plans = plan_routes(parts, edges, byid)
-    width, height, gaps, chans = layout(parts, plans)
-    out = [warn + f'<svg viewBox="0 0 {width} {height}" width="100%" role="img" aria-label="Infra map">',
-           '<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" '
-           'orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>']
-    for path, (x0, y0, x1, y1), label in boundary_rects(parts, m.get("boundaries", {})):
-        out.append(f'<rect class="bnd" x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}" rx="10"/>'
-                   f'<text class="bnd-label" x="{x0 + 8}" y="{y0 + 12}">{esc(label)}</text>')
-    slots, labels = Slots(), []
-    for plan in plans:
-        e = plan[0]
-        d, (lx, ly, anchor) = route(plan, gaps, chans, slots)
-        st = esc(e.get("state", "built"))
-        marker = ' marker-end="url(#arr)"' if e.get("kind") != "data" else ""
-        out.append(f'<g class="edge-g {st}" data-id="{esc(e["from"])} {esc(e["to"])}">'
-                   f'<path class="edge {esc(e.get("kind", "request"))} {st}" d="{d}"{marker}/></g>')
-        if e.get("label"):
-            labels.append(f'<text class="elabel {st}" x="{lx}" y="{ly}" text-anchor="{anchor}">{esc(e["label"])}</text>')
-    for p in parts:
-        x, y = p["x"], p["y"]
-        shape = SHAPE.get(p.get("kind"), lambda x, y: f'<rect class="part" x="{x}" y="{y}" width="{BOX_W}" height="{BOX_H}" rx="6"/>')(x, y)
-        strike = (f'<path class="strike" d="M{x},{y + BOX_H} L{x + BOX_W},{y}"/>'
-                  if p.get("state") == "removed" else "")
-        flag = (f'<circle class="flag" cx="{x + BOX_W}" cy="{y}" r="6"><title>Now in the files: mark it built?</title></circle>'
-                if p.get("_found") else "")
-        room = BOX_W - (34 if p.get("kind") == "schedule" else 20)
-        out.append(f'<g class="part-g {esc(p.get("state", "built"))}" data-id="{esc(p["id"])}">'
-                   f'<title>{esc(p.get("caption", ""))}</title>{shape}{strike}'
-                   + fit(p["label"].upper(), 11, room, "lbl", x + 10, y + 22)
-                   + fit(p.get("sub", ""), 10, BOX_W - 20, "sub", x + 10, y + 38) + f"{flag}</g>")
-    out.extend(labels)  # on top of the boxes and lines, with a halo
-    per_part = {}
-    for d in decisions:
-        target = next((byid[i] for i in d.get("parts", []) if i in byid), None)
-        if not target:
-            continue
-        k = per_part[target["id"]] = per_part.get(target["id"], -1) + 1  # side by side on one part
-        cx, cy = target["x"] + BOX_W - 4 - 24 * k, target["y"] + BOX_H
-        out.append(f'<g class="decision" data-links="{esc(" ".join(d.get("parts", [])))}">'
-                   f'<path d="M{cx},{cy - 10} l10,10 l-10,10 l-10,-10 z"/>'
-                   f'<text class="dlabel" x="{cx}" y="{cy + 4}">{esc(d["id"])}</text></g>')
-    out.append("</svg>")
-    return "\n".join(out)
+    return warn + svg
 
 
 def inventory_check(repo, m):
@@ -427,101 +208,59 @@ def inventory_check(repo, m):
 
 # ---------- page ----------
 CSS = """
-:root{--bg:#fbfaf7;--fg:#1d1d1f;--muted:#6b6b70;--line:#d9d6cf;--card:#fff;--accent:#2563eb;
---accent-soft:#e3ecfd;--amber:#d97706;--red:#dc2626;--ok:#15803d}
-@media (prefers-color-scheme:dark){:root{--bg:#141416;--fg:#ececef;--muted:#9a9aa2;--line:#34343a;
---card:#1c1c20;--accent:#7aa2ff;--accent-soft:#1e2a44;--amber:#f59e0b;--red:#f87171;--ok:#4ade80}}
-body{margin:0;background:var(--bg);color:var(--fg);font:.9375rem/1.5 system-ui,sans-serif}
-header{padding-top:1.125rem}
-h1{font-size:1.25rem;margin:0}h2{font-size:1rem;margin:1.375rem 0 .5rem}.muted{color:var(--muted)}
-.warn{font-size:.75rem;color:var(--muted);margin:.375rem 0}
-.legend{display:flex;flex-wrap:wrap;gap:.75rem;font-size:.75rem;margin:.5rem 0}.legend span{display:inline-flex;align-items:center;gap:.3125rem}
-.sw{width:1.125rem;height:.6875rem;border:1.5px solid var(--fg);border-radius:.1875rem;display:inline-block}
-.sw.building{border-color:var(--accent);background:var(--accent-soft)}.sw.planned{border-style:dashed;border-color:var(--muted)}
-.sw.decision{border:0;background:var(--amber);transform:rotate(45deg);width:.625rem;height:.625rem}
-.tabs{display:flex;gap:.25rem;overflow-x:auto;border-bottom:1px solid var(--line);margin-top:.625rem}
-.tabs a{padding:.5rem .75rem;color:var(--fg);text-decoration:none;white-space:nowrap;border-bottom:2px solid transparent}
-.tabs a[aria-current="page"]{border-bottom-color:var(--accent);font-weight:600}
-.js section.panel[hidden],.js .step[hidden]{display:none}
-.card{background:var(--card);border:1px solid var(--line);border-radius:.625rem;padding:.75rem .875rem;margin:.625rem 0}
-.kv{display:grid;grid-template-columns:6.875rem 1fr;gap:.375rem .75rem}.kv b{color:var(--muted);font-weight:600}
-.bar{height:.5rem;background:var(--line);border-radius:.25rem;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
-.flow{display:flex;flex-wrap:wrap;gap:.5rem}.slice{flex:1 1 9.375rem;max-width:13.75rem;border:1.5px solid var(--fg);border-radius:.5rem;
-padding:.5rem .625rem;background:var(--card);cursor:pointer;font-size:.8125rem}.slice .k{font-size:.6875rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
-.slice.done{border-color:var(--line);color:var(--muted)}.slice.current{border-color:var(--accent);background:var(--accent-soft)}
-.slice.open{border-style:dashed}.slice.waiting{border-color:var(--amber);border-style:dashed}
-details{margin:.375rem 0}summary{cursor:pointer}
-.here{font-size:.6875rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em}.here.side{color:var(--amber)}
-.ghead{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:1.375rem 0 .375rem}
-.rail{border-left:2px solid var(--line);margin-left:.4375rem}
+.kv{display:grid;grid-template-columns:7rem 1fr;gap:.375rem .75rem}.kv b{color:var(--muted);font-weight:600}
+.bar{height:.375rem;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
+.flow{display:flex;flex-wrap:wrap;gap:.75rem 1rem}
+.slice{flex:1 1 9.375rem;max-width:13.75rem;border-top:2px solid var(--fg);padding:.375rem 0;cursor:pointer;font-size:.9375rem}
+.slice .k{font-size:.8125rem;font-style:italic;color:var(--muted)}
+.slice.done{border-top-color:var(--line);color:var(--muted)}.slice.current{border-top-color:var(--accent);background:var(--accent-soft);padding:.375rem .5rem}
+.slice.open{border-top-style:dashed}.slice.waiting{border-top:2px dashed var(--amber)}
+.here{font-size:.875rem;font-style:italic;font-weight:600;color:var(--accent)}.here.side{color:var(--amber)}
+.ghead{font:600 1.125rem var(--serif);color:var(--fg);margin:1.75rem 0 .375rem}
+.rail{border-left:1px solid var(--line);margin-left:.4375rem}
 .rrow{display:flex;gap:.75rem;padding:.625rem .75rem .625rem 0;color:var(--fg);text-decoration:none;position:relative}
 a.rrow:hover .rbody{background:var(--accent-soft)}
-.rrow .dot{flex:0 0 .875rem;height:.875rem;border-radius:50%;margin:.25rem 0 0 -.5rem;background:var(--bg);border:2px solid var(--muted)}
+.rrow .dot{flex:0 0 .875rem;height:.875rem;border-radius:50%;margin:.3125rem 0 0 -.5rem;background:var(--bg);border:2px solid var(--muted)}
 .rrow.k-here .dot{background:var(--accent);border-color:var(--accent)}.rrow.k-side .dot{background:var(--amber);border-color:var(--amber)}
-.rrow.k-done .dot{background:var(--muted)}.rrow.k-done{padding:.25rem .75rem .25rem 0;color:var(--muted);font-size:.875rem}
-.rbody{flex:1;border-radius:.5rem;padding:2px .5rem}
-.rrow.k-here .rbody{background:var(--accent-soft);border:1.5px solid var(--accent);padding:.625rem .75rem}
-.rrow.k-side .rbody{border:1.5px dashed var(--amber);padding:.625rem .75rem}
-.rtop{display:flex;flex-wrap:wrap;align-items:center;gap:.375rem .5rem}
-.note{font-size:.8125rem;color:var(--muted);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.prog{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--muted);margin-top:.375rem}.prog .bar{width:8.75rem}
-.chip{font-size:.6875rem;border-radius:.625rem;padding:1px .5rem;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
-.chip.inprogress,.chip.current{background:var(--accent);border-color:var(--accent);color:#fff}
-.chip.done{color:var(--ok);border-color:var(--ok)}.chip.waiting,.chip.parked{color:var(--amber);border-color:var(--amber)}
-.small{font-size:.8125rem}.later,.log{font-size:.875rem;padding-left:1.25rem}.log li,.later li{margin:.1875rem 0}
-.pick{display:flex;flex-wrap:wrap;gap:.375rem;margin:.75rem 0}
-.pchip{font:600 .8125rem system-ui;padding:.3125rem .75rem;border-radius:1rem;border:1.5px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
-.pchip.k-here{border-color:var(--accent)}.pchip.k-side{border-color:var(--amber)}.pchip.k-done{color:var(--muted)}
-.pchip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
-.phead .rtop{font-size:1.0625rem}.phead p{margin:.375rem 0}
-.spot{background:var(--accent-soft);border:2px solid var(--accent);border-radius:.625rem;padding:.875rem 1rem;margin:.75rem 0}
-.spot .stop{font-size:1.0625rem}.spot .sdetail{font-size:.9375rem}
+.rrow.k-done .dot{background:var(--muted)}.rrow.k-done{padding:.25rem .75rem .25rem 0;color:var(--muted);font-size:.9375rem}
+.rbody{flex:1;padding:2px .5rem}
+.rrow.k-here .rbody{background:var(--accent-soft);padding:.75rem 1rem}
+.rrow.k-side .rbody{border-top:1px dashed var(--amber);padding:.625rem .5rem}
+.rtop{display:flex;flex-wrap:wrap;align-items:baseline;gap:.375rem .75rem}
+.note{font-size:.9375rem;color:var(--muted);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.prog{display:flex;align-items:center;gap:.5rem;font-size:.875rem;color:var(--muted);margin-top:.375rem}.prog .bar{width:8.75rem}
+.later,.log{font-size:.9375rem}
+.pick{display:flex;flex-wrap:wrap;gap:.25rem;margin:.75rem 0}
+.pchip.k-here{color:var(--accent);border-bottom-color:var(--accent)}.pchip.k-side{color:var(--amber);border-bottom-color:var(--amber)}
+.pchip.k-done{color:var(--muted);border-bottom-color:var(--line)}
+.phead .rtop{font:600 1.25rem var(--serif)}.phead p{margin:.375rem 0}
+.spot .stop{font:600 1.125rem var(--serif)}.spot .sdetail{font-size:1rem}
 .srow.done .sdetail{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .srow.done.open .sdetail{display:block}.srow.done .chk{display:none}.srow.done.open .chk{display:block}
-.srow.done .stop::after{content:"tap to read";font-size:.6875rem;color:var(--muted)}.srow.done.open .stop::after{content:""}
-.pgrid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:1.25rem;align-items:start}
+.srow.done .stop::after{content:"tap to read";font-size:.8125rem;font-style:italic;color:var(--muted)}.srow.done.open .stop::after{content:""}
+.pgrid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:2rem;align-items:start}
 @media (max-width:47.5rem){.pgrid{grid-template-columns:1fr}}
-.pgrid aside h3{font-size:.875rem;margin:0 0 .375rem}.pgrid aside{margin-top:2.125rem}.dod{padding-left:1.125rem;margin:0;font-size:.875rem}
-ol.slices{list-style:none;padding:0;margin:.625rem 0;border-left:2px solid var(--line);margin-left:.5625rem}
+.pgrid aside h3{margin:0 0 .375rem}.pgrid aside{margin-top:2.125rem}.dod{padding-left:1.125rem;margin:0;font-size:.9375rem}
+ol.slices{list-style:none;padding:0;margin:.625rem 0 .625rem .5625rem;border-left:1px solid var(--line)}
 .srow{display:flex;gap:.75rem;padding:.5rem 0;cursor:pointer}
-.srow .mark{flex:0 0 1.125rem;height:1.125rem;border-radius:50%;margin:.1875rem 0 0 -.625rem;background:var(--bg);border:2px solid var(--muted);
-display:flex;align-items:center;justify-content:center;font-size:.6875rem;color:#fff}
+.srow .mark{flex:0 0 1.125rem;height:1.125rem;border-radius:50%;margin:.25rem 0 0 -.625rem;background:var(--bg);border:2px solid var(--muted);
+display:flex;align-items:center;justify-content:center;font-size:.6875rem;color:var(--on-accent)}
 .srow.done .mark{background:var(--ok);border-color:var(--ok)}.srow.done .mark::after{content:"✓"}
 .srow.current .mark{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 .25rem var(--accent-soft)}
 .srow.waiting .mark{border-color:var(--amber)}
-.sbody{flex:1;min-width:0;border-radius:.5rem;padding:.25rem .625rem}
-.srow.current .sbody{border:1.5px solid var(--accent);padding:.5rem .75rem}
-.srow.done .sbody{color:var(--muted)}.srow.done .sdetail{font-size:.8125rem}
-.stop{display:flex;flex-wrap:wrap;align-items:center;gap:.375rem .5rem}
-.skey{font:700 .6875rem system-ui;color:var(--muted);min-width:1.375rem}
-.sdetail{margin:.25rem 0;font-size:.875rem}.srow.current .sdetail{font-size:.9375rem}
-ul.chk{list-style:none;padding:0;margin:.375rem 0;font-size:.875rem}ul.chk li{margin:2px 0}ul.chk li.ok{color:var(--muted)}
-.dcard{border-left:.25rem solid var(--amber)}.dcard .id{font-weight:700;color:var(--amber)}
-.map{font-size:.75rem;display:inline-block;margin-top:.25rem}
-.tag{font-size:.6875rem;border:1px solid var(--line);border-radius:.625rem;padding:1px .4375rem;color:var(--muted)}
-.toggles{display:flex;flex-wrap:wrap;gap:.75rem;font-size:.8125rem;margin:.5rem 0}
-.pipe{display:flex;flex-wrap:wrap;gap:.375rem;align-items:center;font-size:.75rem}.pipe span{border:1px dashed var(--muted);border-radius:.375rem;padding:2px .5rem}
-svg{display:block;color:var(--fg)}
-svg .bnd{fill:none;stroke:var(--line);stroke-width:1.2}
-svg .bnd-label{font:600 10px system-ui;letter-spacing:.05em;text-transform:uppercase;fill:var(--muted)}
-svg .part{fill:var(--card);stroke:var(--fg);stroke-width:1.5}svg .part.ext{fill:var(--bg);stroke-dasharray:3 3;stroke:var(--muted)}
-svg .drum,svg .clock{fill:none;stroke:var(--fg);stroke-width:1}svg .edgebar{stroke:var(--fg);stroke-width:4}
-svg .lbl{font:600 11px system-ui;letter-spacing:.04em;text-transform:uppercase;fill:var(--fg)}
-svg .sub{font:10px system-ui;fill:var(--muted)}
-svg .building .part{fill:var(--accent-soft);stroke:var(--accent)}svg .building .lbl{fill:var(--accent)}
-svg .planned .part,svg .edge.planned{stroke-dasharray:5 4;stroke:var(--muted)}svg .planned .lbl{fill:var(--muted)}
-svg .edge{fill:none;stroke:var(--fg);stroke-width:1.2}svg .edge.building{stroke:var(--accent)}
-svg .edge.data{stroke-width:2}svg .edge.event{stroke-dasharray:1 3;stroke-width:1.6}
-svg .elabel{font:600 9px system-ui;fill:var(--muted);paint-order:stroke;stroke:var(--bg);stroke-width:4px;stroke-linejoin:round}
-svg .elabel.building{fill:var(--accent)}
-svg .strike{stroke:var(--red);stroke-width:2}svg .flag{fill:var(--ok)}
-svg .decision path{fill:var(--amber);cursor:pointer}svg .dlabel{font:700 8px system-ui;fill:#fff;text-anchor:middle}
-svg [data-id]{cursor:pointer}
+.sbody{flex:1;min-width:0;padding:.25rem .625rem}
+.srow.current .sbody{background:var(--accent-soft);padding:.625rem 1rem}
+.srow.done .sbody{color:var(--muted)}.srow.done .sdetail{font-size:.9375rem}
+.stop{display:flex;flex-wrap:wrap;align-items:baseline;gap:.375rem .75rem}
+.skey{font-weight:600;color:var(--muted);min-width:1.375rem}
+.sdetail{margin:.25rem 0;font-size:.9375rem}.srow.current .sdetail{font-size:1rem}
+ul.chk{list-style:none;padding:0;margin:.375rem 0;font-size:.9375rem}ul.chk li{margin:2px 0}ul.chk li.ok{color:var(--muted)}
+.dcard .id{font:600 1.0625rem var(--serif);color:var(--amber)}
+.map{font-size:.875rem;display:inline-block;margin-top:.25rem}
+.pipe{display:flex;flex-wrap:wrap;gap:.375rem .75rem;align-items:center;font-size:.875rem}.pipe span{border-bottom:1px dashed var(--muted)}
 body.hide-built .part-g.built,body.hide-built .edge-g.built,body.hide-building .building,
 body.hide-planned .planned,body.hide-decision .decision{display:none}
 body.focus svg [data-id]:not(.hl){opacity:.22}body.focus .slice:not(.hl),body.focus .dcard:not(.hl){opacity:.45}
-.hl{outline:2px solid var(--accent);outline-offset:2px}svg .hl{outline:none;filter:drop-shadow(0 0 4px var(--accent))}
-code{font-size:.9em;background:var(--line);padding:0 .25rem;border-radius:.25rem}
 """
 
 PICK_JS = """(function(){var d=document;function pick(id,keep){var v=[].slice.call(d.querySelectorAll('.pview'));
@@ -779,7 +518,7 @@ def render(repo, out_dir, live=False):
     dynamic = read(DYNAMIC_JS)
     page = f"""<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>{esc(title)} · phase board</title>
-<style>{read(BASE_CSS)}{CSS}</style></head><body>
+<style>{read(BASE_CSS)}{read(THEME_CSS)}{CSS}{SVG_CSS}</style></head><body>
 <header><h1>{esc(title)} · phase board</h1>
 <div class="muted">{esc(current["id"] + " · " + current["name"] if current else "No phase in progress")} · rendered {date.today().isoformat()}{" · live" if live else ""}</div>
 <div class="warn">This page holds host names and the plan. Any device on your LAN can open it while the server runs.</div>
@@ -789,6 +528,7 @@ def render(repo, out_dir, live=False):
 <script>{dynamic}</script><script>{PICK_JS}</script>{f"<script>{LIVE_JS}</script>" if live else ""}
 </body></html>"""
     os.makedirs(out_dir, exist_ok=True)
+    copy_fonts(out_dir)
     stamp = hashlib.sha1(page.replace(f"rendered {date.today().isoformat()}", "").encode()).hexdigest()[:12]
     old = read(os.path.join(out_dir, "stamp.txt")).strip()
     if old != stamp:

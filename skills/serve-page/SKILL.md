@@ -1,6 +1,6 @@
 ---
 name: serve-page
-description: Serve a self-contained HTML page on your LAN, so it opens on a phone or another machine with no login, on the first free port from 38081 to 38089, and stop it when you are done. Other skills (check-architecture, design, improve, trace-impact, aws-cost, teach, review-deep, check-ui-tells, research, phase, prototype) read it in place to build and serve their pages, and its page rules keep every page free of CDN scripts. Run it directly to serve any HTML file. Triggers on "/serve-page <file>", "/serve-page stop", "serve this page on the LAN", or "open this on my phone".
+description: Serve a self-contained HTML page on your LAN, so it opens on a phone or another machine with no login, on the first free port from 38081 to 38089, and stop it when you are done. Other skills (check-architecture, design, improve, trace-impact, aws-cost, teach, review-deep, check-ui-tells, research, phase, prototype, draw-infra) read it in place to build and serve their pages, and its page rules keep every page free of CDN scripts. Run it directly to serve any HTML file. Triggers on "/serve-page <file>", "/serve-page stop", "serve this page on the LAN", or "open this on my phone".
 argument-hint: "[<file.html> | stop]"
 ---
 
@@ -25,7 +25,8 @@ page shows. Write it to `<scratchpad>/<skill>/<slug>/index.html`.
    - Exit 2 (every port is in use) or 3 (no LAN address): give the user the `path=` only, and say
      why.
 2. **Start**: run `<script> start <dir> <port> <ip>` with the Bash tool's `run_in_background:
-   true`, so the server keeps running. Note the background task.
+   true`, so the server keeps running. Note the background task. `plan` and `start` copy the
+   theme fonts into `<dir>/fonts/` when the page uses `theme.css`.
 3. **Check**: run `<script> check <port>`. Exit 0 means the server listens. Otherwise read the
    background task's output, report the error, and give the path only.
 

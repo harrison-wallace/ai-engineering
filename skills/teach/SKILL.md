@@ -73,8 +73,9 @@ that message.
 Do not redo their work. Reword freely for teaching, with one exception: **keep `explain-why`'s
 confidence words and tiers as they are.** Its hedges are findings, not style.
 
-**Infra subjects**: before the sibling skills, run `scripts/infra-inventory.py <repo-root>` (in
-this skill's folder). It lists the parts and edges that the repo's files define today: compose
+**Infra subjects**: before the sibling skills, run
+`../draw-infra/scripts/infra-inventory.py <repo-root>` (relative to this skill's folder, resolved
+with `readlink -f`). It lists the parts and edges that the repo's files define today: compose
 services, `docker run` flags in Jenkinsfiles, Caddy routes, Terraform resources and references,
 k8s objects, and workflows. Pass its output to the `explain-how` explorers as context. Every box
 you draw comes from this list, or is marked as unconfirmed.
@@ -118,10 +119,13 @@ part, so the user watches the system assemble. To teach a flow from A to B to C:
 redraw and add C, then redraw and add the return edge or the next piece. One all-at-once diagram,
 especially one saved for the end, is a reference, not teaching.
 
-**Infra diagrams** follow `../serve-page/references/infra-diagrams.md` (relative to this
-skill's folder, resolved with `readlink -f`): its boundaries, lanes, part shapes, edge labels, and
-geometry. For infra, the series adds one lane or one boundary per frame: the host and the edge
-first, then compute, then data, then the deploy and observe bands.
+**Infra and architecture diagrams** come from `draw-infra`. Do not draw that SVG by hand. Read
+`../draw-infra/SKILL.md` (relative to this skill's folder, resolved with `readlink -f`), and
+follow "Use from another skill". This skill is read-only, so the spec goes in
+`<scratchpad>/teach/<slug>/diagram.json`, never in the repo. The series is one frame per lane,
+from `diagram.py svg --upto 1` up to the full diagram: clients and the edge first, then compute,
+then data, then outside services. To teach a request path, add a flow to the spec and give one
+frame per step with `--flow <id> --step <k>`.
 
 Where the diagrams go:
 

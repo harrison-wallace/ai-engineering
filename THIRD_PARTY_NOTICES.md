@@ -90,3 +90,58 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Diagram skills
+
+[draw-infra](skills/draw-infra/SKILL.md) adapts ideas from two MIT-licensed skills:
+
+| Source | Adapted |
+|---|---|
+| [vidanov/aws-architecture-diagram-skill](https://github.com/vidanov/aws-architecture-diagram-skill) | The layout checks (no edge through a box, straight edges), the companion Markdown file, the render-and-look loop, the audience mode, and for the draw.io output: the verified AWS icon names and colours, the broken-icon list, the group styles, and the export-to-PNG check |
+| [konraddzbik/architecture-diagram-skill](https://github.com/konraddzbik/architecture-diagram-skill) | Click-through flows with one hop lit per step and the rest dimmed, the packet that runs along each hop, payloads per step, the mode switch (dev and prod), and the grounding rules |
+
+Both are distributed under the MIT License, with the same text below the copyright line:
+Copyright (c) 2026 Alexey Vidanov, and Copyright (c) 2026 Konrad Dzbik.
+
+```
+MIT License
+
+Copyright (c) 2026 Alexey Vidanov
+Copyright (c) 2026 Konrad Dzbik
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+## Page theme fonts
+
+The serve-page theme ([`skills/serve-page/assets/theme.css`](skills/serve-page/assets/theme.css))
+ships two fonts as `.woff2` files in `skills/serve-page/assets/fonts/`, and copies them next to
+each served page.
+
+| Font | Source | License |
+|---|---|---|
+| Source Serif 4 | Adobe, via [Fontsource](https://fontsource.org/fonts/source-serif-4) (latin subset) | SIL Open Font License 1.1 |
+| Source Sans 3 | Adobe, via [Fontsource](https://fontsource.org/fonts/source-sans-3) (latin subset) | SIL Open Font License 1.1 |
+
+The full license text is in
+[`skills/serve-page/assets/fonts/OFL.txt`](skills/serve-page/assets/fonts/OFL.txt).
+
+The theme's look follows the editorial patterns in
+[VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) (MIT). No file from
+it is copied.

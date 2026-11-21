@@ -21,6 +21,7 @@ one meaning, and its synonyms are never used:
 | `prototype` | Build throwaway code that answers one design question | mock, spike |
 | `guide` | Walk a human through steps only they can do | walkthrough, howto |
 | `define` | Settle the names of things | |
+| `draw` | Turn a system into a diagram from its real files | sketch, visualise, chart |
 | `research` | Find what outside sources say | |
 | `advise` | Turn findings into ranked moves for this project, and change the plan on approval | recommend, suggest, consult |
 | `summarise` | Restate work or a chat | recap |
