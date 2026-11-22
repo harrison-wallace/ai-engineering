@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.6.1] - 2026-11-22
+
+### Changed
+- `phase`: `status` and `sync` reports now get you back into the work after a gap or a long
+  session. Status leads with the phase goal, a progress bar, and what landed since you were last
+  here. Each task or decision that waits on you says what it is for, what it unblocks, the pick
+  (the doc's or Claude's) and why, and links the detail. Other open decisions are one table row
+  each. Sync reports only what changed, and is one line when nothing did. The rules are in
+  `references/report.md`, with plain words in place of the skill's own (`planned`, not `shaped`),
+  and the counts come from the new `scripts/progress.py`.
+- `phase sync` keeps `NOW.md` to its five short lines, and moves the rest out: the phase's state
+  to the board row's note, facts that span phases (hosts, the live version, owner priorities) to a
+  new `## Notes` section on the board, and slice facts to the phase doc.
+- The phase board page uses the same plain words: "planned", "now", "running beside it", "done
+  when", and "waiting on".
+
+### Fixed
+- The phase board page cut each open decision at its first line, and showed no phase at all on
+  a board with kebab-case phase ids.
+
 ## [3.6.0] - 2026-11-21
 
 ### Added

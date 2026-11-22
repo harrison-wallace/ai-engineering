@@ -73,7 +73,7 @@ def find_section(secs, *names):
 
 
 # ---------- board and NOW ----------
-PHASE_ID = r"[A-Za-z]+\d*[A-Za-z]?|\d+[a-z]?"  # P1, P13b, P2B, PF, 3
+PHASE_ID = r"[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+|[A-Za-z]+\d*[A-Za-z]?|\d+[a-z]?"  # herdr-tab-status, P1, P13b, P2B, PF, 3
 
 
 def parse_board(md):
@@ -92,6 +92,11 @@ def parse_board(md):
         if len(cells) >= 2 and re.match(r"\d{4}-\d{2}-\d{2}", cells[0]):
             log.append((cells[0], cells[1]))
     return rows, later, log
+
+
+# Board status words as the reader says them. The files keep the skill's own words.
+SAY = {"shaped": "planned", "in progress": "now"}
+STATE_SAY = {"current": "now", "open": "to do"}
 
 
 def parse_now(md):
@@ -172,8 +177,8 @@ def parse_phase(md):
     dod = bullets(find_section(secs, "Definition of Done"))
     nogo = re.search(r"No-gos:\s*(.+?)(?:\n- |\Z)", find_section(secs, "Appetite"), re.S)
     decisions = []
-    for l in find_section(secs, "Open decisions").splitlines():
-        m = re.match(r"^- (D\d+):\s*(.+)$", l)
+    for b in bullets(find_section(secs, "Open decisions")):  # a decision may wrap over several lines
+        m = re.match(r"^(D\d+):\s*(.+)$", b)
         if m and "<question>" not in m.group(2):
             decisions.append({"id": m.group(1), "text": m.group(2), "recorded": True})
     adrs = sorted(set(re.findall(r"ADRs? (\d{4})", md)))
@@ -328,7 +333,7 @@ def render(repo, out_dir, live=False):
                 ticks = f' · {sum(i["done"] for i in s["items"])}/{len(s["items"])}'
             attr = f' data-links="{esc(links)}"' if links else ""
             cards.append(f'<div class="slice {state}"{attr}><div class="k">'
-                         f'{esc(s["key"])} · {state}{ticks}</div>{inline(s["name"])}</div>')
+                         f'{esc(s["key"])} · {STATE_SAY.get(state, state)}{ticks}</div>{inline(s["name"])}</div>')
         return '<div class="flow">' + "".join(cards) + "</div>"
 
     pid = current["id"] if current else ""
@@ -353,14 +358,15 @@ def render(repo, out_dir, live=False):
         last = subprocess.run(["git", "-C", repo, "log", "-1", "--format=%cs"], capture_output=True,
                               text=True, timeout=10).stdout.strip()
         if updated and last and last > updated:
-            stale = f'<div class="card" style="border-color:var(--amber)">The board may be stale: a commit on {esc(last)} is newer than NOW ({esc(updated)}). Run <code>/phase sync</code>.</div>'
+            stale = f'<div class="card" style="border-color:var(--amber)">The board may be stale: a commit on {esc(last)} is newer than the last sync ({esc(updated)}). Run <code>/phase sync</code>.</div>'
     except (OSError, subprocess.TimeoutExpired):
         pass
 
     now_tab = [stale, '<div class="card kv">']
-    for k in ("Phase", "Slice", "Blocked", "Parallel", "Live"):
-        if now.get(k):
-            now_tab.append(f"<b>{k}</b><div>{inline(now[k])}</div>")
+    for k, say in (("Phase", "Phase"), ("Slice", "Slice"), ("Blocked", "Waiting on"),
+                   ("Parallel", "Running beside it"), ("Live", "Live")):
+        if now.get(k) and now[k].lower() != "none":
+            now_tab.append(f"<b>{say}</b><div>{inline(now[k])}</div>")
     now_tab.append("</div>")
     if phase:
         pct = int(100 * done_n / len(sl)) if sl else 0
@@ -393,13 +399,13 @@ def render(repo, out_dir, live=False):
 
     def road_row(r):
         k = role[r["id"]]
-        flag = {"here": '<span class="here">You are here</span>', "side": '<span class="here side">Side track</span>'}.get(k, "")
+        flag = {"here": '<span class="here">You are here</span>', "side": '<span class="here side">Running beside it</span>'}.get(k, "")
         go = f' href="#phase" data-phase-go="{esc(r["id"])}"' if docs.get(r["id"]) else ""
         tagname = "a" if go else "div"
         note = f'<div class="note">{inline(r["note"])}</div>' if r["note"] and k != "done" else ""
         return (f'<{tagname} class="rrow k-{k}"{go}><span class="dot"></span><div class="rbody">'
                 f'<div class="rtop"><span><b>{esc(r["id"])}</b> {inline(r["name"])}</span> {flag}'
-                f'<span class="chip {status_cls(r["status"])}">{esc(r["status"])}</span></div>'
+                f'<span class="chip {status_cls(r["status"])}">{esc(SAY.get(r["status"], r["status"]))}</span></div>'
                 f'{note}{progress(r["id"]) if k != "done" else ""}</div></{tagname}>')
 
     status_cls = lambda s: re.sub(r"[^a-z]", "", s)
@@ -429,7 +435,7 @@ def render(repo, out_dir, live=False):
         blocked_keys = waiting if k == "here" else ()
         out = [f'<div class="pview k-{k}{" cur" if k == "here" else ""}" data-phase="{esc(r["id"])}">',
                f'<div class="card phead"><div class="rtop"><span><b>{esc(r["id"])}</b> {inline(r["name"])}</span>'
-               f'<span class="chip {status_cls(r["status"])}">{esc(r["status"])}</span></div>']
+               f'<span class="chip {status_cls(r["status"])}">{esc(SAY.get(r["status"], r["status"]))}</span></div>']
         if ph["goal"]:
             out.append(f'<p>{inline(ph["goal"])}</p>')
         out.append(progress(r["id"]))
@@ -462,7 +468,7 @@ def render(repo, out_dir, live=False):
                        f'<div class="sbody">{body(x, states[x["key"]], full=x is not cs)}</div></li>')
         out.append('</ol></div><aside>')
         if ph["dod"]:
-            out.append('<div class="card"><h3>Definition of Done</h3><ul class="dod">'
+            out.append('<div class="card"><h3>Done when</h3><ul class="dod">'
                        + "".join(f"<li>{inline(x)}</li>" for x in ph["dod"]) + "</ul></div>")
         if ph["nogo"]:
             out.append(f'<div class="card"><h3>No-gos</h3><p>{inline(ph["nogo"])}</p></div>')
@@ -475,7 +481,7 @@ def render(repo, out_dir, live=False):
     if order:
         phase_tab.append('<div class="pick">' + "".join(
             f'<button class="pchip k-{role[r["id"]]}" data-phase-go="{esc(r["id"])}">{esc(r["id"])}'
-            f'{" · now" if role[r["id"]] == "here" else " · side" if role[r["id"]] == "side" else ""}</button>'
+            f'{" · now" if role[r["id"]] == "here" else " · beside" if role[r["id"]] == "side" else ""}</button>'
             for r in order) + "</div>")
         phase_tab.extend(phase_view(r, docs[r["id"]]) for r in order)
     else:

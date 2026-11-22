@@ -13,10 +13,10 @@ repo's `docs/`, never this one.
 
 | Command | What it does |
 |---|---|
-| `/phase` | Read-only brief: phase, slice, blocked, next shaped row, dirty files. Never starts work. |
+| `/phase` | Read-only brief that gets you back in after a gap: where you are (with a progress bar), what landed, what waits on you (with context and a recommendation), and what is next. Never starts work. |
 | `/phase init` | Once per repo: creates `NOW.md` + `BOARD.md`, migrates a leftover `SESSION.md`/`STATUS.md`, appends the two gitignore lines. |
 | `/phase shape auth` | Writes `docs/phases/auth.md` from the template (goal, appetite, scope, DoD) and adds a `shaped` board row. |
-| `/phase sync` | Rewrites `NOW.md` and ticks the checkboxes that actually landed, from git + this chat. Does not close anything. |
+| `/phase sync` | Rewrites `NOW.md` (kept short) and ticks the checkboxes that actually landed, from git + this chat. Reports only what changed. Does not close anything. |
 | `/phase advance slice` | Ticks the current slice and moves `NOW.md` to the next one. Bare `/phase advance` does the same. Never closes a phase. |
 | `/phase advance phase` | Closes the phase if its DoD is met: row `done`, log line, next `shaped` row into `in progress`. Otherwise lists what is left. |
 | `/phase map` | Writes `docs/plans/map.json` (the infra parts and edges, linked to slices and decisions) and renders the live board. |

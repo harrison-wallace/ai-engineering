@@ -10,6 +10,10 @@ WIP: one in-progress phase.
 
 Status: `later` · `shaped` · `in progress` · `blocked` · `done` · `parked`
 
+## Notes
+
+Facts that hold across phases: hosts, the live version, owner priorities. One short line each.
+
 ## Later
 
 Unshaped only. A row becomes `shaped` when `/phase shape` has written its doc.

@@ -1,6 +1,6 @@
 ---
 name: phase
-description: Long-horizon phase board for the cwd repo. BOARD.md tracks phases, NOW.md points at the current slice, phase docs hold checkboxes and DoD. Modes: status (default), init, sync, shape, advance slice|phase, map, prune, help. `map` writes docs/plans/map.json, the infra picture behind a live LAN board that re-renders as the plan changes. Use when the user runs /phase, asks where we are on the plan, or names BOARD.md / NOW.md. Replaces session-* / SESSION.md.
+description: Long-horizon phase board for the cwd repo. BOARD.md tracks phases, NOW.md points at the current slice, phase docs hold checkboxes and DoD. Modes: status (default), init, sync, shape, advance slice|phase, map, prune, help. Status and sync reports re-orient you after a gap: where you are, what landed, what needs you (with context and a recommendation), and what is next. `map` writes docs/plans/map.json, the infra picture behind a live LAN board that re-renders as the plan changes. Use when the user runs /phase, asks where we are on the plan, or names BOARD.md / NOW.md. Replaces session-* / SESSION.md.
 user-invocable: true
 argument-hint: "[status|init|sync|shape|advance [slice|phase]|map|prune|help]"
 ---
@@ -111,16 +111,16 @@ Do not run that command.
 Read only.
 
 1. If BOARD is missing, tell the user to run `/phase init`. Stop.
-2. Read NOW (if present), then BOARD, then **only** the current phase doc, then
-   last ~10 commits and the dirty tree. Do not read `archive/` or every phase
-   doc. Do not treat `ROADMAP.md` as Next.
-3. Brief in a few lines: Phase, Slice, Blocked, open decisions (the count from
-   the phase doc's `## Open decisions`, with their ids), next `shaped` row (or
-   `none`). Mention dirty files in the **reply** only.
+2. Run `python3 -I <skill-dir>/scripts/progress.py <repo>`. It prints the counts, the bar, the
+   next open items, the decisions with their lines, the side track, the next planned phase, and
+   the recent commits. Then read NOW, BOARD, and the lines of the current phase doc that it points
+   to. Do not read `archive/` or every phase doc. Do not treat `ROADMAP.md` as Next.
+3. Write the report in the shape of [references/report.md](references/report.md) §Status, with
+   its wording rules. Mention dirty files in the **reply** only.
 4. Stale: commits after NOW `Updated`, or checkboxes that disagree with git →
    **stale → run `/phase sync`**. Two `in progress` rows → say so; do not pick.
 5. Do not start the slice unless the user also said to continue.
-6. End with one line: the live board URL when `scripts/board-server.py list` shows this repo and
+6. Before the final next-step line, add one line: the live board URL when `scripts/board-server.py list` shows this repo and
    a running server. Otherwise: *"Reply `page` for the board on your LAN."* When the user replies
    `page`, run `scripts/render-board.py <repo> <scratchpad>/phase/<repo>`, then serve that folder
    with `../serve-page/SKILL.md` §3 (relative to this skill's folder, resolved with `readlink -f`).
@@ -132,7 +132,8 @@ Read only.
 Rewrite NOW and the active phase checkboxes. Do not append. Do not close a phase.
 
 1. If BOARD is missing, tell the user to run `/phase init`. Stop.
-2. Set NOW and BOARD `Updated` to today.
+2. Set NOW and BOARD `Updated` to today. Rewrite NOW to the short lines in
+   [references/report.md](references/report.md) §NOW.md stays short, and move the rest out.
 3. Tick checkboxes that actually landed (git + this conversation). Do not tick
    the rest. Adjust NOW `Slice` to the first remaining unchecked slice (or
    `none`). Refresh NOW `Blocked` and the in-progress board `Note`.
@@ -147,6 +148,8 @@ Rewrite NOW and the active phase checkboxes. Do not append. Do not close a phase
 4. Do not change a row's status to `done` (that is `advance phase`). Do not
    append the log. Do not prune Later. Do not keep implementing unless the user asked.
 5. Refresh the map ([references/map.md](references/map.md) §3).
+6. Run `scripts/progress.py <repo>`, and report in the shape of
+   [references/report.md](references/report.md) §Sync. When nothing changed, the report is one line.
 
 ## Shape
 
